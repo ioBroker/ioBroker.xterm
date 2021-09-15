@@ -1,0 +1,14 @@
+/**/*
+/gulpfile.js
+gulpfile.js
+!/admin/**/*
+!/admin/*
+!/lib/**/*
+!/lib/*
+!/public/**/*
+!/public/*
+!/io-package.json
+!/package.json
+!/LICENSE
+!/README.md
+!/main.js

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+
+    <link rel="stylesheet" href="./xterm.css" />
+    <script src="./xterm.js"></script>
+    <script src="./xterm-addon-fit.js"></script>
+    <style>
+        html, body {
+            width:  100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        #terminal {
+            width: calc(100% - 8px);
+            height: calc(100% - 8px);
+            overflow: hidden;
+        }
+        .disconnected {
+            opacity: 0.2;
+        }
+    </style>
+</head>
+<body>
+<div id="terminal"></div>
+<script>
+    var resizeTimeout;
+    var ws;
+    var connectTimer;
+    var connectingTimeout;
+    var terminalDiv = document.getElementById('terminal');
+    var currentLine = '';
+    var isExecuting = false;
+    var entries = [];
+    var completion = {};
+    var cmdHistory = window.localStorage.getItem('xterm.history') || '[]';
+    var historyPosition = -1;
+    var copied = '';
+
+    try {
+        cmdHistory = JSON.parse(cmdHistory);
+    } catch (e) {
+        cmdHistory = [];
+    }
+
+    function findOption() {
+        if (!completion || !completion.options) {
+            return '';
+        } else {
+            if (completion.lastSearch === currentLine) {
+                completion.index++;
+                if (completion.index >= completion.filteredOptions.length) {
+                    completion.index = 0;
+                }
+                return completion.filteredOptions[completion.index] || '';
+            } else {
+                const word = currentLine.split(' ').pop();
+                completion.filteredOptions = completion.options.filter(a => a.startsWith(word));
+                completion.lastSearch = currentLine;
+                completion.index = 0;
+                return completion.filteredOptions[completion.index] || '';
+            }
+        }
+    }
+
+    function reconnect(noWait) {
+        terminalDiv.className = 'disconnected';
+        isExecuting = false;
+
+        connectTimer = connectTimer || setTimeout(() => {
+            connectTimer = null;
+            connectingTimeout && clearTimeout(connectingTimeout);
+            connectingTimeout = setTimeout(() => {
+                console.log('Connect timeout');
+                reconnect();
+            }, 5000);
+
+            ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:${window.location.port}`);
+            ws.onopen = function (event) {
+                connectingTimeout && clearTimeout(connectingTimeout);
+                connectingTimeout = null;
+                //ws.send(JSON.stringify({method: 'prompt'}));
+                console.log('Connected')
+                terminalDiv.className = '';
+            };
+
+            ws.onerror = function (error) {
+                console.error('Cannot connect: ' + error);
+                try {
+                    ws.close();
+                    ws = null;
+                } catch (e) {
+
+                }
+
+                reconnect();
+            };
+
+            ws.onclose = function (event) {
+                try {
+                    ws.close();
+                    ws = null;
+                } catch (e) {
+
+                }
+                reconnect();
+            };
+
+            // Receive data from socket
+            ws.onmessage = msg => {
+                msg = JSON.parse(msg.data);
+                if (msg.isExecuting !== undefined) {
+                    isExecuting = msg.isExecuting;
+                    if (!isExecuting) {
+                        currentLine = '';
+                    }
+                }
+                if (msg.completion) {
+                    completion = {options: msg.completion};
+                    processTab();
+                }
+
+                if (msg.data !== undefined) {
+                    if (msg.error) {
+                        term.write('\r\n' + msg.data);
+                    } else {
+                        term.write('\r\n' + msg.data);
+                    }
+                }
+
+                if (msg.prompt === true) {
+                    term.write('\r\nweb shell $ ');
+                    currentLine = '';
+                } else if (msg.prompt) {
+                    term.write('\r\n' + msg.prompt + ' ');
+                    currentLine = '';
+                }
+            };
+        }, noWait ? 0 : 5000);
+    }
+
+    var term = new Terminal({
+        cursorBlink: 'block',
+        width: '100%',
+        height: '100%',
+        convertEol: true,
+        rendererType: 'dom',
+    });
+
+    terminalDiv.className = 'disconnected';
+
+    terminalDiv.addEventListener('contextmenu', event => {
+        event.preventDefault();
+
+        if (term.hasSelection()) {
+            copied = term.getSelection();
+            document.execCommand('copy');
+            term.select(0, 0, 0)
+        } else {
+            window.navigator.clipboard.readText()
+                .then(clipText => {
+                    //document.execCommand('paste');
+                    currentLine += clipText;
+                    term.write(clipText);
+                })
+        }
+    });
+
+    var fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+
+    term.open(terminalDiv);
+
+    fitAddon.fit();
+
+    term.prompt = () => {
+        if (currentLine) {
+            let data = { method: 'command', command: currentLine };
+            ws.send(JSON.stringify(data));
+        }
+    };
+
+    function replaceCurrentInput(newText) {
+        if (currentLine) {
+            term.write(Array(currentLine.length + 1).join('\b \b'));
+        }
+        currentLine = newText;
+        term.write(currentLine);
+    }
+
+    function processTab() {
+        // remove actual tab text
+        if (completion.inputLength) {
+            var toDelete = currentLine.length - completion.inputLength;
+            currentLine = currentLine.substring(0, completion.inputLength);
+            term.write(Array(toDelete + 1).join('\b \b'));
+        }
+
+        var line = findOption();
+        // remove actual text
+        if (line) {
+            completion.inputLength = currentLine.length;
+            var words = currentLine.split(' ');
+            var lastWord = words.pop();
+            var addedText = line.substring(lastWord.length);
+            currentLine += addedText;
+            term.write(addedText);
+        }
+    }
+
+    term.onKey(function (key) {
+        if (isExecuting) {
+            term.write(key.key);
+            return ws.send(JSON.stringify({ method: 'key', key: key.key }));
+        }
+        if (key.domEvent.key === 'Tab') {
+            if (!completion || !completion.options) {
+                ws.send(JSON.stringify({ method: 'tab' }));
+            } else {
+                processTab();
+            }
+        } else
+        // UP
+        if (key.domEvent.key === 'ArrowUp') {
+            if (historyPosition < cmdHistory.length - 1) {
+                historyPosition++;
+                replaceCurrentInput(cmdHistory[historyPosition]);
+            }
+        }  else
+        // Down
+        if (key.domEvent.key === 'ArrowDown') {
+            if (historyPosition > 0) {
+                historyPosition--;
+                replaceCurrentInput(cmdHistory[historyPosition]);
+            }
+        } else
+        //Enter
+        if (key.domEvent.key === 'Enter') {
+            completion = null;
+            if (currentLine) {
+                historyPosition = -1;
+                cmdHistory.unshift(currentLine);
+                window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
+                entries.push(currentLine);
+                term.write('\r\n');
+                term.prompt();
+            }
+        } else if (key.domEvent.key === 'Backspace') {
+            completion = null;
+            // Backspace
+            if (currentLine) {
+                currentLine = currentLine.slice(0, currentLine.length - 1);
+                term.write('\b \b');
+            }
+        } else {
+            historyPosition = -1;
+            completion = null;
+            currentLine += key.key;
+            term.write(key.key);
+        }
+    });
+
+    window.addEventListener('resize', function () {
+        resizeTimeout && clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function () {
+            resizeTimeout = null;
+            fitAddon.fit();
+        });
+    }, true);
+
+    reconnect(true);
+</script>
+</body>
+</html>

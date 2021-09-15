@@ -1,0 +1,108 @@
+{
+    "common": {
+        "name": "xterm",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "首次出版"
+            }
+        },
+        "title": "Shell console",
+        "titleLang": {
+            "en": "Shell console",
+            "de": "Shell-Konsole",
+            "ru": "Консоль оболочки",
+            "pt": "Console shell",
+            "nl": "Shell-console",
+            "fr": "Console coque",
+            "it": "Console shell",
+            "es": "Consola de Shell",
+            "pl": "Konsola powłoki",
+            "zh-cn": "外壳控制台"
+        },
+        "desc": {
+            "en": "This adapter allows to execute shell commands on ioBroker host.",
+            "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
+            "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
+            "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
+            "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
+            "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
+            "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
+            "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
+            "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
+            "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
+        },
+        "authors": [
+            "ioBroker <dogafox@gmail.com>"
+        ],
+        "keywords": [
+            "terminal",
+            "ssh"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "main": "main.js",
+        "icon": "xterm.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/bluefox <dogafox@gmail.com>/ioBroker.xterm/master/admin/xterm.png",
+        "readme": "https://github.com/bluefox <dogafox@gmail.com>/ioBroker.xterm/blob/master/README.md",
+        "loglevel": "info",
+        "mode": "daemon",
+        "type": "utility",
+        "compact": true,
+        "materialize": true,
+        "adminUI": {
+            "config": "json"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=1.4.2"
+            }
+        ]
+    },
+    "native": {
+        "bind": "0.0.0.0",
+        "port": "8099",
+        "secure": false,
+        "auth": true,
+        "certPublic": "",
+        "certPrivate": "",
+        "certChained": "",
+        "leEnabled": false,
+        "leUpdate": false,
+        "lePort": 80
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}

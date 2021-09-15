@@ -59,7 +59,10 @@
         "mode": "daemon",
         "type": "utility",
         "compact": true,
-        "materialize": true,
+        "localLinks": {"_default": "%protocol%://%ip%:%port%"},
+        "adminTab": {
+            "link": "%protocol%://%ip%:%port%"
+        },
         "adminUI": {
             "config": "json"
         },

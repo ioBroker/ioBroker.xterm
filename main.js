@@ -100,11 +100,12 @@ function startAdapter(options) {
                     } catch (e) {
                         // ignore
                     }
-
-                    callback();
+                    adapter.setForeignStateChangedAsync('info.connection', 0, true)
+                        .then(() => callback());
                 }, 300);
             } catch (e) {
-                callback();
+                adapter.setForeignStateChangedAsync('info.connection', 0, true)
+                    .then(() => callback());
             }
         },
     }));
@@ -161,8 +162,7 @@ function cd(thePath, ws) {
             const parts = ws.__iobroker.cwd.split('/');
             parts.length > 1 && parts.pop();
             ws.__iobroker.cwd = parts.join('/');
-        }
-
+        } else
         if (thePath.match(/^\W:/) || thePath.startsWith('/')) {
             // full path
             if (isDirectory(thePath)) {
@@ -312,7 +312,7 @@ function initSocketConnection(ws) {
         return;
     }
     connectedCounter++;
-    adapter.setState('info.connection', true, true);
+    adapter.setState('info.connection', connectedCounter, true);
 
     ws.on('message', message => {
         // console.log('received: %s', message);
@@ -423,9 +423,7 @@ function initSocketConnection(ws) {
 
         connectedCounter && connectedCounter--;
         console.log('disconnected');
-        if (!connectedCounter) {
-            adapter.setState('info.connection', false, true);
-        }
+        adapter.setState('info.connection', connectedCounter, true);
     });
 
     ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
@@ -566,6 +564,7 @@ function initWebServer(settings) {
 }
 
 async function main() {
+    await adapter.setForeignStateChangedAsync('info.connection', 0, true);
     adapter.config.encoding = adapter.config.encoding || 'utf-8';
     server = initWebServer(adapter.config);
 }

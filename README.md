@@ -30,7 +30,7 @@ If the authentication is enabled, only ioBroker "admin" user can log in.
 -->
 
 ## Changelog
-### 0.0.2 (2021-09-16)
+### __WORK IN PROGRESS__
 * (ioBroker) first working release
 
 ### 0.0.1

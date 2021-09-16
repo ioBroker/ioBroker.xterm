@@ -124,11 +124,11 @@
             "type": "state",
             "common": {
                 "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
+                "name": "Number or connected clients",
+                "type": "number",
                 "read": true,
                 "write": false,
-                "def": false
+                "def": 0
             },
             "native": {}
         }

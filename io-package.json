@@ -89,7 +89,12 @@
             "sentry": {
                 "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
             }
-        }
+        },
+        "globalDependencies": [
+            {
+                "admin": ">=5.1.0"
+            }
+        ]
     },
     "native": {
         "bind": "0.0.0.0",

@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "xterm",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "news": {
+            "0.0.3": {
+                "en": "first working release",
+                "de": "erste Arbeitsversion",
+                "ru": "первый рабочий релиз",
+                "pt": "primeiro lançamento de trabalho",
+                "nl": "eerste werkende release",
+                "fr": "première version de travail",
+                "it": "prima versione funzionante",
+                "es": "primer lanzamiento de trabajo",
+                "pl": "pierwsze wydanie robocze",
+                "zh-cn": "第一个工作版本"
+            },
             "0.0.2": {
                 "en": "first working release",
                 "de": "erste Arbeitsversion",

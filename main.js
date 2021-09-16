@@ -7,6 +7,7 @@ const fs       = require('fs');
 const path     = require('path');
 const express  = require('express');
 const LE       = require(utils.controllerDir + '/lib/letsencrypt.js');
+const iconv    = require('iconv-lite');
 
 const locationXterm = require.resolve('xterm').replace(/\\/g, '/');
 const locationXtermFit = require.resolve('xterm-addon-fit').replace(/\\/g, '/');
@@ -28,6 +29,30 @@ const files = {
 let adapter;
 let server;
 let connectedCounter = 0;
+const bruteForce = {};
+const IOB_DIR = findIoBrokerDirectory();
+
+function findIoBrokerDirectory() {
+    const dir = utils.controllerDir.replace(/\\/g, '/');
+    const parts = dir.split('/');
+    let pos = parts.indexOf('iobroker');
+    if (pos === -1) {
+        pos = parts.indexOf('iob');
+    }
+    if (pos === -1) {
+        pos = parts.indexOf('node_modules');
+        if (pos === -1) {
+            parts.pop();
+            return parts.join('/');
+        } else {
+            parts.splice(pos - 1);
+            return parts.join('/');
+        }
+    } else {
+        parts.splice(pos);
+        return parts.join('/');
+    }
+}
 
 /**
  * Starts the adapter instance
@@ -92,24 +117,28 @@ function executeCommand(command, ws, cb) {
     } catch (e) {
         return e;
     }*/
-    const ls = exec(command);
+    ws.__iobroker.encoding = '';
+    const ls = exec(command, ws.__iobroker);
     ls.stdout.on('data', data => {
-        ws.send(JSON.stringify({data, error: true}));
+        data = iconv.decode(data, adapter.config.encoding);
+        ws.send(JSON.stringify({data}));
     });
 
     ls.stderr.on('data', data => {
-        console.log('stderr: ' + data.toString());
+        data = iconv.decode(data, adapter.config.encoding);
+        adapter.log.error('stderr: ' + data);
         ws.send(JSON.stringify({data, error: true}));
     });
 
     ls.on('exit', code => {
         ws._stdin = null;
         ws._process = null;
-        console.log('child process exited with code ' + (code === null ? 'null' : code.toString()));
-        cb && cb(code);
+        console.log(`child process exited with code ${code === null ? 'null' : code.toString()}`);
+        // wait for the outputs
+        cb && setTimeout(() => cb(code), 100);
     });
 
-    ls.stdin.setEncoding('utf8');
+    //ls.stdin.setEncoding('utf8');
 
     ws._stdin = ls.stdin;
     ws._process = ls;
@@ -119,33 +148,50 @@ function isDirectory(thePath) {
     return fs.existsSync(thePath) && fs.statSync(thePath).isDirectory();
 }
 
-function cd(thePath) {
-    thePath = thePath.trim();
+function cd(thePath, ws) {
+    thePath = thePath.trim().replace(/\\/g, '/');
+
     if (!thePath) {
-        thePath = HOME_DIRECTORY;
+        thePath = ws.__iobroker.cwd;
     }
     if (thePath) {
-        if (isDirectory(thePath)) {
-            try {
-                process.chdir(thePath);
-            } catch (e) {
+        if (thePath === '.') {
+            // do not change anything
+        } else if (thePath === '..') {
+            const parts = ws.__iobroker.cwd.split('/');
+            parts.length > 1 && parts.pop();
+            ws.__iobroker.cwd = parts.join('/');
+        }
+
+        if (thePath.match(/^\W:/) || thePath.startsWith('/')) {
+            // full path
+            if (isDirectory(thePath)) {
+                ws.__iobroker.cwd = thePath;
+            } else {
                 return {
-                    data: `cd ${thePath}: Unable to change directory`
+                    data: `cd ${thePath}: No such directory`
                 };
             }
         } else {
-            return {
-                data: `cd ${thePath}: No such directory`
-            };
+            // add to current
+            thePath = path.join(ws.__iobroker.cwd, thePath).replace(/\\/g, '/');
+            if (isDirectory(thePath)) {
+                ws.__iobroker.cwd = thePath;
+            } else {
+                return {
+                    data: `cd ${thePath}: No such directory`
+                };
+            }
         }
     }
-    return true;
+
+    return ws.__iobroker.cwd.includes('/') ? ws.__iobroker.cwd : ws.__iobroker.cwd + '/';
 }
 
-function completion(pattern) {
+function completion(pattern, ws) {
     let scanPath = '';
     let completionPrefix = '';
-    let completion = [];
+    let data = [];
 
     if (pattern) {
         if (!isDirectory(pattern)) {
@@ -155,36 +201,35 @@ function completion(pattern) {
         if (pattern) {
             if (isDirectory(pattern)) {
                 scanPath = completionPrefix = pattern;
-                if (completionPrefix.substr(-1) !== '/') {
+                if (completionPrefix.endsWith('/')) {
                     completionPrefix += '/';
                 }
             }
         } else {
-            scanPath = process.cwd();
+            scanPath = ws.__iobroker.cwd;
         }
     } else {
-        scanPath = process.cwd();
+        scanPath = ws.__iobroker.cwd;
     }
 
     if (scanPath) {
         // Loading directory listing
-        completion = fs.readdirSync(scanPath);
-        completion.sort(String.naturalCompare);
+        data = fs.readdirSync(scanPath);
+        data.sort(String.naturalCompare);
 
         // Prefix
-        if (completionPrefix && completion.length > 0) {
-            completion = completion.map(c => completionPrefix + c);
+        if (completionPrefix && data.length > 0) {
+            data = data.map(c => completionPrefix + c);
         }
         // Pattern
-        if (pattern && completion.length > 0) {
-            completion = completion.filter(c => pattern === c.substr(0, pattern.length));
+        if (pattern && data.length > 0) {
+            data = data.filter(c => pattern === c.substr(0, pattern.length));
         }
     }
 
-    return completion;
+    return data;
 }
 
-let HOME_DIRECTORY = '';
 let cache = null;
 function auth(req, callback) {
     const str = req.headers.Authorization || req.headers.authorization;
@@ -196,22 +241,196 @@ function auth(req, callback) {
         return callback(false);
     }
     const data = Buffer.from(str.substring(6), 'base64').toString();
-    const [name, password] = data.split(':');
-    if (name !== 'admin' || !password) {
+    const [username, password] = data.split(':');
+
+    if (username !== 'admin' || !password) {
         cache = null;
         return callback(false);
     }
 
-    adapter.checkPassword('admin', password, result => {
+    if (bruteForce[username] && bruteForce[username].errors > 4) {
+        let minutes = Date.now() - bruteForce[username].time;
+        if (bruteForce[username].errors < 7) {
+            if (Date.now() - bruteForce[username].time < 60000) {
+                minutes = 1;
+            } else {
+                minutes = 0;
+            }
+        } else
+        if (bruteForce[username].errors < 10) {
+            if (Date.now() - bruteForce[username].time < 180000) {
+                minutes = Math.ceil((180000 - minutes) / 60000);
+            } else {
+                minutes = 0;
+            }
+        } else
+        if (bruteForce[username].errors < 15) {
+            if (Date.now() - bruteForce[username].time < 600000) {
+                minutes = Math.ceil((600000 - minutes) / 60000);
+            } else {
+                minutes = 0;
+            }
+        } else
+        if (Date.now() - bruteForce[username].time < 3600000) {
+            minutes = Math.ceil((3600000 - minutes) / 60000);
+        } else {
+            minutes = 0;
+        }
+
+        if (minutes) {
+            return callback(false, `Too many errors. Try again in ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}.`);
+        }
+    }
+
+    adapter.checkPassword(username, password, result => {
         if (result) {
             cache = {data: str, ts: Date.now()};
+            if (bruteForce[username]) {
+                delete bruteForce[username];
+            }
         } else {
-            // TODO: ADD brute force protection
             cache = null;
+            bruteForce[username] = bruteForce[username] || {errors: 0};
+            bruteForce[username].time = Date.now();
+            bruteForce[username].errors++;
         }
 
         callback(result);
     });
+}
+
+function initSocketConnection(ws) {
+    ws.__iobroker = {
+        cwd: IOB_DIR,
+        env: JSON.parse(JSON.stringify(process.env)),
+        encoding: 'buffer'
+    };
+
+    if (adapter.config.auth && !ws._socket.___auth) {
+        ws.close();
+        adapter.log.error('Cannot establish socket connection as no credentials found!');
+        return;
+    }
+    connectedCounter++;
+    adapter.setState('info.connection', true, true);
+
+    ws.on('message', message => {
+        // console.log('received: %s', message);
+        message = JSON.parse(message);
+        if (message.method === 'prompt') {
+            ws.send(JSON.stringify({
+                data: '',
+                prompt: ws.__iobroker.cwd + '>',
+            }));
+        } else
+        if (message.method === 'key') {
+            if (message.key === '\u0003' && ws._process && ws._process.kill) {
+                ws._process.kill();
+            } else if (ws._stdin) {
+                ws._stdin.write(message.key, adapter.config.encoding);
+            }
+        } else
+        if (message.method === 'tab') {
+            const str = completion(message.start, ws);
+            ws.send(JSON.stringify({completion: str}));
+        } else
+        if (message.method === 'command') {
+            if (!ws._isExecuting) {
+                if (!message.command) {
+                    ws.send(JSON.stringify({
+                        prompt: ws.__iobroker.cwd + '>',
+                    }));
+                    return;
+                }
+                // fix user typo
+                if (message.command === 'cd..') {
+                    message.command === 'cd ..';
+                } else if (message.command === 'cd') {
+                    message.command === 'cd .';
+                }
+
+                if (message.command.startsWith('cd ')) {
+                    const result = cd(message.command.substring(3), ws);
+                    if (typeof result === 'string') {
+                        ws.send(JSON.stringify({
+                            data: '',
+                            prompt: result + '>',
+                        }));
+                    } else {
+                        result.prompt = ws.__iobroker.cwd + '>';
+                        ws.send(JSON.stringify(result));
+                    }
+                } else if (message.command === 'set' || message.command === 'env') {
+                    const result = {
+                        prompt: ws.__iobroker.cwd + '>',
+                        data: Object.keys(ws.__iobroker.env).map(v => `${v}=${ws.__iobroker.env[v]}`).sort().join('\r\n')
+                    };
+                    ws.send(JSON.stringify(result));
+                } else if (message.command === 'set' || message.command === 'export') {
+                    const result = {
+                        prompt: ws.__iobroker.cwd + '>',
+                        data: Object.keys(ws.__iobroker.env).map(v => `declare -x ${v}="${ws.__iobroker.env[v]}"`).sort().join('\r\n')
+                    };
+                    ws.send(JSON.stringify(result));
+                } else
+                if (message.command.startsWith('set ') || message.command.startsWith('export ')) {
+                    const result = {
+                        prompt: ws.__iobroker.cwd + '>',
+                    };
+                    let [name, val] = message.command.split('=', 2);
+
+                    if (name !== undefined) {
+                        name = name.trim();
+                        name = name.split(' ').pop();
+                    }
+                    if (val !== undefined) {
+                        val = val.trim().replace(/^"/, '').replace(/"$/, '');
+                        ws.__iobroker.env[name] = val;
+                    }
+
+                    ws.send(JSON.stringify(result));
+                } else {
+                    ws._isExecuting = true;
+                    ws.send(JSON.stringify({isExecuting: true}));
+
+                    if (message.command === 'node') {
+                        message.command += ' -i';
+                    }
+
+                    executeCommand(message.command, ws, code => {
+                        ws._isExecuting = false;
+                        ws.send(JSON.stringify({
+                            prompt: ws.__iobroker.cwd + '>',
+                            isExecuting: false,
+                            exitCode: code
+                        }));
+                    });
+                }
+            }
+        }
+    });
+
+    ws.on('close', function () {
+        if (ws && ws._process) {
+            try {
+                ws._process.kill();
+            } catch (e) {
+                // ignore
+            }
+            ws._process = null;
+            ws._stdin = null;
+        }
+
+        connectedCounter && connectedCounter--;
+        console.log('disconnected');
+        if (!connectedCounter) {
+            adapter.setState('info.connection', false, true);
+        }
+    });
+
+    ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
+
+    console.log('connected');
 }
 
 //settings: {
@@ -247,12 +466,16 @@ function initWebServer(settings) {
 
             if (adapter.config.auth) {
                 server.app.use((req, res, next) => {
-                    auth(req, result => {
+                    auth(req, (result, text) => {
                         if (result) {
                             next();
                         } else {
-                            res.set('WWW-Authenticate', 'Basic realm="xterm"');
-                            res.status(401).send('Unauthorized');
+                            if (text) {
+                                res.status(429).send(text);
+                            } else {
+                                res.set('WWW-Authenticate', 'Basic realm="xterm"');
+                                res.status(401).send('Unauthorized');
+                            }
                         }
                     });
                 });
@@ -332,90 +555,7 @@ function initWebServer(settings) {
 
             server.io = new ws.Server ({ noServer: true });
 
-            server.io.on('connection', ws => {
-                if (adapter.config.auth && !ws._socket.___auth) {
-                    ws.close();
-                    adapter.log.error('Cannot establish socket connection as no credentials found!');
-                    return;
-                }
-                connectedCounter++;
-                adapter.setState('info.connection', true, true);
-
-                ws.on('message', message => {
-                    console.log('received: %s', message);
-                    message = JSON.parse(message);
-                    if (message.method === 'prompt') {
-                        ws.send(JSON.stringify({
-                            data: '',
-                            prompt: process.cwd() + '>',
-                        }));
-                    } else
-                    if (message.method === 'key') {
-                        if (message.key === '\u0003' && ws._process && ws._process.kill) {
-                            ws._process.kill();
-                        } else if (ws._stdin) {
-                            ws._stdin.write(message.key, 'utf8');
-                        }
-                    } else
-                    if (message.method === 'tab') {
-                        const str = completion(message.start);
-                        ws.send(JSON.stringify({completion: str}));
-                    } else
-                    if (message.method === 'command') {
-                        if (message.command.startsWith('cd ')) {
-                            const result = cd(message.command.substring(3));
-                            if (result === true) {
-                                ws.send(JSON.stringify({
-                                    data: '',
-                                    prompt: process.cwd() + '>',
-                                }));
-                            } else {
-                                result.prompt = process.cwd() + '>';
-                                ws.send(JSON.stringify(result));
-                            }
-                        } else if (message.command && !ws._isExecuting) {
-                            ws._isExecuting = true;
-                            ws.send(JSON.stringify({isExecuting: true}));
-
-                            if (message.command === 'node') {
-                                message.command += ' -i';
-                            }
-
-                            executeCommand(message.command, ws, code => {
-                                ws._isExecuting = false;
-                                ws.send(JSON.stringify({
-                                    prompt: process.cwd() + '>',
-                                    isExecuting: false,
-                                }));
-                            });
-                        }
-                    }
-                });
-
-                ws.on('close', function () {
-                    if (ws && ws._process) {
-                        try {
-                            ws._process.kill();
-                        } catch (e) {
-                            // ignore
-                        }
-                        ws._process = null;
-                        ws._stdin = null;
-                    }
-
-                    connectedCounter && connectedCounter--;
-                    console.log('disconnected');
-                    if (!connectedCounter) {
-                        adapter.setState('info.connection', false, true);
-                    }
-                });
-
-                ws.send(JSON.stringify({
-                    prompt: process.cwd() + '>',
-                }));
-
-                console.log('connected');
-            });
+            server.io.on('connection', initSocketConnection);
         });
     } else {
         adapter.log.error('port missing');
@@ -426,6 +566,7 @@ function initWebServer(settings) {
 }
 
 async function main() {
+    adapter.config.encoding = adapter.config.encoding || 'utf-8';
     server = initWebServer(adapter.config);
 }
 

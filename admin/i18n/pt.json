@@ -1,0 +1,20 @@
+{
+  "Main settings": "Configurações principais",
+  "Port": "Porta",
+  "Secure(HTTPS)": "Seguro (HTTPS)",
+  "Authentication": "Autenticação",
+  "Public certificate": "Certificado público",
+  "Private certificate": "Certificado privado",
+  "Chained certificate": "Certificado acorrentado",
+  "Terminal encoding": "Codificação terminal",
+  "Read about Let's Encrypt certificates": "Leia sobre Let's Encrypt certificados",
+  "Use Let's Encrypt certificates": "Use Let's Encrypt certificados",
+  "Use this instance for automatic update": "Use esta instância para atualização automática",
+  "Port to check the domain": "Porta para verificar o domínio",
+  "Disable authentication": "Desativar autenticação",
+  "Ignore warning": "Ignorar aviso",
+  "Warning!": "Aviso!",
+  "Unsecure_Auth": "A senha será enviada sem criptografia por meio de uma conexão não segura. Para proteger suas senhas, habilite a conexão segura (HTTPS)!",
+  "Let's Encrypt SSL": "Let's Encrypt SSL",
+  "IP": "Interface de IP local"
+}

@@ -11,18 +11,27 @@
 [![NPM](https://nodei.co/npm/iobroker.xterm.png?downloads=true)](https://nodei.co/npm/iobroker.xterm/)
 
 ## xterm adapter for ioBroker
-This adapter allows executing shell commands on ioBroker host.
+This adapter allows executing shell commands on ioBroker host. It replaces the `ioBroker.terminal` adapter.
 
 Terminal server to open command line interface. 
 Please use it only for administration purposes.
 
 Based on xterm.js package. 
 
+If the authentication is enabled, only ioBroker "admin" user can log in.
+
 ## TODO
-- Brute force protection
-- Support of sessions (actually only one supported, because of current directory)
+- Ctrl + R (History)
+- More encoding pages. If you find code page that suits to your system, please create an issue. Possible coding pages could be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings). 
+
+<!--
+	Placeholder for the next version (at the beginning of the line):
+	### __WORK IN PROGRESS__
+-->
 
 ## Changelog
+### __WORK IN PROGRESS__
+* (ioBroker) first working release
 
 ### 0.0.1
 * (ioBroker) initial release

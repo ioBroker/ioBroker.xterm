@@ -1,0 +1,20 @@
+{
+  "Main settings": "Belangrijkste instellingen",
+  "Port": "Haven",
+  "Secure(HTTPS)": "Secure (HTTPS)",
+  "Authentication": "Authenticatie",
+  "Public certificate": "Openbaar certificaat",
+  "Private certificate": "Privé certificaat",
+  "Chained certificate": "Geketend certificaat",
+  "Terminal encoding": "Terminal-codering:",
+  "Read about Let's Encrypt certificates": "Lees over Let's Encrypt-certificaten",
+  "Use Let's Encrypt certificates": "Gebruik Let's Encrypt-certificaten",
+  "Use this instance for automatic update": "Gebruik deze instantie voor automatische update",
+  "Port to check the domain": "Poort om het domein te controleren",
+  "Disable authentication": "Verificatie uitschakelen",
+  "Ignore warning": "Negeer waarschuwing",
+  "Warning!": "Waarschuwing!",
+  "Unsecure_Auth": "Het wachtwoord wordt onversleuteld verzonden via een onbeveiligde verbinding. Schakel de beveiligde verbinding (HTTPS) in om uw wachtwoorden te beschermen!",
+  "Let's Encrypt SSL": "Let's Encrypt SSL",
+  "IP": "Lokale IP-interface"
+}

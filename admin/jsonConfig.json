@@ -78,6 +78,20 @@
           "sm": 12,
           "md": 6,
           "lg": 2
+        },
+        "encoding": {
+          "sm": 12,
+          "md": 6,
+          "lg": 2,
+          "newLine": true,
+          "type": "select",
+          "label": "Terminal encoding",
+          "noTranslation": true,
+          "options": [
+            {"label": "utf-8", "value": "utf-8"},
+            {"label": "cp850 - german", "value": "cp850"},
+            {"label": "cp1251 - russin", "value": "cp1251"}
+          ]
         }
       }
     },
@@ -109,7 +123,7 @@
         "leEnabled": {
           "newLine": true,
           "type": "checkbox",
-          "label": "Use Lets Encrypt certificates"
+          "label": "Use Let's Encrypt certificates"
         },
         "leUpdate": {
           "newLine": true,

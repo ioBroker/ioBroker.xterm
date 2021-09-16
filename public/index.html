@@ -55,7 +55,7 @@
                 }
                 return completion.filteredOptions[completion.index] || '';
             } else {
-                const word = currentLine.split(' ').pop();
+                var word = currentLine.split(' ').pop();
                 completion.filteredOptions = completion.options.filter(a => a.startsWith(word));
                 completion.lastSearch = currentLine;
                 completion.index = 0;
@@ -122,10 +122,18 @@
                 }
 
                 if (msg.data !== undefined) {
-                    if (msg.error) {
-                        term.write('\r\n' + msg.data);
+                    if (isExecuting) {
+                        if (msg.error) {
+                            term.write(msg.data); // TODO: change color
+                        } else {
+                            term.write(msg.data);
+                        }
                     } else {
-                        term.write('\r\n' + msg.data);
+                        if (msg.error) {
+                            term.write('\r\n' + msg.data); // TODO: change color
+                        } else {
+                            term.write('\r\n' + msg.data);
+                        }
                     }
                 }
 
@@ -175,10 +183,8 @@
     fitAddon.fit();
 
     term.prompt = () => {
-        if (currentLine) {
-            let data = { method: 'command', command: currentLine };
-            ws.send(JSON.stringify(data));
-        }
+        var data = { method: 'command', command: currentLine };
+        ws.send(JSON.stringify(data));
     };
 
     function replaceCurrentInput(newText) {
@@ -243,9 +249,21 @@
                 cmdHistory.unshift(currentLine);
                 window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
                 entries.push(currentLine);
-                term.write('\r\n');
-                term.prompt();
             }
+            term.write('\r\n');
+
+            if (currentLine.trim() === 'cls') {
+                currentLine = '';
+                term.clear();
+            } else if (currentLine.trim() === 'history') {
+                currentLine = '';
+                term.write(cmdHistory.map((line, i) => ` ${(i + 1).toString().padStart(3)}  ${line}`).join('\r\n'));
+            } else if (currentLine.trim() === 'history -c') {
+                currentLine = '';
+                cmdHistory = [];
+                window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
+            }
+            term.prompt();
         } else if (key.domEvent.key === 'Backspace') {
             completion = null;
             // Backspace

@@ -1,0 +1,20 @@
+{
+  "Main settings": "Réglages principaux",
+  "Port": "Port",
+  "Secure(HTTPS)": "Sécurisé (HTTPS)",
+  "Authentication": "Authentification",
+  "Public certificate": "Certificat public",
+  "Private certificate": "Certificat privé",
+  "Chained certificate": "Certificat chaîné",
+  "Terminal encoding": "Codage des bornes",
+  "Read about Let's Encrypt certificates": "En savoir plus sur les certificats Let's Encrypt",
+  "Use Let's Encrypt certificates": "Utiliser les certificats Let's Encrypt",
+  "Use this instance for automatic update": "Utiliser cette instance pour la mise à jour automatique",
+  "Port to check the domain": "Port pour vérifier le domaine",
+  "Disable authentication": "Désactiver l'authentification",
+  "Ignore warning": "Ignorer l'avertissement",
+  "Warning!": "Avertissement!",
+  "Unsecure_Auth": "Le mot de passe sera envoyé non crypté via une connexion non sécurisée. Pour protéger vos mots de passe, activez la connexion sécurisée (HTTPS) !",
+  "Let's Encrypt SSL": "Let's Encrypt SSL",
+  "IP": "Interface IP locale"
+}

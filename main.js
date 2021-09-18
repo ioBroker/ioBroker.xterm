@@ -28,7 +28,7 @@ const files = {
  */
 let adapter;
 let server;
-let connectedCounter = 0;
+let connectedIPs = [];
 const bruteForce = {};
 const IOB_DIR = findIoBrokerDirectory();
 
@@ -100,11 +100,11 @@ function startAdapter(options) {
                     } catch (e) {
                         // ignore
                     }
-                    adapter.setForeignStateChangedAsync('info.connection', 0, true)
+                    adapter.setForeignStateChangedAsync('info.connection', '', true)
                         .then(() => callback());
                 }, 300);
             } catch (e) {
-                adapter.setForeignStateChangedAsync('info.connection', 0, true)
+                adapter.setForeignStateChangedAsync('info.connection', '', true)
                     .then(() => callback());
             }
         },
@@ -303,7 +303,8 @@ function initSocketConnection(ws) {
     ws.__iobroker = {
         cwd: IOB_DIR,
         env: JSON.parse(JSON.stringify(process.env)),
-        encoding: 'buffer'
+        encoding: 'buffer',
+        address: ws._socket.address().address,
     };
 
     if (adapter.config.auth && !ws._socket.___auth) {
@@ -311,8 +312,8 @@ function initSocketConnection(ws) {
         adapter.log.error('Cannot establish socket connection as no credentials found!');
         return;
     }
-    connectedCounter++;
-    adapter.setState('info.connection', connectedCounter, true);
+    !connectedIPs.includes(ws.__iobroker.address) && connectedIPs.push(ws.__iobroker.address);
+    adapter.setState('info.connection', connectedIPs.join(', '), true);
 
     ws.on('message', message => {
         // console.log('received: %s', message);
@@ -360,6 +361,12 @@ function initSocketConnection(ws) {
                         result.prompt = ws.__iobroker.cwd + '>';
                         ws.send(JSON.stringify(result));
                     }
+                } else if (message.command === 'pwd') {
+                    const result = {
+                        prompt: ws.__iobroker.cwd + '>',
+                        data: ws.__iobroker.cwd
+                    };
+                    ws.send(JSON.stringify(result));
                 } else if (message.command === 'set' || message.command === 'env') {
                     const result = {
                         prompt: ws.__iobroker.cwd + '>',
@@ -421,9 +428,11 @@ function initSocketConnection(ws) {
             ws._stdin = null;
         }
 
-        connectedCounter && connectedCounter--;
+        const pos = connectedIPs.indexOf(ws.__iobroker.address);
+        pos !== -1 && connectedIPs.splice(pos, 1);
         console.log('disconnected');
-        adapter.setState('info.connection', connectedCounter, true);
+        adapter.setState('info.connection', connectedIPs.join(', '), true);
+        delete ws.__iobroker;
     });
 
     ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
@@ -564,6 +573,12 @@ function initWebServer(settings) {
 }
 
 async function main() {
+    const obj = await adapter.getObjectAsync('info.connection');
+    if (obj.common.type !== 'string') {
+        obj.common.type = 'string';
+        await adapter.setObjectAsync(obj._id, obj);
+    }
+
     await adapter.setForeignStateChangedAsync('info.connection', 0, true);
     adapter.config.encoding = adapter.config.encoding || 'utf-8';
     server = initWebServer(adapter.config);

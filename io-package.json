@@ -77,8 +77,8 @@
         "main": "main.js",
         "icon": "xterm.png",
         "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/bluefox <dogafox@gmail.com>/ioBroker.xterm/master/admin/xterm.png",
-        "readme": "https://github.com/bluefox <dogafox@gmail.com>/ioBroker.xterm/blob/master/README.md",
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
+        "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
         "loglevel": "info",
         "mode": "daemon",
         "type": "utility",
@@ -137,7 +137,7 @@
             "common": {
                 "role": "indicator.connected",
                 "name": "Number or connected clients",
-                "type": "number",
+                "type": "string",
                 "read": true,
                 "write": false,
                 "def": 0

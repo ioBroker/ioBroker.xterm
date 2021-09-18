@@ -22,7 +22,8 @@ If the authentication is enabled, only ioBroker "admin" user can log in.
 
 ## TODO
 - Ctrl + R (History)
-- More encoding pages. If you find code page that suits to your system, please create an issue. Possible coding pages could be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings). 
+- More encoding pages. If you find code page that suits to your system, please create an issue. Possible coding pages could be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings).
+- Support more than one session (Tabs)
 
 <!--
 	Placeholder for the next version (at the beginning of the line):

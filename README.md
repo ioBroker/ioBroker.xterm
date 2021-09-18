@@ -38,7 +38,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
-### __WORK IN PROGRESS__
+### 0.2.0 (2021-09-18)
 * (bluefox) Added the real terminal (bash or cmd.exe) to simulated one
 
 ### 0.1.0 (2021-09-18)

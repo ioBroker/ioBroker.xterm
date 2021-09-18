@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "xterm",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "news": {
+            "0.2.0": {
+                "en": "Added the real terminal (bash or cmd.exe) to simulated one",
+                "de": "Das echte Terminal (bash oder cmd.exe) zum simulierten hinzugefügt",
+                "ru": "Добавлен реальный терминал (bash или cmd.exe) к имитируемому",
+                "pt": "Adicionado o terminal real (bash ou cmd.exe) para simular um",
+                "nl": "De echte terminal (bash of cmd.exe) toegevoegd aan de gesimuleerde",
+                "fr": "Ajout du vrai terminal (bash ou cmd.exe) à un simulé",
+                "it": "Aggiunto il terminale reale (bash o cmd.exe) a quello simulato",
+                "es": "Se agregó la terminal real (bash o cmd.exe) a una simulada",
+                "pl": "Dodano prawdziwy terminal (bash lub cmd.exe) do symulowanego",
+                "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
+            },
             "0.1.0": {
                 "en": "changed type of the connection state to \"string\"",
                 "de": "Typ des Verbindungsstatus in \"string\" geändert",

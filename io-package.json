@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "xterm",
-        "version": "0.0.3",
+        "version": "0.1.0",
         "news": {
+            "0.1.0": {
+                "en": "changed type of the connection state to \"string\"",
+                "de": "Typ des Verbindungsstatus in \"string\" geändert",
+                "ru": "изменен тип состояния подключения на \"строка\"",
+                "pt": "mudou o tipo de estado da conexão para \"string\"",
+                "nl": "type van de verbindingsstatus gewijzigd in \"string\"",
+                "fr": "changement du type de l'état de la connexion en \"chaîne\"",
+                "it": "modificato il tipo dello stato di connessione in \"stringa\"",
+                "es": "cambió el tipo de estado de conexión a \"cadena\"",
+                "pl": "zmieniono typ stanu połączenia na „string”",
+                "zh-cn": "将连接状态的类型更改为“字符串”"
+            },
             "0.0.3": {
                 "en": "first working release",
                 "de": "erste Arbeitsversion",

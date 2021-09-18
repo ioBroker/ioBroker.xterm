@@ -30,7 +30,7 @@ If the authentication is enabled, only ioBroker "admin" user can log in.
 -->
 
 ## Changelog
-### __WORK IN PROGRESS__
+### 0.1.0 (2021-09-18)
 * (bluefox) changed type of the connection state to "string" 
 
 ### 0.0.3 (2021-09-16)

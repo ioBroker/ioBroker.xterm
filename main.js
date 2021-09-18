@@ -8,6 +8,8 @@ const path     = require('path');
 const express  = require('express');
 const LE       = require(utils.controllerDir + '/lib/letsencrypt.js');
 const iconv    = require('iconv-lite');
+const os       = require('os');
+const pty      = require('node-pty');
 
 const locationXterm = require.resolve('xterm').replace(/\\/g, '/');
 const locationXtermFit = require.resolve('xterm-addon-fit').replace(/\\/g, '/');
@@ -100,11 +102,11 @@ function startAdapter(options) {
                     } catch (e) {
                         // ignore
                     }
-                    adapter.setForeignStateChangedAsync('info.connection', '', true)
+                    adapter.setStateChangedAsync('info.connection', '', true)
                         .then(() => callback());
                 }, 300);
             } catch (e) {
-                adapter.setForeignStateChangedAsync('info.connection', '', true)
+                adapter.setStateChangedAsync('info.connection', '', true)
                     .then(() => callback());
             }
         },
@@ -299,6 +301,29 @@ function auth(req, callback) {
     });
 }
 
+function startShell(ws) {
+    const shell = os.platform() === 'win32' ? 'cmd.exe' : 'bash';
+
+    if (!ws) {
+        return;
+    }
+
+    ws.__iobroker.ptyProcess = pty.spawn(shell, [], {
+        name: 'xterm-color-' + Date.now(),
+        cols: 80,
+        rows: 30,
+        cwd: IOB_DIR,
+        env: process.env,
+    });
+
+    ws.__iobroker.ptyProcess.onData(data =>
+        ws.send(JSON.stringify({data})));
+
+    ws.__iobroker.ptyProcess.onExit(() => {
+        ws.__iobroker && startShell(ws);
+    });
+}
+
 function initSocketConnection(ws) {
     ws.__iobroker = {
         cwd: IOB_DIR,
@@ -309,15 +334,20 @@ function initSocketConnection(ws) {
 
     if (adapter.config.auth && !ws._socket.___auth) {
         ws.close();
-        adapter.log.error('Cannot establish socket connection as no credentials found!');
-        return;
+        return adapter.log.error('Cannot establish socket connection as no credentials found!');
     }
+
+    adapter.config.pty && startShell(ws);
+
     !connectedIPs.includes(ws.__iobroker.address) && connectedIPs.push(ws.__iobroker.address);
     adapter.setState('info.connection', connectedIPs.join(', '), true);
 
     ws.on('message', message => {
         // console.log('received: %s', message);
         message = JSON.parse(message);
+        if (message.method === 'resize') {
+            ws.__iobroker.ptyProcess && ws.__iobroker.ptyProcess.resize(message.cols, message.rows);
+        } else
         if (message.method === 'prompt') {
             ws.send(JSON.stringify({
                 data: '',
@@ -325,7 +355,9 @@ function initSocketConnection(ws) {
             }));
         } else
         if (message.method === 'key') {
-            if (message.key === '\u0003' && ws._process && ws._process.kill) {
+            if (ws.__iobroker.ptyProcess) {
+                ws.__iobroker.ptyProcess.write(message.key);
+            } else if (message.key === '\u0003' && ws._process && ws._process.kill) {
                 ws._process.kill();
             } else if (ws._stdin) {
                 ws._stdin.write(message.key, adapter.config.encoding);
@@ -338,10 +370,7 @@ function initSocketConnection(ws) {
         if (message.method === 'command') {
             if (!ws._isExecuting) {
                 if (!message.command) {
-                    ws.send(JSON.stringify({
-                        prompt: ws.__iobroker.cwd + '>',
-                    }));
-                    return;
+                    return ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>',}));
                 }
                 // fix user typo
                 if (message.command === 'cd..') {
@@ -427,7 +456,13 @@ function initSocketConnection(ws) {
             ws._process = null;
             ws._stdin = null;
         }
-
+        if (ws && ws.__iobroker.ptyProcess) {
+            try {
+                ws.__iobroker.ptyProcess.kill();
+            } catch (e) {
+                // ignore
+            }
+        }
         const pos = connectedIPs.indexOf(ws.__iobroker.address);
         pos !== -1 && connectedIPs.splice(pos, 1);
         console.log('disconnected');
@@ -435,7 +470,8 @@ function initSocketConnection(ws) {
         delete ws.__iobroker;
     });
 
-    ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
+    ws.send(JSON.stringify({mode: adapter.config.pty ? 'pty' : 'simulate'}));
+    !adapter.config.pty && ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
 
     console.log('connected');
 }

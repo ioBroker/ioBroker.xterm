@@ -79,10 +79,20 @@
           "md": 6,
           "lg": 2
         },
+        "pty": {
+          "newLine": true,
+          "type": "checkbox",
+          "label": "Use Bash or cmd.exe",
+          "help": "If unchecked, the shell will be simulated",
+          "sm": 12,
+          "md": 12,
+          "lg": 4
+        },
         "encoding": {
           "sm": 12,
           "md": 6,
           "lg": 2,
+          "hidden": "data.pty===true",
           "newLine": true,
           "type": "select",
           "label": "Terminal encoding",

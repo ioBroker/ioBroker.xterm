@@ -16,13 +16,20 @@ This adapter allows executing shell commands on ioBroker host. It replaces the `
 Terminal server to open command line interface. 
 Please use it only for administration purposes.
 
-Based on xterm.js package. 
+Based on xterm.js and node-pty packages. 
 
 If the authentication is enabled, only ioBroker "admin" user can log in.
 
+## Usage
+Adapter support 2 modes: 
+- Starts cmd.exe(windows) or bash(linux). On Linux the bash runs under `iobroker` user, and maybe you should switch to other user with more privilegs (via `su USER`).
+- Or simulate shell with node.js (You can activate this option if the first option does not work)
+
+Note: Some terminal commands with interactivity do not work. E.g. `nano` and some others.  
+
 ## TODO
-- Ctrl + R (History)
-- More encoding pages. If you find code page that suits to your system, please create an issue. Possible coding pages could be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings).
+- Simulation: Ctrl + R (History)
+- Simulation: More encoding pages. If you find code page that suits to your system, please create an issue. Possible coding pages could be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings).
 - Support more than one session (Tabs)
 
 <!--
@@ -31,6 +38,9 @@ If the authentication is enabled, only ioBroker "admin" user can log in.
 -->
 
 ## Changelog
+### __WORK IN PROGRESS__
+* (bluefox) Added the real terminal (bash or cmd.exe) to simulated one
+
 ### 0.1.0 (2021-09-18)
 * (bluefox) changed type of the connection state to "string" 
 

@@ -9,7 +9,7 @@ const express  = require('express');
 const LE       = require(utils.controllerDir + '/lib/letsencrypt.js');
 const iconv    = require('iconv-lite');
 const os       = require('os');
-const pty      = require('node-pty');
+let pty;
 
 const locationXterm = require.resolve('xterm').replace(/\\/g, '/');
 const locationXtermFit = require.resolve('xterm-addon-fit').replace(/\\/g, '/');
@@ -337,6 +337,14 @@ function initSocketConnection(ws) {
         return adapter.log.error('Cannot establish socket connection as no credentials found!');
     }
 
+    if (adapter.config.pty) {
+        try {
+            pty = pty || require('node-pty');
+        } catch (err) {
+            adapter.log.error(`node-pty was not installed, can not use bash/cmd.exe - fallback to simulated shell!`);
+            adapter.config.pty = false;
+        }
+    }
     adapter.config.pty && startShell(ws);
 
     !connectedIPs.includes(ws.__iobroker.address) && connectedIPs.push(ws.__iobroker.address);

@@ -41,10 +41,11 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 ## Changelog
 
 ### __WORK IN PROGRESS__
-* (Apollon77) Update all dependencies
-* (Apollon77) Add sentry for crash reporting
 * (Apollon77) Prevent some warnings in js-controller 3+
 * (Apollon77) Add Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!
+* (Apollon77) Rework info.connection status to show that server is connected also as green by using "none" to show that noone is connected
+* (Apollon77) Update all dependencies
+* (Apollon77) Add sentry for crash reporting
 
 ### 0.2.0 (2021-09-18)
 * (bluefox) Added the real terminal (bash or cmd.exe) to simulated one

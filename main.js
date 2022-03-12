@@ -102,11 +102,11 @@ function startAdapter(options) {
                     } catch (e) {
                         // ignore
                     }
-                    adapter.setStateChangedAsync('info.connection', '', true)
+                    adapter && adapter.setStateChangedAsync('info.connection', '', true)
                         .then(() => callback());
                 }, 300);
             } catch (e) {
-                adapter.setStateChangedAsync('info.connection', '', true)
+                adapter && adapter.setStateChangedAsync('info.connection', '', true)
                     .then(() => callback());
             }
         },
@@ -348,7 +348,7 @@ function initSocketConnection(ws) {
     adapter.config.pty && startShell(ws);
 
     !connectedIPs.includes(ws.__iobroker.address) && connectedIPs.push(ws.__iobroker.address);
-    adapter.setState('info.connection', connectedIPs.join(', '), true);
+    adapter.setState('info.connection', connectedIPs.join(', ') || 'none', true);
 
     ws.on('message', message => {
         // console.log('received: %s', message);
@@ -473,15 +473,15 @@ function initSocketConnection(ws) {
         }
         const pos = connectedIPs.indexOf(ws.__iobroker.address);
         pos !== -1 && connectedIPs.splice(pos, 1);
-        console.log('disconnected');
-        adapter.setState('info.connection', connectedIPs.join(', '), true);
+        adapter.log.debug('WebSocket connection disconnected');
+        adapter.setState('info.connection', connectedIPs.join(', ') || 'none', true);
         delete ws.__iobroker;
     });
 
     ws.send(JSON.stringify({mode: adapter.config.pty ? 'pty' : 'simulate'}));
     !adapter.config.pty && ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
 
-    console.log('connected');
+    adapter.log.debug('WebSocket connection established');
 }
 
 //settings: {
@@ -626,6 +626,7 @@ async function main() {
     await adapter.setStateChangedAsync('info.connection', '', true);
     adapter.config.encoding = adapter.config.encoding || 'utf-8';
     server = initWebServer(adapter.config);
+    await adapter.setStateChangedAsync('info.connection', 'none', true);
 }
 
 // @ts-ignore parent is a valid property on module

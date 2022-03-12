@@ -118,7 +118,7 @@
         },
         "dependencies": [
             {
-                "js-controller": ">=1.4.2"
+                "js-controller": ">=2.0.0"
             }
         ],
         "plugins": {
@@ -130,7 +130,10 @@
             {
                 "admin": ">=5.1.0"
             }
-        ]
+        ],
+        "connectionType": "local",
+        "dataSource": "none",
+        "tier": 2
     },
     "native": {
         "bind": "0.0.0.0",

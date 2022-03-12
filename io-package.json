@@ -1,176 +1,188 @@
 {
-    "common": {
-        "name": "xterm",
-        "version": "0.2.0",
-        "news": {
-            "0.2.0": {
-                "en": "Added the real terminal (bash or cmd.exe) to simulated one",
-                "de": "Das echte Terminal (bash oder cmd.exe) zum simulierten hinzugefügt",
-                "ru": "Добавлен реальный терминал (bash или cmd.exe) к имитируемому",
-                "pt": "Adicionado o terminal real (bash ou cmd.exe) para simular um",
-                "nl": "De echte terminal (bash of cmd.exe) toegevoegd aan de gesimuleerde",
-                "fr": "Ajout du vrai terminal (bash ou cmd.exe) à un simulé",
-                "it": "Aggiunto il terminale reale (bash o cmd.exe) a quello simulato",
-                "es": "Se agregó la terminal real (bash o cmd.exe) a una simulada",
-                "pl": "Dodano prawdziwy terminal (bash lub cmd.exe) do symulowanego",
-                "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
-            },
-            "0.1.0": {
-                "en": "changed type of the connection state to \"string\"",
-                "de": "Typ des Verbindungsstatus in \"string\" geändert",
-                "ru": "изменен тип состояния подключения на \"строка\"",
-                "pt": "mudou o tipo de estado da conexão para \"string\"",
-                "nl": "type van de verbindingsstatus gewijzigd in \"string\"",
-                "fr": "changement du type de l'état de la connexion en \"chaîne\"",
-                "it": "modificato il tipo dello stato di connessione in \"stringa\"",
-                "es": "cambió el tipo de estado de conexión a \"cadena\"",
-                "pl": "zmieniono typ stanu połączenia na „string”",
-                "zh-cn": "将连接状态的类型更改为“字符串”"
-            },
-            "0.0.3": {
-                "en": "first working release",
-                "de": "erste Arbeitsversion",
-                "ru": "первый рабочий релиз",
-                "pt": "primeiro lançamento de trabalho",
-                "nl": "eerste werkende release",
-                "fr": "première version de travail",
-                "it": "prima versione funzionante",
-                "es": "primer lanzamiento de trabajo",
-                "pl": "pierwsze wydanie robocze",
-                "zh-cn": "第一个工作版本"
-            },
-            "0.0.2": {
-                "en": "first working release",
-                "de": "erste Arbeitsversion",
-                "ru": "первый рабочий релиз",
-                "pt": "primeiro lançamento de trabalho",
-                "nl": "eerste werkende release",
-                "fr": "première version de travail",
-                "it": "prima versione funzionante",
-                "es": "primer lanzamiento de trabajo",
-                "pl": "pierwsze wydanie robocze",
-                "zh-cn": "第一个工作版本"
-            },
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Начальная версия",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "zh-cn": "首次出版"
-            }
-        },
-        "title": "Shell console XTerm",
-        "titleLang": {
-            "en": "Shell console XTerm",
-            "de": "Shell-Konsole XTerm",
-            "ru": "Консоль shell XTerm",
-            "pt": "Console shell XTerm",
-            "nl": "Shell-console XTerm",
-            "fr": "Console coque XTerm",
-            "it": "Console shell XTerm",
-            "es": "Consola de Shell XTerm",
-            "pl": "Konsola powłoki XTerm",
-            "zh-cn": "外壳控制台 XTerm"
-        },
-        "desc": {
-            "en": "This adapter allows to execute shell commands on ioBroker host.",
-            "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
-            "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
-            "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
-            "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
-            "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
-            "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
-            "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
-            "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
-            "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
-        },
-        "authors": [
-            "ioBroker <dogafox@gmail.com>"
-        ],
-        "keywords": [
-            "terminal",
-            "ssh"
-        ],
-        "license": "MIT",
-        "platform": "Javascript/Node.js",
-        "main": "main.js",
-        "icon": "xterm.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
-        "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "utility",
-        "compact": true,
-        "localLinks": {
-            "_default": "%protocol%://%ip%:%port%"
-        },
-        "adminTab": {
-            "link": "%protocol%://%ip%:%port%"
-        },
-        "adminUI": {
-            "config": "json"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=2.0.0"
-            }
-        ],
-        "plugins": {
-            "sentry": {
-                "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
-            }
-        },
-        "globalDependencies": [
-            {
-                "admin": ">=5.1.0"
-            }
-        ],
-        "connectionType": "local",
-        "dataSource": "none",
-        "tier": 2
+  "common": {
+    "name": "xterm",
+    "version": "0.3.0",
+    "news": {
+      "0.3.0": {
+        "en": "Prevent some warnings in js-controller 3+\nAdd Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!\nRework info.connection status to show that server is connected also as green by using \"none\" to show that noone is connected\nUpdate all dependencies\nAdd sentry for crash reporting",
+        "de": "Einige Warnungen in js-controller 3+ verhindern\nFallback zur simulierten Shell hinzufügen, wenn bash/cmd.exe von node-pty ausgewählt wird, wurde nicht korrekt installiert!\nÜberarbeiten Sie den info.connection-Status, um anzuzeigen, dass der Server verbunden ist, auch als grün, indem Sie \"none\" verwenden, um anzuzeigen, dass niemand verbunden ist\nAktualisieren Sie alle Abhängigkeiten\nSentry für Absturzberichte hinzufügen",
+        "ru": "Предотвратить некоторые предупреждения в js-controller 3+\nДобавьте резервный вариант в смоделированную оболочку, если bash/cmd.exe выбран из-за неправильной установки node-pty!\nПереработать статус info.connection, чтобы показать, что сервер подключен, также зеленым, используя «none», чтобы показать, что никто не подключен.\nОбновить все зависимости\nДобавить часового для отчетов о сбоях",
+        "pt": "Evite alguns avisos no js-controller 3+\nAdicione Fallback ao shell simulado se bash/cmd.exe for selecionado por node-pty não foi instalado corretamente!\nRetrabalhe o status info.connection para mostrar que o servidor também está conectado como verde usando \"none\" para mostrar que ninguém está conectado\nAtualizar todas as dependências\nAdicionar sentinela para relatórios de falhas",
+        "nl": "Voorkom enkele waarschuwingen in js-controller 3+\nVoeg terugval toe aan gesimuleerde shell als bash/cmd.exe is geselecteerd door node-pty niet correct is geïnstalleerd!\nHerwerk de info.connection-status om aan te geven dat de server ook groen is verbonden door \"none\" te gebruiken om aan te geven dat er niemand is verbonden\nAlle afhankelijkheden bijwerken\nEen schildwacht toevoegen voor crashrapportage",
+        "fr": "Empêcher certains avertissements dans js-controller 3+\nAjoutez Fallback au shell simulé si bash/cmd.exe est sélectionné par node-pty n'a pas été installé correctement !\nRetravailler l'état de l'info.connexion pour montrer que le serveur est connecté également en vert en utilisant \"aucun\" pour montrer que personne n'est connecté\nMettre à jour toutes les dépendances\nAjouter une sentinelle pour les rapports de plantage",
+        "it": "Impedisci alcuni avvisi in js-controller 3+\nAggiungi fallback alla shell simulata se bash/cmd.exe è selezionato da node-pty non è stato installato correttamente!\nRielabora lo stato di info.connection per mostrare che il server è connesso anche come verde usando \"none\" per mostrare che nessuno è connesso\nAggiorna tutte le dipendenze\nAggiungi sentinella per la segnalazione degli arresti anomali",
+        "es": "Evite algunas advertencias en js-controller 3+\n¡Agregue Fallback al shell simulado si node-pty seleccionó bash/cmd.exe y no se instaló correctamente!\nVuelva a trabajar en el estado de info.connection para mostrar que el servidor está conectado también como verde usando \"ninguno\" para mostrar que nadie está conectado\nActualizar todas las dependencias\nAgregar centinela para informes de fallas",
+        "pl": "Zapobiegaj niektórym ostrzeżeniom w js-controller 3+\nDodaj Fallback do symulowanej powłoki, jeśli bash/cmd.exe jest wybrany przez node-pty nie został poprawnie zainstalowany!\nZmień stan info.connection, aby pokazać, że serwer jest podłączony również na zielono, używając „brak”, aby pokazać, że nikt nie jest podłączony\nZaktualizuj wszystkie zależności\nDodaj wartownika do zgłaszania awarii",
+        "zh-cn": "防止在 js-controller 3+ 中出现一些警告\n如果 node-pty 选择的 bash/cmd.exe 未正确安装，则将 Fallback 添加到模拟 shell！\n重做 info.connection 状态以显示服务器也已连接为绿色，使用“none”表示没有人连接\n更新所有依赖项\n为崩溃报告添加哨兵"
+      },
+      "0.2.0": {
+        "en": "Added the real terminal (bash or cmd.exe) to simulated one",
+        "de": "Das echte Terminal (bash oder cmd.exe) zum simulierten hinzugefügt",
+        "ru": "Добавлен реальный терминал (bash или cmd.exe) к имитируемому",
+        "pt": "Adicionado o terminal real (bash ou cmd.exe) para simular um",
+        "nl": "De echte terminal (bash of cmd.exe) toegevoegd aan de gesimuleerde",
+        "fr": "Ajout du vrai terminal (bash ou cmd.exe) à un simulé",
+        "it": "Aggiunto il terminale reale (bash o cmd.exe) a quello simulato",
+        "es": "Se agregó la terminal real (bash o cmd.exe) a una simulada",
+        "pl": "Dodano prawdziwy terminal (bash lub cmd.exe) do symulowanego",
+        "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
+      },
+      "0.1.0": {
+        "en": "changed type of the connection state to \"string\"",
+        "de": "Typ des Verbindungsstatus in \"string\" geändert",
+        "ru": "изменен тип состояния подключения на \"строка\"",
+        "pt": "mudou o tipo de estado da conexão para \"string\"",
+        "nl": "type van de verbindingsstatus gewijzigd in \"string\"",
+        "fr": "changement du type de l'état de la connexion en \"chaîne\"",
+        "it": "modificato il tipo dello stato di connessione in \"stringa\"",
+        "es": "cambió el tipo de estado de conexión a \"cadena\"",
+        "pl": "zmieniono typ stanu połączenia na „string”",
+        "zh-cn": "将连接状态的类型更改为“字符串”"
+      },
+      "0.0.3": {
+        "en": "first working release",
+        "de": "erste Arbeitsversion",
+        "ru": "первый рабочий релиз",
+        "pt": "primeiro lançamento de trabalho",
+        "nl": "eerste werkende release",
+        "fr": "première version de travail",
+        "it": "prima versione funzionante",
+        "es": "primer lanzamiento de trabajo",
+        "pl": "pierwsze wydanie robocze",
+        "zh-cn": "第一个工作版本"
+      },
+      "0.0.2": {
+        "en": "first working release",
+        "de": "erste Arbeitsversion",
+        "ru": "первый рабочий релиз",
+        "pt": "primeiro lançamento de trabalho",
+        "nl": "eerste werkende release",
+        "fr": "première version de travail",
+        "it": "prima versione funzionante",
+        "es": "primer lanzamiento de trabajo",
+        "pl": "pierwsze wydanie robocze",
+        "zh-cn": "第一个工作版本"
+      },
+      "0.0.1": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Начальная версия",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "zh-cn": "首次出版"
+      }
     },
-    "native": {
-        "bind": "0.0.0.0",
-        "port": "8099",
-        "pty": true,
-        "secure": false,
-        "auth": true,
-        "encoding": "utf-8",
-        "certPublic": "",
-        "certPrivate": "",
-        "certChained": "",
-        "leEnabled": false,
-        "leUpdate": false,
-        "lePort": 80
+    "title": "Shell console XTerm",
+    "titleLang": {
+      "en": "Shell console XTerm",
+      "de": "Shell-Konsole XTerm",
+      "ru": "Консоль shell XTerm",
+      "pt": "Console shell XTerm",
+      "nl": "Shell-console XTerm",
+      "fr": "Console coque XTerm",
+      "it": "Console shell XTerm",
+      "es": "Consola de Shell XTerm",
+      "pl": "Konsola powłoki XTerm",
+      "zh-cn": "外壳控制台 XTerm"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Number or connected clients",
-                "type": "string",
-                "read": true,
-                "write": false,
-                "def": ""
-            },
-            "native": {}
-        }
-    ]
+    "desc": {
+      "en": "This adapter allows to execute shell commands on ioBroker host.",
+      "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
+      "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
+      "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
+      "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
+      "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
+      "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
+      "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
+      "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
+      "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
+    },
+    "authors": [
+      "ioBroker <dogafox@gmail.com>"
+    ],
+    "keywords": [
+      "terminal",
+      "ssh"
+    ],
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "main": "main.js",
+    "icon": "xterm.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
+    "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "utility",
+    "compact": true,
+    "localLinks": {
+      "_default": "%protocol%://%ip%:%port%"
+    },
+    "adminTab": {
+      "link": "%protocol%://%ip%:%port%"
+    },
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=2.0.0"
+      }
+    ],
+    "plugins": {
+      "sentry": {
+        "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
+      }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=5.1.0"
+      }
+    ],
+    "connectionType": "local",
+    "dataSource": "none",
+    "tier": 2
+  },
+  "native": {
+    "bind": "0.0.0.0",
+    "port": "8099",
+    "pty": true,
+    "secure": false,
+    "auth": true,
+    "encoding": "utf-8",
+    "certPublic": "",
+    "certPrivate": "",
+    "certChained": "",
+    "leEnabled": false,
+    "leUpdate": false,
+    "lePort": 80
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Number or connected clients",
+        "type": "string",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    }
+  ]
 }

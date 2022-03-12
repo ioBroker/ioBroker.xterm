@@ -39,8 +39,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 0.3.0 (2022-03-12)
 * (Apollon77) Prevent some warnings in js-controller 3+
 * (Apollon77) Add Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!
 * (Apollon77) Rework info.connection status to show that server is connected also as green by using "none" to show that noone is connected
@@ -51,7 +50,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 * (bluefox) Added the real terminal (bash or cmd.exe) to simulated one
 
 ### 0.1.0 (2021-09-18)
-* (bluefox) changed type of the connection state to "string" 
+* (bluefox) changed type of the connection state to "string"
 
 ### 0.0.3 (2021-09-16)
 * (ioBroker) first working release

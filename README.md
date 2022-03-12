@@ -42,6 +42,8 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 
 ### __WORK IN PROGRESS__
 * (Apollon77) Update all dependencies
+* (Apollon77) Add sentry for crash reporting
+* (Apollon77) Prevent some warnings in js-controller 3+
 * (Apollon77) Add Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!
 
 ### 0.2.0 (2021-09-18)

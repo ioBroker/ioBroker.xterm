@@ -623,7 +623,7 @@ async function main() {
         await adapter.setObjectAsync(obj._id, obj);
     }
 
-    await adapter.setForeignStateChangedAsync('info.connection', 0, true);
+    await adapter.setStateChangedAsync('info.connection', 0, true);
     adapter.config.encoding = adapter.config.encoding || 'utf-8';
     server = initWebServer(adapter.config);
 }

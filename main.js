@@ -352,6 +352,9 @@ function initSocketConnection(ws) {
 
     ws.on('message', message => {
         // console.log('received: %s', message);
+        if (!ws.__iobroker) {
+            return;
+        }
         message = JSON.parse(message);
         if (message.method === 'resize') {
             ws.__iobroker.ptyProcess && ws.__iobroker.ptyProcess.resize(message.cols, message.rows);

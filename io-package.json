@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "xterm",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "news": {
+      "0.3.1": {
+        "en": "Fix a crash case reported by Sentry",
+        "de": "Beheben Sie einen von Sentry gemeldeten Absturzfall",
+        "ru": "Исправление сбоя, о котором сообщил Sentry",
+        "pt": "Corrigir um caso de falha relatado pelo Sentinela",
+        "nl": "Een door Sentry gemeld crashgeval oplossen",
+        "fr": "Correction d'un cas de plantage signalé par Sentry",
+        "it": "Risolvi un caso di crash segnalato da Sentry",
+        "es": "Solucionar un caso de bloqueo informado por Sentry",
+        "pl": "Napraw awarię zgłoszoną przez Sentry",
+        "zh-cn": "修复 Sentry 报告的崩溃案例"
+      },
       "0.3.0": {
         "en": "Prevent some warnings in js-controller 3+\nAdd Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!\nRework info.connection status to show that server is connected also as green by using \"none\" to show that noone is connected\nUpdate all dependencies\nAdd sentry for crash reporting",
         "de": "Einige Warnungen in js-controller 3+ verhindern\nFallback zur simulierten Shell hinzufügen, wenn bash/cmd.exe von node-pty ausgewählt wird, wurde nicht korrekt installiert!\nÜberarbeiten Sie den info.connection-Status, um anzuzeigen, dass der Server verbunden ist, auch als grün, indem Sie \"none\" verwenden, um anzuzeigen, dass niemand verbunden ist\nAktualisieren Sie alle Abhängigkeiten\nSentry für Absturzberichte hinzufügen",

@@ -39,8 +39,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 0.3.1 (2022-03-18)
 * (Apollon77) Fix a crash case reported by Sentry
 
 ### 0.3.0 (2022-03-12)

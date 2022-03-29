@@ -446,7 +446,7 @@ function initSocketConnection(ws) {
 
                     executeCommand(message.command, ws, code => {
                         ws._isExecuting = false;
-                        ws.send(JSON.stringify({
+                        ws.__iobroker && ws.send(JSON.stringify({
                             prompt: ws.__iobroker.cwd + '>',
                             isExecuting: false,
                             exitCode: code

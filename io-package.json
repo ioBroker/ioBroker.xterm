@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "xterm",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "news": {
+      "0.3.2": {
+        "en": "Fix crash cases reported by Sentry",
+        "de": "Von Sentry gemeldete Absturzfälle beheben",
+        "ru": "Исправить случаи сбоев, о которых сообщил Sentry",
+        "pt": "Corrigir casos de travamento relatados pelo Sentinela",
+        "nl": "Herstel crashgevallen gemeld door Sentry",
+        "fr": "Correction des cas de plantage signalés par Sentry",
+        "it": "Risolvi i casi di crash segnalati da Sentry",
+        "es": "Solucionar casos de fallas informados por Sentry",
+        "pl": "Napraw przypadki awarii zgłoszone przez Sentry",
+        "zh-cn": "修复 Sentry 报告的崩溃案例"
+      },
       "0.3.1": {
         "en": "Fix a crash case reported by Sentry",
         "de": "Beheben Sie einen von Sentry gemeldeten Absturzfall",
@@ -74,18 +86,6 @@
         "es": "primer lanzamiento de trabajo",
         "pl": "pierwsze wydanie robocze",
         "zh-cn": "第一个工作版本"
-      },
-      "0.0.1": {
-        "en": "initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Начальная версия",
-        "pt": "lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "zh-cn": "首次出版"
       }
     },
     "title": "Shell console XTerm",

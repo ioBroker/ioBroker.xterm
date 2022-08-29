@@ -35,10 +35,13 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 
 <!--
 	Placeholder for the next version (at the beginning of the line):
-	### __WORK IN PROGRESS__
+	### **WORK IN PROGRESS**
 -->
 
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Check only port of the interface and not of all interfaces
+
 ### 0.3.2 (2022-03-29)
 * (Apollon77) Fix crash cases reported by Sentry
 

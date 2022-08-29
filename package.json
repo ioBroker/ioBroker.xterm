@@ -28,7 +28,7 @@
     "express": "^4.18.1"
   },
   "devDependencies": {
-    "@iobroker/testing": "^3.0.2",
+    "@iobroker/testing": "^4.0.0",
     "@alcalzone/release-script": "^3.5.9",
     "@alcalzone/release-script-plugin-iobroker": "^3.5.9",
     "@alcalzone/release-script-plugin-license": "^3.5.9",
@@ -51,6 +51,13 @@
     "sinon-chai": "^3.7.0"
   },
   "main": "main.js",
+  "files": [
+    "admin/",
+    "public/",
+    "main.js",
+    "LICENSE",
+    "io-package.json"
+  ],
   "scripts": {
     "test:js": "mocha \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup).js}\"",
     "test:package": "mocha test/package --exit",

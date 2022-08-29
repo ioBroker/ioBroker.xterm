@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "xterm",
-    "version": "0.3.2",
+    "version": "1.0.0",
     "news": {
+      "1.0.0": {
+        "en": "Check only port of the interface and not of all interfaces",
+        "de": "Überprüfen Sie nur den Port der Schnittstelle und nicht alle Schnittstellen",
+        "ru": "Проверьте только порт интерфейса и не все интерфейсы",
+        "pt": "Verifique apenas a porta da interface e não de todas as interfaces",
+        "nl": "Controleer alleen de interface en niet van alle interfaces",
+        "fr": "Vérifiez uniquement le port de l'interface et pas de toutes les interfaces",
+        "it": "Controllare solo la porta dell'interfaccia e non di tutte le interfacce",
+        "es": "Compruebe sólo el puerto de la interfaz y no de todas las interfaces",
+        "pl": "Check jedynie port interfejsu i nie wszystkie interfejsy",
+        "zh-cn": "检查站只是接口的港口,而不是所有接口"
+      },
       "0.3.2": {
         "en": "Fix crash cases reported by Sentry",
         "de": "Von Sentry gemeldete Absturzfälle beheben",
@@ -64,18 +76,6 @@
         "zh-cn": "将连接状态的类型更改为“字符串”"
       },
       "0.0.3": {
-        "en": "first working release",
-        "de": "erste Arbeitsversion",
-        "ru": "первый рабочий релиз",
-        "pt": "primeiro lançamento de trabalho",
-        "nl": "eerste werkende release",
-        "fr": "première version de travail",
-        "it": "prima versione funzionante",
-        "es": "primer lanzamiento de trabajo",
-        "pl": "pierwsze wydanie robocze",
-        "zh-cn": "第一个工作版本"
-      },
-      "0.0.2": {
         "en": "first working release",
         "de": "erste Arbeitsversion",
         "ru": "первый рабочий релиз",

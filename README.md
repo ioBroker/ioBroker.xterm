@@ -39,7 +39,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.0.0 (2022-08-29)
 * (bluefox) Check only port of the interface and not of all interfaces
 
 ### 0.3.2 (2022-03-29)

@@ -66,7 +66,9 @@
     "test": "npm run test:js && npm run test:package",
     "lint": "eslint",
     "release": "release-script",
-    "release-minor": "release-script minor"
+    "release-patch": "release-script patch --yes",
+    "release-minor": "release-script minor --yes",
+    "release-major": "release-script major --yes"
   },
   "bugs": {
     "url": "https://github.com/ioBroker/ioBroker.xterm/issues"

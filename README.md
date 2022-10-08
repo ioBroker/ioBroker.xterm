@@ -39,6 +39,11 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
+
+### __WORK IN PROGRESS__
+* (Apollon77) Update xterm library
+* (Apollon77) Prepare for future js-controller versions
+
 ### 1.0.0 (2022-08-29)
 * (bluefox) Check only port of the interface and not of all interfaces
 

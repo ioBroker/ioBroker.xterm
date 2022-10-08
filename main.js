@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const fs       = require('fs');
 const path     = require('path');
 const express  = require('express');
-const LE       = require(`${utils.controllerDir}/lib/letsencrypt.js`);
+const LE       = utils.commonTools.letsEncrypt;
 const iconv    = require('iconv-lite');
 const os       = require('os');
 let pty;
@@ -30,30 +30,15 @@ const files = {
  */
 let adapter;
 let server;
-let connectedIPs = [];
+const connectedIPs = [];
 const bruteForce = {};
 const IOB_DIR = findIoBrokerDirectory();
 
 function findIoBrokerDirectory() {
-    const dir = utils.controllerDir.replace(/\\/g, '/');
+    const dir = utils.getAbsoluteDefaultDataDir().replace(/\\/g, '/');
     const parts = dir.split('/');
-    let pos = parts.indexOf('iobroker');
-    if (pos === -1) {
-        pos = parts.indexOf('iob');
-    }
-    if (pos === -1) {
-        pos = parts.indexOf('node_modules');
-        if (pos === -1) {
-            parts.pop();
-            return parts.join('/');
-        } else {
-            parts.splice(pos - 1);
-            return parts.join('/');
-        }
-    } else {
-        parts.splice(pos);
-        return parts.join('/');
-    }
+    parts.pop();
+    return parts.join('/');
 }
 
 /**
@@ -62,7 +47,7 @@ function findIoBrokerDirectory() {
  */
 function startAdapter(options) {
     // Create the adapter and define its methods
-    return adapter = utils.adapter(Object.assign({}, options, {
+    return adapter = utils.Adapter(Object.assign({}, options, {
         name: 'xterm',
 
         // The ready callback is called when databases are connected and adapter received configuration.
@@ -122,12 +107,12 @@ function executeCommand(command, ws, cb) {
     }*/
     ws.__iobroker.encoding = '';
     const ls = exec(command, ws.__iobroker);
-    ls.stdout.on('data', data => {
+    ls.stdout && ls.stdout.on('data', data => {
         data = iconv.decode(data, adapter.config.encoding);
         ws.send(JSON.stringify({data}));
     });
 
-    ls.stderr.on('data', data => {
+    ls.stderr && ls.stderr.on('data', data => {
         data = iconv.decode(data, adapter.config.encoding);
         adapter.log.error('stderr: ' + data);
         ws.send(JSON.stringify({data, error: true}));

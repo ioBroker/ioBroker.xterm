@@ -93,8 +93,9 @@
                     ws.close();
                     ws = null;
                 } catch (e) {
-                    // Ignore
+
                 }
+
                 reconnect();
             };
 
@@ -153,7 +154,6 @@
                     term.write('\r\n' + msg.prompt + ' ');
                     currentLine = '';
                 }
-                cursorPosition = currentLine.length;
             };
 
             setTimeout(function () {
@@ -317,14 +317,12 @@
             if (currentLine) {
                 currentLine = currentLine.slice(0, currentLine.length - 1);
                 term.write('\x1B[C \x1B[C');
-                cursorPosition -= 1;
             }
         } else {
             historyPosition = -1;
             completion = null;
             currentLine += currentLine.substr(0, cursorPosition) + key.key + currentLine.substr(cursorPosition);
             term.write(key.key);
-            cursorPosition += 1;
         }
     });
 

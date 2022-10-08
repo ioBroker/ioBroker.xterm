@@ -36,7 +36,6 @@
     var completion = {};
     var cmdHistory = window.localStorage.getItem('xterm.history') || '[]';
     var historyPosition = -1;
-    var cursorPosition = 0;
     var copied = '';
     var puttyMode = true;
 
@@ -218,11 +217,10 @@
 
     function replaceCurrentInput(newText) {
         if (currentLine) {
-            term.write(Array(currentLine.length + 1).join('\x1B[C \x1B[C'));
+            term.write(Array(currentLine.length + 1).join('\b \b'));
         }
         currentLine = newText;
         term.write(currentLine);
-        cursorPosition = currentLine.length;
     }
 
     function processTab() {
@@ -230,8 +228,7 @@
         if (completion.inputLength) {
             var toDelete = currentLine.length - completion.inputLength;
             currentLine = currentLine.substring(0, completion.inputLength);
-            term.write(Array(toDelete + 1).join('\x1B[C \x1B[C'));
-            cursorPosition -= toDelete;
+            term.write(Array(toDelete + 1).join('\b \b'));
         }
 
         var line = findOption();
@@ -243,7 +240,6 @@
             var addedText = line.substring(lastWord.length);
             currentLine += addedText;
             term.write(addedText);
-            cursorPosition += addedText.length;
         }
     }
 
@@ -273,20 +269,6 @@
                 replaceCurrentInput(cmdHistory[historyPosition]);
             }
         } else
-        // Left
-        if (key.domEvent.key === 'ArrowLeft') {
-            if (cursorPosition > 0) {
-                cursorPosition -= 1;
-                term.write('\x1B[C');
-            }
-        } else
-        // Right
-        if (key.domEvent.key === 'ArrowRight') {
-            if (cursorPosition < currentLine.length) {
-                cursorPosition += 1;
-                term.write('\x1B[D');
-            }
-        } else
         //Enter
         if (key.domEvent.key === 'Enter') {
             completion = null;
@@ -296,32 +278,31 @@
                 window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
                 entries.push(currentLine);
             }
+            term.write('\r\n');
 
             if (currentLine.trim() === 'cls') {
                 currentLine = '';
                 term.clear();
             } else if (currentLine.trim() === 'history') {
                 currentLine = '';
-                term.write('\r\n');
                 term.write(cmdHistory.map((line, i) => ` ${(i + 1).toString().padStart(3)}  ${line}`).join('\r\n'));
             } else if (currentLine.trim() === 'history -c') {
                 currentLine = '';
                 cmdHistory = [];
                 window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
             }
-            cursorPosition = currentLine.length;
             term.prompt();
         } else if (key.domEvent.key === 'Backspace') {
             completion = null;
             // Backspace
             if (currentLine) {
                 currentLine = currentLine.slice(0, currentLine.length - 1);
-                term.write('\x1B[C \x1B[C');
+                term.write('\b \b');
             }
         } else {
             historyPosition = -1;
             completion = null;
-            currentLine += currentLine.substr(0, cursorPosition) + key.key + currentLine.substr(cursorPosition);
+            currentLine += key.key;
             term.write(key.key);
         }
     });

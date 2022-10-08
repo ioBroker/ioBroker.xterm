@@ -39,8 +39,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 1.1.0 (2022-10-08)
 * (Apollon77) Update xterm library
 * (Apollon77) Prepare for future js-controller versions
 

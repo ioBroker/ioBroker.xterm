@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "xterm",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "news": {
+      "1.1.0": {
+        "en": "Update xterm library\nPrepare for future js-controller versions",
+        "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",
+        "ru": "Обновление библиотеки xterm\nПодготовьтесь к будущим версиям js-controller",
+        "pt": "Atualizar biblioteca xterm\nPrepare-se para futuras versões js-controller",
+        "nl": "Update Xterm bibliotheek\nBereid je voor op toekomstige Js-controller versie",
+        "fr": "Mettre à jour la bibliothèque xterm\nPréparez-vous pour les versions futures de js-controller",
+        "it": "Aggiornare la libreria xterm\nPrepararsi per le future versioni js-controller",
+        "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
+        "pl": "Biblioteka xterma\nPrepare for future js-controller version",
+        "zh-cn": "更新图书馆\n今后防污版本的编制"
+      },
       "1.0.0": {
         "en": "Check only port of the interface and not of all interfaces",
         "de": "Überprüfen Sie nur den Port der Schnittstelle und nicht alle Schnittstellen",
@@ -74,18 +86,6 @@
         "es": "cambió el tipo de estado de conexión a \"cadena\"",
         "pl": "zmieniono typ stanu połączenia na „string”",
         "zh-cn": "将连接状态的类型更改为“字符串”"
-      },
-      "0.0.3": {
-        "en": "first working release",
-        "de": "erste Arbeitsversion",
-        "ru": "первый рабочий релиз",
-        "pt": "primeiro lançamento de trabalho",
-        "nl": "eerste werkende release",
-        "fr": "première version de travail",
-        "it": "prima versione funzionante",
-        "es": "primer lanzamiento de trabajo",
-        "pl": "pierwsze wydanie robocze",
-        "zh-cn": "第一个工作版本"
       }
     },
     "title": "Shell console XTerm",

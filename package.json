@@ -20,7 +20,7 @@
     "node-pty": "^0.10.1"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.6.7",
+    "@iobroker/adapter-core": "^2.6.8",
     "ws": "^8.12.1",
     "xterm": "^5.1.0",
     "xterm-addon-fit": "^0.7.0",

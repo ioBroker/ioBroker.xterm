@@ -17,7 +17,7 @@
     "url": "https://github.com/ioBroker/ioBroker.xterm"
   },
   "optionalDependencies": {
-    "node-pty": "^0.10.1"
+    "node-pty": "^1.0.0"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.6.8",

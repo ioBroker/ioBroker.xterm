@@ -16,5 +16,8 @@
   "Warning!": "Warning!",
   "Unsecure_Auth": "The password will be sent unencrypted via an unsecure connection. To protect your passwords enable the secure connection (HTTPS)!",
   "Let's Encrypt SSL": "Let's Encrypt SSL",
-  "IP": "Local IP interface"
+  "IP": "Local IP interface",
+  "Use Bash or cmd.exe": "Use Bash or cmd.exe",
+  "If unchecked, the shell will be simulated": "If unchecked, the shell will be simulated",
+  "Do not use canvas plugin": "Do not use canvas plugin"
 }

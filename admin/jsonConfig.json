@@ -31,35 +31,6 @@
           "md": 6,
           "lg": 2
         },
-        "certPublic": {
-          "type": "certificate",
-          "hidden": "!data.secure",
-          "certType": "public",
-          "validator": "!data.secure || data.certPublic",
-          "label": "Public certificate",
-          "sm": 12,
-          "md": 6,
-          "lg": 2
-        },
-        "certPrivate": {
-          "hidden": "!data.secure",
-          "type": "certificate",
-          "certType": "private",
-          "validator": "!data.secure || data.certPrivate",
-          "label": "Private certificate",
-          "sm": 12,
-          "md": 6,
-          "lg": 2
-        },
-        "certChained": {
-          "hidden": "!data.secure",
-          "type": "certificate",
-          "certType": "chained",
-          "label": "Chained certificate",
-          "sm": 12,
-          "md": 6,
-          "lg": 2
-        },
         "auth": {
           "newLine": true,
           "type": "checkbox",

@@ -102,13 +102,21 @@
             {"label": "cp850 - german", "value": "cp850"},
             {"label": "cp1251 - russin", "value": "cp1251"}
           ]
+        },
+        "doNotUseCanvas": {
+          "sm": 12,
+          "md": 6,
+          "lg": 2,
+          "newLine": true,
+          "type": "checkbox",
+          "label": "Do not use canvas plugin"
         }
       }
     },
     "leTab": {
       "type": "panel",
       "label": "Let's Encrypt SSL",
-      "disabled": "!data.secure",
+      "hidden": "!data.secure",
       "items": {
         "_image": {
           "type": "staticImage",
@@ -120,38 +128,9 @@
             "height": 59
           }
         },
-        "_link": {
-          "newLine": true,
-          "type": "staticLink",
-          "href": "https://github.com/ioBroker/ioBroker.admin/blob/master/README.md#lets-encrypt-certificates",
-          "label": "Read about Let's Encrypt certificates",
-          "style": {
-            "fontSize": 16,
-            "marginBottom": 20
-          }
-        },
-        "leEnabled": {
-          "newLine": true,
-          "type": "checkbox",
-          "label": "Use Let's Encrypt certificates"
-        },
-        "leUpdate": {
-          "newLine": true,
-          "type": "checkbox",
-          "hidden": "!data.leEnabled",
-          "label": "Use this instance for automatic update"
-        },
-        "lePort": {
-          "newLine": true,
-          "sm": 11,
-          "lg": 4,
-          "type": "number",
-          "hidden": "!data.leEnabled || !data.leUpdate",
-          "label": "Port to check the domain",
-          "style": {
-            "marginTop": 15,
-            "maxWidth": 200
-          }
+        "_staticText": {
+          "type": "staticText",
+          "text": "ra_Use iobroker.acme adapter for letsencrypt certificates"
         }
       }
     }

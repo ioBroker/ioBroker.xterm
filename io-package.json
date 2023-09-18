@@ -166,12 +166,7 @@
     "secure": false,
     "auth": true,
     "encoding": "utf-8",
-    "certPublic": "",
-    "certPrivate": "",
-    "certChained": "",
-    "leEnabled": false,
-    "leUpdate": false,
-    "lePort": 80
+    "doNotUseCanvas": false
   },
   "objects": [],
   "instanceObjects": [

@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="./xterm.css" />
     <script src="./xterm.js"></script>
     <script src="./xterm-addon-fit.js"></script>
+    <script src="./xterm-addon-canvas.js"></script>
     <style>
         html, body {
             width:  100%;
@@ -19,6 +20,17 @@
         }
         .disconnected {
             opacity: 0.2;
+        }
+        /* scrollbar */
+        *::-webkit-scrollbar-track {
+            background-color: #ccc;
+        }
+        *::-webkit-scrollbar {
+            width: 6px;
+            background-color: #ccc;
+        }
+        *::-webkit-scrollbar-thumb {
+            background-color: #575757;
         }
     </style>
 </head>
@@ -38,6 +50,7 @@
     var historyPosition = -1;
     var copied = '';
     var puttyMode = true;
+    var resizeSent = null;
 
     try {
         cmdHistory = JSON.parse(cmdHistory);
@@ -132,6 +145,12 @@
 
                 if (msg.data !== undefined) {
                     if (puttyMode || isExecuting) {
+                        if (puttyMode && resizeSent && Date.now() - resizeSent < 500) {
+                            resizeSent = null;
+                            // ignore this line as it is duplicated
+                            return;
+                        }
+
                         if (msg.error) {
                             term.write(msg.data); // TODO: change color
                         } else {
@@ -156,7 +175,8 @@
             };
 
             setTimeout(function () {
-                ws.send(JSON.stringify({method: 'resize', cols: term.cols, rows: term.rows}));
+                resizeSent = Date.now();
+                ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
             }, 200);
         }, noWait ? 0 : 5000);
     }
@@ -197,7 +217,17 @@
     });
 
     var fitAddon = new FitAddon.FitAddon();
+    var canvasAddon;
+    if (typeof CanvasAddon !== 'undefined') {
+        canvasAddon = new CanvasAddon.CanvasAddon();
+    }
+
+    // webglAddon.onContextLoss(function (e) {
+    //     webglAddon.dispose();
+    // });
+
     term.loadAddon(fitAddon);
+    canvasAddon && term.loadAddon(canvasAddon);
 
     term.open(terminalDiv);
 
@@ -315,7 +345,8 @@
 
             // update server terminal with new size
             try {
-                ws && ws.send(JSON.stringify({method: 'resize', cols: term.cols, rows: term.rows}));
+                resizeSent = Date.now();
+                ws && ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
             } catch (e) {
 
             }

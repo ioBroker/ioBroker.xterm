@@ -6,22 +6,28 @@ const { exec } = require('child_process');
 const fs       = require('fs');
 const path     = require('path');
 const express  = require('express');
-const LE       = utils.commonTools.letsEncrypt;
 const iconv    = require('iconv-lite');
 const os       = require('os');
+const IoBWebServer = require('@iobroker/webserver');
 let pty;
 
 const locationXterm = require.resolve('xterm').replace(/\\/g, '/');
 const locationXtermFit = require.resolve('xterm-addon-fit').replace(/\\/g, '/');
+// const locationXtermWebgl = require.resolve('xterm-addon-webgl').replace(/\\/g, '/');
+const locationXtermCanvas = require.resolve('xterm-addon-canvas').replace(/\\/g, '/');
 
 const files = {
     'xterm.js': {path: locationXterm, contentType: 'text/javascript'},
-    'xterm.js.map': {path: locationXterm + '.map', contentType: 'text/javascript'},
+    'xterm.js.map': {path: `${locationXterm}.map`, contentType: 'text/javascript'},
     'xterm.css': {path: locationXterm.replace('/lib/xterm.js', '/css/xterm.css'), contentType: 'text/css'},
     'xterm-addon-fit.js': {path: locationXtermFit, contentType: 'text/javascript'},
-    'xterm-addon-fit.js.map': {path: locationXtermFit + '.map', contentType: 'text/javascript'},
-    'index.html': {path: __dirname + '/public/index.html', contentType: 'text/html'},
-    'favicon.ico': {path: __dirname + '/public/favicon.ico', contentType: 'image/x-icon'},
+    'xterm-addon-fit.js.map': {path: `${locationXtermFit}.map`, contentType: 'text/javascript'},
+    // 'xterm-addon-webgl.js': {path: locationXtermWebgl, contentType: 'text/javascript'},
+    // 'xterm-addon-webgl.js.map': {path: `${locationXtermWebgl}.map`, contentType: 'text/javascript'},
+    'xterm-addon-canvas.js': {path: locationXtermCanvas, contentType: 'text/javascript'},
+    'xterm-addon-canvas.js.map': {path: `${locationXtermCanvas}.map`, contentType: 'text/javascript'},
+    'index.html': {path: `${__dirname}/public/index.html`, contentType: 'text/html'},
+    'favicon.ico': {path: `${__dirname}/public/favicon.ico`, contentType: 'image/x-icon'},
 };
 
 /**
@@ -52,20 +58,7 @@ function startAdapter(options) {
 
         // The ready callback is called when databases are connected and adapter received configuration.
         // start here!
-        ready: () => {
-            if (adapter.config.secure) {
-                // Load certificates
-                adapter.getCertificates((err, certificates, leConfig) => {
-                    adapter.config.certificates = certificates;
-                    adapter.config.leConfig     = leConfig;
-                    main()
-                        .then(() => {});
-                });
-            } else {
-                main()
-                    .then(() => {});
-            }
-        }, // Main method defined below for readability
+        ready: () => main(), // Main method defined below for readability
 
         // is called when adapter shuts down - callback has to be called under any circumstances!
         unload: callback => {
@@ -114,7 +107,7 @@ function executeCommand(command, ws, cb) {
 
     ls.stderr && ls.stderr.on('data', data => {
         data = iconv.decode(data, adapter.config.encoding);
-        adapter.log.error('stderr: ' + data);
+        adapter.log.error(`stderr: ${data}`);
         ws.send(JSON.stringify({data, error: true}));
     });
 
@@ -149,8 +142,7 @@ function cd(thePath, ws) {
             const parts = ws.__iobroker.cwd.split('/');
             parts.length > 1 && parts.pop();
             ws.__iobroker.cwd = parts.join('/');
-        } else
-        if (thePath.match(/^\W:/) || thePath.startsWith('/')) {
+        } else if (thePath.match(/^\W:/) || thePath.startsWith('/')) {
             // full path
             if (isDirectory(thePath)) {
                 ws.__iobroker.cwd = thePath;
@@ -243,22 +235,19 @@ function auth(req, callback) {
             } else {
                 minutes = 0;
             }
-        } else
-        if (bruteForce[username].errors < 10) {
+        } else if (bruteForce[username].errors < 10) {
             if (Date.now() - bruteForce[username].time < 180000) {
                 minutes = Math.ceil((180000 - minutes) / 60000);
             } else {
                 minutes = 0;
             }
-        } else
-        if (bruteForce[username].errors < 15) {
+        } else if (bruteForce[username].errors < 15) {
             if (Date.now() - bruteForce[username].time < 600000) {
                 minutes = Math.ceil((600000 - minutes) / 60000);
             } else {
                 minutes = 0;
             }
-        } else
-        if (Date.now() - bruteForce[username].time < 3600000) {
+        } else if (Date.now() - bruteForce[username].time < 3600000) {
             minutes = Math.ceil((3600000 - minutes) / 60000);
         } else {
             minutes = 0;
@@ -294,7 +283,7 @@ function startShell(ws) {
     }
 
     ws.__iobroker.ptyProcess = pty.spawn(shell, [], {
-        name: 'xterm-color-' + Date.now(),
+        name: `xterm-color-${Date.now()}`,
         cols: 80,
         rows: 30,
         cwd: IOB_DIR,
@@ -304,9 +293,8 @@ function startShell(ws) {
     ws.__iobroker.ptyProcess.onData(data =>
         ws.send(JSON.stringify({data})));
 
-    ws.__iobroker.ptyProcess.onExit(() => {
-        ws.__iobroker && startShell(ws);
-    });
+    ws.__iobroker.ptyProcess.onExit(() =>
+        ws.__iobroker && startShell(ws));
 }
 
 function initSocketConnection(ws) {
@@ -343,14 +331,12 @@ function initSocketConnection(ws) {
         message = JSON.parse(message);
         if (message.method === 'resize') {
             ws.__iobroker.ptyProcess && ws.__iobroker.ptyProcess.resize(message.cols, message.rows);
-        } else
-        if (message.method === 'prompt') {
+        } else if (message.method === 'prompt') {
             ws.send(JSON.stringify({
                 data: '',
-                prompt: ws.__iobroker.cwd + '>',
+                prompt: `${ws.__iobroker.cwd}>`,
             }));
-        } else
-        if (message.method === 'key') {
+        } else if (message.method === 'key') {
             if (ws.__iobroker.ptyProcess) {
                 ws.__iobroker.ptyProcess.write(message.key);
             } else if (message.key === '\u0003' && ws._process && ws._process.kill) {
@@ -358,15 +344,13 @@ function initSocketConnection(ws) {
             } else if (ws._stdin) {
                 ws._stdin.write(message.key, adapter.config.encoding);
             }
-        } else
-        if (message.method === 'tab') {
+        } else if (message.method === 'tab') {
             const str = completion(message.start, ws);
             ws.send(JSON.stringify({completion: str}));
-        } else
-        if (message.method === 'command') {
+        } else if (message.method === 'command') {
             if (!ws._isExecuting) {
                 if (!message.command) {
-                    return ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>',}));
+                    return ws.send(JSON.stringify({prompt: `${ws.__iobroker.cwd}>`,}));
                 }
                 // fix user typo
                 if (message.command === 'cd..') {
@@ -380,34 +364,33 @@ function initSocketConnection(ws) {
                     if (typeof result === 'string') {
                         ws.send(JSON.stringify({
                             data: '',
-                            prompt: result + '>',
+                            prompt: `${result}>`,
                         }));
                     } else {
-                        result.prompt = ws.__iobroker.cwd + '>';
+                        result.prompt = `${ws.__iobroker.cwd}>`;
                         ws.send(JSON.stringify(result));
                     }
                 } else if (message.command === 'pwd') {
                     const result = {
-                        prompt: ws.__iobroker.cwd + '>',
+                        prompt: `${ws.__iobroker.cwd}>`,
                         data: ws.__iobroker.cwd
                     };
                     ws.send(JSON.stringify(result));
                 } else if (message.command === 'set' || message.command === 'env') {
                     const result = {
-                        prompt: ws.__iobroker.cwd + '>',
+                        prompt: `${ws.__iobroker.cwd}>`,
                         data: Object.keys(ws.__iobroker.env).map(v => `${v}=${ws.__iobroker.env[v]}`).sort().join('\r\n')
                     };
                     ws.send(JSON.stringify(result));
                 } else if (message.command === 'set' || message.command === 'export') {
                     const result = {
-                        prompt: ws.__iobroker.cwd + '>',
+                        prompt: `${ws.__iobroker.cwd}>`,
                         data: Object.keys(ws.__iobroker.env).map(v => `declare -x ${v}="${ws.__iobroker.env[v]}"`).sort().join('\r\n')
                     };
                     ws.send(JSON.stringify(result));
-                } else
-                if (message.command.startsWith('set ') || message.command.startsWith('export ')) {
+                } else if (message.command.startsWith('set ') || message.command.startsWith('export ')) {
                     const result = {
-                        prompt: ws.__iobroker.cwd + '>',
+                        prompt: `${ws.__iobroker.cwd}>`,
                     };
                     let [name, val] = message.command.split('=', 2);
 
@@ -432,7 +415,7 @@ function initSocketConnection(ws) {
                     executeCommand(message.command, ws, code => {
                         ws._isExecuting = false;
                         ws.__iobroker && ws.send(JSON.stringify({
-                            prompt: ws.__iobroker.cwd + '>',
+                            prompt: `${ws.__iobroker.cwd}>`,
                             isExecuting: false,
                             exitCode: code
                         }));
@@ -467,7 +450,7 @@ function initSocketConnection(ws) {
     });
 
     ws.send(JSON.stringify({mode: adapter.config.pty ? 'pty' : 'simulate'}));
-    !adapter.config.pty && ws.send(JSON.stringify({prompt: ws.__iobroker.cwd + '>'}));
+    !adapter.config.pty && ws.send(JSON.stringify({prompt: `${ws.__iobroker.cwd}>`}));
 
     adapter.log.debug('WebSocket connection established');
 }
@@ -480,10 +463,10 @@ function initSocketConnection(ws) {
 //}
 function initWebServer(settings) {
     const server = {
-        app:       null,
-        server:    null,
-        io:        null,
-        settings:  settings
+        app:    null,
+        server: null,
+        io:     null,
+        settings,
     };
 
     settings.port = parseInt(settings.port, 10) || 8099;
@@ -495,7 +478,7 @@ function initWebServer(settings) {
 
         adapter.getPort(settings.port, (!settings.bind || settings.bind === '0.0.0.0') ? undefined : settings.bind || undefined, async port => {
             if (parseInt(port, 10) !== settings.port && !adapter.config.findNextPort) {
-                adapter.log.error('port ' + settings.port + ' already in use');
+                adapter.log.error(`port ${settings.port} already in use`);
                 return adapter.terminate ? adapter.terminate(utils.EXIT_CODES.ADAPTER_REQUESTED_TERMINATION) : process.exit(utils.EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
             }
 
@@ -526,17 +509,30 @@ function initWebServer(settings) {
 
                 if (files[file]) {
                     res.setHeader('Content-Type', files[file].contentType);
-                    res.send(fs.readFileSync(files[file].path));
+                    if (files[file].data) {
+                        res.send(files[file].data);
+                    } else {
+                        res.send(fs.readFileSync(files[file].path));
+                    }
                 } else if (!file || file === '/') {
                     res.setHeader('Content-Type', files['index.html'].contentType);
-                    res.send(fs.readFileSync(files['index.html'].path));
+                    if (files['index.html'].data) {
+                        res.send(files['index.html'].data);
+                    } else {
+                        res.send(fs.readFileSync(files['index.html'].path));
+                    }
                 } else {
                     res.status(404).json({error: 'not found'});
                 }
             });
 
             try {
-                server.server = await LE.createServerAsync(server.app, settings, adapter.config.certificates, adapter.config.leConfig, adapter.log, adapter);
+                const webserver = new IoBWebServer.WebServer({
+                    app: server.app,
+                    adapter,
+                    secure: settings.secure,
+                });
+                server.server = await webserver.init();
             } catch (err) {
                 adapter.log.error(`Cannot create webserver: ${err}`);
                 adapter.terminate ? adapter.terminate(utils.EXIT_CODES.ADAPTER_REQUESTED_TERMINATION) : process.exit(utils.EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
@@ -566,7 +562,7 @@ function initWebServer(settings) {
             // Start the web server
             server.server.listen(settings.port, (!settings.bind || settings.bind === '0.0.0.0') ? undefined : settings.bind || undefined, () => {
                 serverListening = true;
-                adapter.log.debug('XTerm is listening on '  + (adapter.config.port || 8099));
+                adapter.log.debug(`XTerm is listening on ${adapter.config.port || 8099}`);
             });
 
             // upgrade socket
@@ -609,6 +605,12 @@ async function main() {
     if (obj.common.type !== 'string') {
         obj.common.type = 'string';
         await adapter.setObjectAsync(obj._id, obj);
+    }
+
+    if (adapter.config.doNotUseCanvas) {
+        let index = fs.readFileSync(`${__dirname}/public/index.html`).toString();
+        index = index.replace('<script src="./xterm-addon-canvas.js"></script>', '');
+        files['index.html'].data = index;
     }
 
     await adapter.setStateChangedAsync('info.connection', '', true);

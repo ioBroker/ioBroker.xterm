@@ -39,7 +39,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 -->
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 2.0.1 (2023-09-18)
 * (bluefox) xterm library updated
 * (bluefox) Move Lets encrypt settings to acme adapter
 * (bluefox) Minimal supported node.js version is 16

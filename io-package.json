@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "xterm",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "news": {
+      "2.0.1": {
+        "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
+        "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
+        "ru": "обновлена библиотека xterm\nMove Lets зашифровать настройки в acme адаптер\nМинимальная поддерживаемая версия node.js 16",
+        "pt": "biblioteca xterm atualizado\nMover Permite criptografar configurações para o adaptador acme\nNode.js com suporte mínimo é 16",
+        "nl": "xterm bibliotheek update\nVerplaats Lets encrypt setting om acme adapter te maken\nMinimale ondersteunde node",
+        "fr": "xterm library updated\nDéplacer permet de chiffrer les paramètres à l'adaptateur acme\nVersion node.js supportée Minimal est 16",
+        "it": "xterm library aggiornato\nSposta Consente di crittografare le impostazioni all'adattatore acme\nMinimal supportato node.js versione è 16",
+        "es": "xterm library updated\nMover Permite encriptar los ajustes para el adaptador de acme\nMinimal soportado node.js versión es 16",
+        "pl": "biblioteki xterm\nMove Lets encrypts adapter to acme adapter\nMinimal supportowana wersja węzła wynosi 16",
+        "uk": "русскийукраїнськабеларускаяoʻzbek tilienglish\nПеремістити налаштування шифрування до адаптера Acme\nMinimal підтримуваний node.js версія 16",
+        "zh-cn": "更新图书馆\n让加密环境适应者\n米切尔支持不dejs版本为16。"
+      },
       "1.1.0": {
         "en": "Update xterm library\nPrepare for future js-controller versions",
         "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",

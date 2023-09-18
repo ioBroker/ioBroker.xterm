@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "xterm",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "news": {
+      "2.0.0": {
+        "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
+        "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
+        "ru": "обновлена библиотека xterm\nMove Lets зашифровать настройки в acme адаптер\nМинимальная поддерживаемая версия node.js 16",
+        "pt": "biblioteca xterm atualizado\nMover Permite criptografar configurações para o adaptador acme\nNode.js com suporte mínimo é 16",
+        "nl": "xterm bibliotheek update\nVerplaats Lets encrypt setting om acme adapter te maken\nMinimale ondersteunde node",
+        "fr": "xterm library updated\nDéplacer permet de chiffrer les paramètres à l'adaptateur acme\nVersion node.js supportée Minimal est 16",
+        "it": "xterm library aggiornato\nSposta Consente di crittografare le impostazioni all'adattatore acme\nMinimal supportato node.js versione è 16",
+        "es": "xterm library updated\nMover Permite encriptar los ajustes para el adaptador de acme\nMinimal soportado node.js versión es 16",
+        "pl": "biblioteki xterm\nMove Lets encrypts adapter to acme adapter\nMinimal supportowana wersja węzła wynosi 16",
+        "uk": "русскийукраїнськабеларускаяoʻzbek tilienglish\nПеремістити налаштування шифрування до адаптера Acme\nMinimal підтримуваний node.js версія 16",
+        "zh-cn": "更新图书馆\n让加密环境适应者\n米切尔支持不dejs版本为16。"
+      },
       "1.1.0": {
         "en": "Update xterm library\nPrepare for future js-controller versions",
         "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",
@@ -74,18 +87,6 @@
         "es": "Se agregó la terminal real (bash o cmd.exe) a una simulada",
         "pl": "Dodano prawdziwy terminal (bash lub cmd.exe) do symulowanego",
         "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
-      },
-      "0.1.0": {
-        "en": "changed type of the connection state to \"string\"",
-        "de": "Typ des Verbindungsstatus in \"string\" geändert",
-        "ru": "изменен тип состояния подключения на \"строка\"",
-        "pt": "mudou o tipo de estado da conexão para \"string\"",
-        "nl": "type van de verbindingsstatus gewijzigd in \"string\"",
-        "fr": "changement du type de l'état de la connexion en \"chaîne\"",
-        "it": "modificato il tipo dello stato di connessione in \"stringa\"",
-        "es": "cambió el tipo de estado de conexión a \"cadena\"",
-        "pl": "zmieniono typ stanu połączenia na „string”",
-        "zh-cn": "将连接状态的类型更改为“字符串”"
       }
     },
     "title": "Shell console XTerm",

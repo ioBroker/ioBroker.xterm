@@ -89,7 +89,6 @@
         "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
       }
     },
-    "title": "Shell console XTerm",
     "titleLang": {
       "en": "Shell console XTerm",
       "de": "Shell-Konsole XTerm",

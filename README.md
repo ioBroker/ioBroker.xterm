@@ -79,7 +79,7 @@ Note: Some terminal commands with interactivity do not work. E.g. `nano` and som
 ## License
 MIT License
 
-Copyright (c) 2021-2023 ioBroker <dogafox@gmail.com>
+Copyright (c) 2021-2026 ioBroker <dogafox@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

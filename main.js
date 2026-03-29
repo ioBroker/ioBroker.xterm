@@ -2,12 +2,12 @@
 
 const utils    = require('@iobroker/adapter-core');
 const ws       = require('ws');
-const { exec } = require('child_process');
-const fs       = require('fs');
-const path     = require('path');
+const { exec } = require('node:child_process');
+const fs       = require('node:fs');
+const path     = require('node:path');
 const express  = require('express');
 const iconv    = require('iconv-lite');
-const os       = require('os');
+const os       = require('node:os');
 const IoBWebServer = require('@iobroker/webserver');
 let pty;
 

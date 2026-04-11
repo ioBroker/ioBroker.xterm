@@ -9,6 +9,7 @@
   "homepage": "https://github.com/ioBroker/ioBroker.xterm",
   "license": "MIT",
   "keywords": [
+    "ioBroker",
     "terminal",
     "ssh"
   ],

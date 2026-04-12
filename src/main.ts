@@ -1,20 +1,15 @@
 import { Adapter, type AdapterOptions, EXIT_CODES, getAbsoluteDefaultDataDir } from '@iobroker/adapter-core';
 import { WebServer as IoBWebServer } from '@iobroker/webserver';
-import { exec, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
-import path from 'node:path';
 import os from 'node:os';
 import express from 'express';
-import * as iconv from 'iconv-lite';
 import { WebSocketServer, type WebSocket } from 'ws';
-import type * as PTy from 'node-pty';
+import * as pty from 'node-pty';
 import type { Socket, AddressInfo } from 'node:net';
 import type { Server as HttpServer } from 'node:http';
 import type { Server as HttpsServer } from 'node:https';
 
 import type { XtermAdapterConfig } from './types';
-
-let pty: typeof PTy | undefined;
 
 interface FileEntry {
     path: string;
@@ -24,17 +19,12 @@ interface FileEntry {
 
 interface IobrokerMeta {
     cwd: string;
-    env: Record<string, string | undefined>;
-    encoding: string;
     address: string;
-    ptyProcess?: PTy.IPty;
+    ptyProcess?: pty.IPty;
 }
 
 interface XtermWebSocket extends WebSocket {
     __iobroker?: IobrokerMeta;
-    _stdin: NodeJS.WritableStream | null;
-    _process: ChildProcess | null;
-    _isExecuting: boolean;
     _socket: Socket & { ___auth?: boolean };
 }
 
@@ -88,9 +78,11 @@ class XtermAdapter extends Adapter {
     }
 
     private initFileMap(): void {
-        const locationXterm = require.resolve('xterm').replace(/\\/g, '/');
-        const locationXtermFit = require.resolve('xterm-addon-fit').replace(/\\/g, '/');
-        const locationXtermCanvas = require.resolve('xterm-addon-canvas').replace(/\\/g, '/');
+        const locationXterm = require.resolve('@xterm/xterm').replace(/\\/g, '/');
+        const locationXtermFit = require.resolve('@xterm/addon-fit').replace(/\\/g, '/');
+        const locationXtermWebgl = require.resolve('@xterm/addon-webgl').replace(/\\/g, '/');
+        const locationXtermWebLinks = require.resolve('@xterm/addon-web-links').replace(/\\/g, '/');
+        const locationXtermSearch = require.resolve('@xterm/addon-search').replace(/\\/g, '/');
 
         this.files = {
             'xterm.js': { path: locationXterm, contentType: 'text/javascript' },
@@ -101,8 +93,12 @@ class XtermAdapter extends Adapter {
             },
             'xterm-addon-fit.js': { path: locationXtermFit, contentType: 'text/javascript' },
             'xterm-addon-fit.js.map': { path: `${locationXtermFit}.map`, contentType: 'text/javascript' },
-            'xterm-addon-canvas.js': { path: locationXtermCanvas, contentType: 'text/javascript' },
-            'xterm-addon-canvas.js.map': { path: `${locationXtermCanvas}.map`, contentType: 'text/javascript' },
+            'xterm-addon-webgl.js': { path: locationXtermWebgl, contentType: 'text/javascript' },
+            'xterm-addon-webgl.js.map': { path: `${locationXtermWebgl}.map`, contentType: 'text/javascript' },
+            'xterm-addon-web-links.js': { path: locationXtermWebLinks, contentType: 'text/javascript' },
+            'xterm-addon-web-links.js.map': { path: `${locationXtermWebLinks}.map`, contentType: 'text/javascript' },
+            'xterm-addon-search.js': { path: locationXtermSearch, contentType: 'text/javascript' },
+            'xterm-addon-search.js.map': { path: `${locationXtermSearch}.map`, contentType: 'text/javascript' },
             'index.html': { path: `${__dirname}/../public/index.html`, contentType: 'text/html' },
             'favicon.ico': { path: `${__dirname}/../public/favicon.ico`, contentType: 'image/x-icon' },
         };
@@ -145,133 +141,9 @@ class XtermAdapter extends Adapter {
             await this.setObjectAsync(obj._id, obj);
         }
 
-        if (this.config.doNotUseCanvas) {
-            let index = fs.readFileSync(`${__dirname}/../public/index.html`).toString();
-            index = index.replace('<script src="./xterm-addon-canvas.js"></script>', '');
-            this.files['index.html'].data = index;
-        }
-
         await this.setStateChangedAsync('info.connection', '', true);
-        this.config.encoding = this.config.encoding || 'utf-8';
         this.server = this.initWebServer(this.config);
         await this.setStateChangedAsync('info.connection', 'none', true);
-    }
-
-    private executeCommand(command: string, ws: XtermWebSocket, cb?: (code: number | null) => void): void {
-        if (!ws.__iobroker) {
-            throw new Error('Invalid socket');
-        }
-        ws.__iobroker.encoding = '';
-        const ls = exec(command, { cwd: ws.__iobroker.cwd, env: ws.__iobroker.env, encoding: 'buffer' });
-
-        ls.stdout?.on('data', (data: Buffer) => {
-            const decoded = iconv.decode(data, this.config.encoding);
-            ws.send(JSON.stringify({ data: decoded }));
-        });
-
-        ls.stderr?.on('data', (data: Buffer) => {
-            const decoded = iconv.decode(data, this.config.encoding);
-            this.log.error(`stderr: ${decoded}`);
-            ws.send(JSON.stringify({ data: decoded, error: true }));
-        });
-
-        ls.on('exit', (code: number | null) => {
-            ws._stdin = null;
-            ws._process = null;
-            this.log.debug(`child process exited with code ${code === null ? 'null' : code.toString()}`);
-            // wait for the outputs
-            if (cb) {
-                setTimeout(() => cb(code), 100);
-            }
-        });
-
-        ws._stdin = ls.stdin;
-        ws._process = ls;
-    }
-
-    private static isDirectory(thePath: string): boolean {
-        return fs.existsSync(thePath) && fs.statSync(thePath).isDirectory();
-    }
-
-    private cd(thePath: string, ws: XtermWebSocket): string | { data: string; prompt?: string } {
-        thePath = thePath.trim().replace(/\\/g, '/');
-        if (!ws.__iobroker) {
-            throw new Error('Invalid socket');
-        }
-        if (!thePath) {
-            thePath = ws.__iobroker.cwd;
-        }
-
-        if (thePath) {
-            if (thePath === '.') {
-                // do not change anything
-            } else if (thePath === '..') {
-                const parts = ws.__iobroker.cwd.split('/');
-                if (parts.length > 1) {
-                    parts.pop();
-                }
-                ws.__iobroker.cwd = parts.join('/');
-            } else if (/^\w:/.test(thePath) || thePath.startsWith('/')) {
-                // full path
-                if (XtermAdapter.isDirectory(thePath)) {
-                    ws.__iobroker.cwd = thePath;
-                } else {
-                    return { data: `cd ${thePath}: No such directory` };
-                }
-            } else {
-                // add to current
-                thePath = path.join(ws.__iobroker.cwd, thePath).replace(/\\/g, '/');
-                if (XtermAdapter.isDirectory(thePath)) {
-                    ws.__iobroker.cwd = thePath;
-                } else {
-                    return { data: `cd ${thePath}: No such directory` };
-                }
-            }
-        }
-
-        return ws.__iobroker.cwd.includes('/') ? ws.__iobroker.cwd : `${ws.__iobroker.cwd}/`;
-    }
-
-    private completion(pattern: string, ws: XtermWebSocket): string[] {
-        let scanPath = '';
-        let completionPrefix = '';
-        let data: string[] = [];
-        if (!ws.__iobroker) {
-            throw new Error('Invalid socket');
-        }
-        if (pattern) {
-            if (!XtermAdapter.isDirectory(pattern)) {
-                pattern = path.dirname(pattern);
-                pattern = pattern === '.' ? '' : pattern;
-            }
-            if (pattern) {
-                if (XtermAdapter.isDirectory(pattern)) {
-                    scanPath = pattern;
-                    completionPrefix = pattern;
-                    if (completionPrefix.endsWith('/')) {
-                        completionPrefix += '/';
-                    }
-                }
-            } else {
-                scanPath = ws.__iobroker.cwd;
-            }
-        } else {
-            scanPath = ws.__iobroker.cwd;
-        }
-
-        if (scanPath) {
-            data = fs.readdirSync(scanPath);
-            data.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-
-            if (completionPrefix && data.length > 0) {
-                data = data.map(c => completionPrefix + c);
-            }
-            if (pattern && data.length > 0) {
-                data = data.filter(c => c.substring(0, pattern.length) === pattern);
-            }
-        }
-
-        return data;
     }
 
     private auth(req: express.Request, callback: (result: boolean, text?: string) => void): void {
@@ -325,7 +197,7 @@ class XtermAdapter extends Adapter {
             }
         }
 
-        this.checkPassword(username, password, result => {
+        void this.checkPassword(username, password, result => {
             if (result) {
                 this.cache = { data: str, ts: Date.now() };
                 if (this.bruteForce[username]) {
@@ -345,14 +217,12 @@ class XtermAdapter extends Adapter {
     private startShell(ws: XtermWebSocket): void {
         const shell = os.platform() === 'win32' ? 'cmd.exe' : 'bash';
 
-        if (!ws) {
+        if (!ws?.__iobroker) {
             return;
         }
-        if (!ws.__iobroker) {
-            throw new Error('Invalid socket');
-        }
-        ws.__iobroker.ptyProcess = pty!.spawn(shell, [], {
-            name: `xterm-color-${Date.now()}`,
+
+        ws.__iobroker.ptyProcess = pty.spawn(shell, [], {
+            name: 'xterm-256color',
             cols: 80,
             rows: 30,
             cwd: this.IOB_DIR,
@@ -368,11 +238,9 @@ class XtermAdapter extends Adapter {
         });
     }
 
-    private async initSocketConnection(ws: XtermWebSocket): Promise<void> {
+    private initSocketConnection(ws: XtermWebSocket): void {
         ws.__iobroker = {
             cwd: this.IOB_DIR,
-            env: JSON.parse(JSON.stringify(process.env)),
-            encoding: 'buffer',
             address: (ws._socket.address() as AddressInfo).address,
         };
 
@@ -382,23 +250,12 @@ class XtermAdapter extends Adapter {
             return;
         }
 
-        if (this.config.pty) {
-            try {
-                pty = pty || (await import('node-pty'));
-            } catch {
-                this.log.error('node-pty was not installed, can not use bash/cmd.exe - fallback to simulated shell!');
-                this.config.pty = false;
-            }
-        }
-
-        if (this.config.pty) {
-            this.startShell(ws);
-        }
+        this.startShell(ws);
 
         if (!this.connectedIPs.includes(ws.__iobroker.address)) {
             this.connectedIPs.push(ws.__iobroker.address);
         }
-        this.setState('info.connection', this.connectedIPs.join(', ') || 'none', true);
+        void this.setStateAsync('info.connection', this.connectedIPs.join(', ') || 'none', true);
 
         ws.on('message', (rawMessage: Buffer | string) => {
             if (!ws.__iobroker) {
@@ -407,39 +264,12 @@ class XtermAdapter extends Adapter {
             const message = JSON.parse(rawMessage.toString());
             if (message.method === 'resize') {
                 ws.__iobroker.ptyProcess?.resize(message.cols, message.rows);
-            } else if (message.method === 'prompt') {
-                ws.send(
-                    JSON.stringify({
-                        data: '',
-                        prompt: `${ws.__iobroker.cwd}>`,
-                    }),
-                );
             } else if (message.method === 'key') {
-                if (ws.__iobroker.ptyProcess) {
-                    ws.__iobroker.ptyProcess.write(message.key);
-                } else if (message.key === '\u0003' && ws._process?.kill) {
-                    ws._process.kill();
-                } else if (ws._stdin) {
-                    ws._stdin.write(message.key);
-                }
-            } else if (message.method === 'tab') {
-                const str = this.completion(message.start, ws);
-                ws.send(JSON.stringify({ completion: str }));
-            } else if (message.method === 'command') {
-                this.handleCommand(message, ws);
+                ws.__iobroker.ptyProcess?.write(message.key);
             }
         });
 
         ws.on('close', () => {
-            if (ws._process) {
-                try {
-                    ws._process.kill();
-                } catch {
-                    // ignore
-                }
-                ws._process = null;
-                ws._stdin = null;
-            }
             if (ws.__iobroker?.ptyProcess) {
                 try {
                     ws.__iobroker.ptyProcess.kill();
@@ -455,111 +285,10 @@ class XtermAdapter extends Adapter {
                 delete ws.__iobroker;
             }
             this.log.debug('WebSocket connection disconnected');
-            this.setState('info.connection', this.connectedIPs.join(', ') || 'none', true);
+            void this.setStateAsync('info.connection', this.connectedIPs.join(', ') || 'none', true);
         });
 
-        ws.send(JSON.stringify({ mode: this.config.pty ? 'pty' : 'simulate' }));
-        if (!this.config.pty && ws.__iobroker) {
-            ws.send(JSON.stringify({ prompt: `${ws.__iobroker.cwd}>` }));
-        }
-
         this.log.debug('WebSocket connection established');
-    }
-
-    private handleCommand(message: { command: string }, ws: XtermWebSocket): void {
-        if (ws._isExecuting) {
-            return;
-        }
-        if (!ws.__iobroker) {
-            throw new Error('Invalid socket');
-        }
-        if (!message.command) {
-            ws.send(JSON.stringify({ prompt: `${ws.__iobroker.cwd}>` }));
-            return;
-        }
-
-        // fix user typo
-        if (message.command === 'cd..') {
-            message.command = 'cd ..';
-        } else if (message.command === 'cd') {
-            message.command = 'cd .';
-        }
-
-        if (message.command.startsWith('cd ')) {
-            const result = this.cd(message.command.substring(3), ws);
-            if (typeof result === 'string') {
-                ws.send(
-                    JSON.stringify({
-                        data: '',
-                        prompt: `${result}>`,
-                    }),
-                );
-            } else {
-                result.prompt = `${ws.__iobroker.cwd}>`;
-                ws.send(JSON.stringify(result));
-            }
-        } else if (message.command === 'pwd') {
-            ws.send(
-                JSON.stringify({
-                    prompt: `${ws.__iobroker.cwd}>`,
-                    data: ws.__iobroker.cwd,
-                }),
-            );
-        } else if (message.command === 'set' || message.command === 'env') {
-            ws.send(
-                JSON.stringify({
-                    prompt: `${ws.__iobroker.cwd}>`,
-                    data: Object.keys(ws.__iobroker.env)
-                        .map(v => `${v}=${ws.__iobroker!.env[v]}`)
-                        .sort()
-                        .join('\r\n'),
-                }),
-            );
-        } else if (message.command === 'export') {
-            ws.send(
-                JSON.stringify({
-                    prompt: `${ws.__iobroker.cwd}>`,
-                    data: Object.keys(ws.__iobroker.env)
-                        .map(v => `declare -x ${v}="${ws.__iobroker!.env[v]}"`)
-                        .sort()
-                        .join('\r\n'),
-                }),
-            );
-        } else if (message.command.startsWith('set ') || message.command.startsWith('export ')) {
-            let [name, val] = message.command.split('=', 2);
-
-            if (name !== undefined) {
-                name = name.trim();
-                name = name.split(' ').pop()!;
-            }
-            if (val !== undefined) {
-                val = val.trim().replace(/^"/, '').replace(/"$/, '');
-                ws.__iobroker.env[name] = val;
-            }
-
-            ws.send(JSON.stringify({ prompt: `${ws.__iobroker.cwd}>` }));
-        } else {
-            ws._isExecuting = true;
-            ws.send(JSON.stringify({ isExecuting: true }));
-
-            let command = message.command;
-            if (command === 'node') {
-                command += ' -i';
-            }
-
-            this.executeCommand(command, ws, code => {
-                ws._isExecuting = false;
-                if (ws.__iobroker) {
-                    ws.send(
-                        JSON.stringify({
-                            prompt: `${ws.__iobroker.cwd}>`,
-                            isExecuting: false,
-                            exitCode: code,
-                        }),
-                    );
-                }
-            });
-        }
     }
 
     private initWebServer(settings: XtermAdapterConfig): WebServerInstance | null {

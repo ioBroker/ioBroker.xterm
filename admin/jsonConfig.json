@@ -47,38 +47,6 @@
                     "sm": 12,
                     "md": 6,
                     "lg": 2
-                },
-                "pty": {
-                    "newLine": true,
-                    "type": "checkbox",
-                    "label": "Use Bash or cmd.exe",
-                    "help": "If unchecked, the shell will be simulated",
-                    "sm": 12,
-                    "md": 12,
-                    "lg": 4
-                },
-                "encoding": {
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 2,
-                    "hidden": "data.pty===true",
-                    "newLine": true,
-                    "type": "select",
-                    "label": "Terminal encoding",
-                    "noTranslation": true,
-                    "options": [
-                        { "label": "utf-8", "value": "utf-8" },
-                        { "label": "cp850 - german", "value": "cp850" },
-                        { "label": "cp1251 - russin", "value": "cp1251" }
-                    ]
-                },
-                "doNotUseCanvas": {
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 2,
-                    "newLine": true,
-                    "type": "checkbox",
-                    "label": "Do not use canvas plugin"
                 }
             }
         },

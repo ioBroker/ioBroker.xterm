@@ -166,11 +166,8 @@
   "native": {
     "bind": "0.0.0.0",
     "port": "8099",
-    "pty": true,
     "secure": false,
-    "auth": true,
-    "encoding": "utf-8",
-    "doNotUseCanvas": false
+    "auth": true
   },
   "objects": [],
   "instanceObjects": [

@@ -13,36 +13,103 @@
         />
         <script src="./xterm.js"></script>
         <script src="./xterm-addon-fit.js"></script>
-        <script src="./xterm-addon-canvas.js"></script>
+        <script src="./xterm-addon-webgl.js"></script>
+        <script src="./xterm-addon-web-links.js"></script>
+        <script src="./xterm-addon-search.js"></script>
         <style>
             html,
             body {
                 width: 100%;
                 height: 100%;
+                margin: 0;
+                padding: 0;
                 overflow: hidden;
+                background: #1e1e1e;
             }
             #terminal {
                 width: calc(100% - 8px);
                 height: calc(100% - 8px);
+                padding: 4px;
                 overflow: hidden;
             }
             .disconnected {
                 opacity: 0.2;
             }
+            #search-bar {
+                display: none;
+                position: fixed;
+                top: 8px;
+                right: 24px;
+                z-index: 100;
+                background: #252526;
+                border: 1px solid #555;
+                border-radius: 4px;
+                padding: 4px 8px;
+            }
+            #search-bar.visible {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            #search-input {
+                background: #1e1e1e;
+                color: #d4d4d4;
+                border: 1px solid #555;
+                border-radius: 2px;
+                padding: 3px 6px;
+                font-size: 13px;
+                outline: none;
+                width: 220px;
+            }
+            #search-input:focus {
+                border-color: #007acc;
+            }
+            .search-btn {
+                background: #333;
+                color: #d4d4d4;
+                border: 1px solid #555;
+                border-radius: 2px;
+                padding: 3px 8px;
+                cursor: pointer;
+                font-size: 12px;
+            }
+            .search-btn:hover {
+                background: #444;
+            }
             /* scrollbar */
             *::-webkit-scrollbar-track {
-                background-color: #ccc;
+                background-color: #1e1e1e;
             }
             *::-webkit-scrollbar {
-                width: 6px;
-                background-color: #ccc;
+                width: 10px;
+                background-color: #1e1e1e;
             }
             *::-webkit-scrollbar-thumb {
-                background-color: #575757;
+                background-color: #444;
+                border-radius: 4px;
             }
         </style>
     </head>
     <body>
+        <div id="search-bar">
+            <input
+                id="search-input"
+                type="text"
+                placeholder="Search..."
+            />
+            <button
+                class="search-btn"
+                id="search-prev"
+            >&#9650;</button>
+            <button
+                class="search-btn"
+                id="search-next"
+            >&#9660;</button>
+            <button
+                class="search-btn"
+                id="search-close"
+            >&#10005;</button>
+        </div>
         <div id="terminal"></div>
         <script>
             let resizeTimeout;
@@ -50,50 +117,140 @@
             let connectTimer;
             let connectingTimeout;
             const terminalDiv = document.getElementById('terminal');
-            let currentLine = '';
-            let isExecuting = false;
-            const entries = [];
-            const completion = {};
-            let cmdHistory = [];
-            let historyPosition = -1;
-            let copied = '';
-            let puttyMode = true;
-            let resizeSent = null;
 
+            const term = new Terminal({
+                cursorBlink: true,
+                cursorStyle: 'block',
+                scrollback: 5000,
+                fontSize: 14,
+                fontFamily: 'Consolas, "Courier New", monospace',
+                allowProposedApi: true,
+                theme: {
+                    background: '#1e1e1e',
+                    foreground: '#d4d4d4',
+                    cursor: '#d4d4d4',
+                    cursorAccent: '#1e1e1e',
+                    selectionBackground: '#264f78',
+                    selectionForeground: '#ffffff',
+                    black: '#1e1e1e',
+                    red: '#f44747',
+                    green: '#6a9955',
+                    yellow: '#d7ba7d',
+                    blue: '#569cd6',
+                    magenta: '#c586c0',
+                    cyan: '#4ec9b0',
+                    white: '#d4d4d4',
+                    brightBlack: '#808080',
+                    brightRed: '#f44747',
+                    brightGreen: '#6a9955',
+                    brightYellow: '#d7ba7d',
+                    brightBlue: '#569cd6',
+                    brightMagenta: '#c586c0',
+                    brightCyan: '#4ec9b0',
+                    brightWhite: '#ffffff',
+                },
+            });
+
+            terminalDiv.className = 'disconnected';
+
+            // Addons
+            const fitAddon = new FitAddon.FitAddon();
+            term.loadAddon(fitAddon);
+
+            const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+            term.loadAddon(webLinksAddon);
+
+            const searchAddon = new SearchAddon.SearchAddon();
+            term.loadAddon(searchAddon);
+
+            term.open(terminalDiv);
+
+            // Try WebGL renderer, ignore if unsupported
             try {
-                cmdHistory = JSON.parse(window.localStorage.getItem('xterm.history') || '[]');
+                const webglAddon = new WebglAddon.WebglAddon();
+                webglAddon.onContextLoss(() => webglAddon.dispose());
+                term.loadAddon(webglAddon);
             } catch (e) {
-                // ignore
+                console.warn('WebGL addon not available, using default renderer');
             }
 
-            function findOption() {
-                if (!completion || !completion.options) {
-                    return '';
-                }
-                if (completion.lastSearch === currentLine) {
-                    completion.index++;
-                    if (completion.index >= completion.filteredOptions.length) {
-                        completion.index = 0;
-                    }
-                    return completion.filteredOptions[completion.index] || '';
-                }
-                const word = currentLine.split(' ').pop();
-                completion.filteredOptions = completion.options.filter(a => a.startsWith(word));
-                completion.lastSearch = currentLine;
-                completion.index = 0;
-                return completion.filteredOptions[completion.index] || '';
+            fitAddon.fit();
+
+            // Search bar
+            const searchBar = document.getElementById('search-bar');
+            const searchInput = document.getElementById('search-input');
+            const searchPrev = document.getElementById('search-prev');
+            const searchNext = document.getElementById('search-next');
+            const searchClose = document.getElementById('search-close');
+
+            function openSearch() {
+                searchBar.classList.add('visible');
+                searchInput.focus();
+                searchInput.select();
             }
+
+            function closeSearch() {
+                searchBar.classList.remove('visible');
+                searchAddon.clearDecorations();
+                term.focus();
+            }
+
+            searchInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.shiftKey ? searchAddon.findPrevious(searchInput.value) : searchAddon.findNext(searchInput.value);
+                } else if (e.key === 'Escape') {
+                    closeSearch();
+                }
+            });
+            searchPrev.addEventListener('click', () => searchAddon.findPrevious(searchInput.value));
+            searchNext.addEventListener('click', () => searchAddon.findNext(searchInput.value));
+            searchClose.addEventListener('click', closeSearch);
+
+            // Copy on select (PuTTY-style)
+            term.onSelectionChange(() => {
+                const selected = term.getSelection();
+                if (selected.length) {
+                    navigator.clipboard.writeText(selected).catch(() => {});
+                }
+            });
+
+            // Right-click paste
+            terminalDiv.addEventListener('contextmenu', event => {
+                event.preventDefault();
+                navigator.clipboard.readText().then(text => {
+                    if (text && ws) {
+                        ws.send(JSON.stringify({ method: 'key', key: text }));
+                    }
+                }).catch(() => {});
+            });
+
+            // All keystrokes go straight to the PTY
+            term.onData(data => {
+                if (ws) {
+                    ws.send(JSON.stringify({ method: 'key', key: data }));
+                }
+            });
+
+            // Ctrl+Shift+F for search
+            term.attachCustomKeyEventHandler(e => {
+                if (e.type === 'keydown' && e.ctrlKey && e.shiftKey && e.key === 'F') {
+                    openSearch();
+                    return false;
+                }
+                return true;
+            });
 
             function reconnect(noWait) {
                 terminalDiv.className = 'disconnected';
-                isExecuting = false;
 
                 connectTimer =
                     connectTimer ||
                     setTimeout(
                         () => {
                             connectTimer = null;
-                            connectingTimeout && clearTimeout(connectingTimeout);
+                            if (connectingTimeout) {
+                                clearTimeout(connectingTimeout);
+                            }
                             connectingTimeout = setTimeout(() => {
                                 console.log('Connect timeout');
                                 reconnect();
@@ -102,12 +259,15 @@
                             ws = new WebSocket(
                                 `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:${window.location.port}`,
                             );
-                            ws.onopen = function (event) {
-                                connectingTimeout && clearTimeout(connectingTimeout);
-                                connectingTimeout = null;
-                                //ws.send(JSON.stringify({method: 'prompt'}));
+                            ws.onopen = function () {
+                                if (connectingTimeout) {
+                                    clearTimeout(connectingTimeout);
+                                    connectingTimeout = null;
+                                }
                                 console.log('Connected');
                                 terminalDiv.className = '';
+                                // Send initial terminal size
+                                ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
                             };
 
                             ws.onerror = function (error) {
@@ -116,11 +276,10 @@
                                     ws.close();
                                     ws = null;
                                 } catch (e) {}
-
                                 reconnect();
                             };
 
-                            ws.onclose = function (event) {
+                            ws.onclose = function () {
                                 try {
                                     ws.close();
                                     ws = null;
@@ -128,236 +287,30 @@
                                 reconnect();
                             };
 
-                            // Receive data from socket
                             ws.onmessage = msg => {
-                                msg = JSON.parse(msg.data);
-                                if (msg.mode === 'pty') {
-                                    puttyMode = true;
-                                    return;
-                                } else if (msg.mode === 'simulate') {
-                                    puttyMode = false;
-                                    return;
-                                }
-
-                                if (msg.isExecuting !== undefined) {
-                                    isExecuting = msg.isExecuting;
-                                    if (!isExecuting) {
-                                        currentLine = '';
-                                    }
-                                }
-                                if (msg.completion) {
-                                    completion = { options: msg.completion };
-                                    processTab();
-                                }
-
-                                if (msg.data !== undefined) {
-                                    if (puttyMode || isExecuting) {
-                                        if (puttyMode && resizeSent && Date.now() - resizeSent < 500) {
-                                            resizeSent = null;
-                                            // ignore this line as it is duplicated
-                                            return;
-                                        }
-
-                                        if (msg.error) {
-                                            term.write(msg.data); // TODO: change color
-                                        } else {
-                                            term.write(msg.data);
-                                        }
-                                    } else {
-                                        if (msg.error) {
-                                            term.write('\r\n' + msg.data); // TODO: change color
-                                        } else {
-                                            term.write('\r\n' + msg.data);
-                                        }
-                                    }
-                                }
-
-                                if (msg.prompt === true) {
-                                    term.write('\r\nweb shell $ ');
-                                    currentLine = '';
-                                } else if (msg.prompt) {
-                                    term.write('\r\n' + msg.prompt + ' ');
-                                    currentLine = '';
+                                const parsed = JSON.parse(msg.data);
+                                if (parsed.data !== undefined) {
+                                    term.write(parsed.data);
                                 }
                             };
-
-                            setTimeout(function () {
-                                resizeSent = Date.now();
-                                ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
-                            }, 200);
                         },
                         noWait ? 0 : 5000,
                     );
             }
 
-            const term = new Terminal({
-                cursorBlink: 'block',
-                width: '100%',
-                height: '100%',
-                convertEol: true,
-                rendererType: 'dom',
-            });
-
-            terminalDiv.className = 'disconnected';
-
-            terminalDiv.addEventListener('contextmenu', event => {
-                event.preventDefault();
-
-                if (term.hasSelection()) {
-                    copied = term.getSelection();
-                    document.execCommand('copy');
-                    term.select(0, 0, 0);
-                } else {
-                    if (copied) {
-                        currentLine += copied;
-                        term.write(copied);
-                    } else {
-                        try {
-                            window.navigator.clipboard.readText().then(clipText => {
-                                currentLine += clipText;
-                                term.write(clipText);
-                            });
-                        } catch (e) {
-                            window.alert('Cannot access clipboard!');
-                        }
-                    }
-                }
-            });
-
-            const fitAddon = new FitAddon.FitAddon();
-            let canvasAddon;
-            if (typeof CanvasAddon !== 'undefined') {
-                canvasAddon = new CanvasAddon.CanvasAddon();
-            }
-
-            // webglAddon.onContextLoss(function (e) {
-            //     webglAddon.dispose();
-            // });
-
-            term.loadAddon(fitAddon);
-            canvasAddon && term.loadAddon(canvasAddon);
-
-            term.open(terminalDiv);
-
-            fitAddon.fit();
-
-            term.prompt = () => {
-                const data = { method: 'command', command: currentLine };
-                ws.send(JSON.stringify(data));
-            };
-
-            term.onSelectionChange(() => {
-                copied = term.getSelection();
-                if (copied.length) {
-                    document.execCommand('copy');
-                }
-            });
-
-            function replaceCurrentInput(newText) {
-                if (currentLine) {
-                    term.write(Array(currentLine.length + 1).join('\b \b'));
-                }
-                currentLine = newText;
-                term.write(currentLine);
-            }
-
-            function processTab() {
-                // remove actual tab text
-                if (completion.inputLength) {
-                    const toDelete = currentLine.length - completion.inputLength;
-                    currentLine = currentLine.substring(0, completion.inputLength);
-                    term.write(Array(toDelete + 1).join('\b \b'));
-                }
-
-                const line = findOption();
-                // remove actual text
-                if (line) {
-                    completion.inputLength = currentLine.length;
-                    const words = currentLine.split(' ');
-                    const lastWord = words.pop();
-                    const addedText = line.substring(lastWord.length);
-                    currentLine += addedText;
-                    term.write(addedText);
-                }
-            }
-
-            term.onKey(key => {
-                if (puttyMode || isExecuting) {
-                    !puttyMode && term.write(key.key);
-                    return ws.send(JSON.stringify({ method: 'key', key: key.key }));
-                }
-                if (key.domEvent.key === 'Tab') {
-                    if (!completion || !completion.options) {
-                        ws.send(JSON.stringify({ method: 'tab' }));
-                    } else {
-                        processTab();
-                    }
-                } else if (key.domEvent.key === 'ArrowUp') {
-                    // UP
-                    if (historyPosition < cmdHistory.length - 1) {
-                        historyPosition++;
-                        replaceCurrentInput(cmdHistory[historyPosition]);
-                    }
-                } else if (key.domEvent.key === 'ArrowDown') {
-                    // Down
-                    if (historyPosition > 0) {
-                        historyPosition--;
-                        replaceCurrentInput(cmdHistory[historyPosition]);
-                    }
-                } else if (key.domEvent.key === 'Enter') {
-                    //Enter
-                    completion = null;
-                    if (currentLine) {
-                        historyPosition = -1;
-                        cmdHistory.unshift(currentLine);
-                        window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
-                        entries.push(currentLine);
-                    }
-                    term.write('\r\n');
-
-                    if (currentLine.trim() === 'cls') {
-                        currentLine = '';
-                        term.clear();
-                    } else if (currentLine.trim() === 'history') {
-                        currentLine = '';
-                        term.write(
-                            cmdHistory.map((line, i) => ` ${(i + 1).toString().padStart(3)}  ${line}`).join('\r\n'),
-                        );
-                    } else if (currentLine.trim() === 'history -c') {
-                        currentLine = '';
-                        cmdHistory = [];
-                        window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
-                    }
-                    term.prompt();
-                } else if (key.domEvent.key === 'Backspace') {
-                    completion = null;
-                    // Backspace
-                    if (currentLine) {
-                        currentLine = currentLine.slice(0, currentLine.length - 1);
-                        term.write('\b \b');
-                    }
-                } else {
-                    historyPosition = -1;
-                    completion = null;
-                    currentLine += key.key;
-                    term.write(key.key);
-                }
-            });
-
             window.addEventListener(
                 'resize',
                 () => {
-                    resizeTimeout && clearTimeout(resizeTimeout);
+                    if (resizeTimeout) {
+                        clearTimeout(resizeTimeout);
+                    }
                     resizeTimeout = setTimeout(function () {
                         resizeTimeout = null;
                         fitAddon.fit();
-
-                        // update server terminal with new size
                         try {
-                            resizeSent = Date.now();
                             ws && ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
                         } catch (e) {}
-                    });
+                    }, 150);
                 },
                 true,
             );

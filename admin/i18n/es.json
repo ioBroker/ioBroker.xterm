@@ -6,7 +6,6 @@
     "Public certificate": "Certificado público",
     "Private certificate": "Certificado privado",
     "Chained certificate": "Certificado encadenado",
-    "Terminal encoding": "Codificación de terminales",
     "Read about Let's Encrypt certificates": "Más información sobre los certificados Let's Encrypt",
     "Use Let's Encrypt certificates": "Utilice certificados Let's Encrypt",
     "Use this instance for automatic update": "Utilice esta instancia para la actualización automática",
@@ -16,8 +15,5 @@
     "Warning!": "¡Advertencia!",
     "Unsecure_Auth": "La contraseña se enviará sin cifrar a través de una conexión no segura. Para proteger sus contraseñas, habilite la conexión segura (HTTPS).",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
-    "IP": "Interfaz IP local",
-    "Use Bash or cmd.exe": "Utilice Bash o cmd.exe",
-    "If unchecked, the shell will be simulated": "Si no está marcado, el shell será simulado.",
-    "Do not use canvas plugin": "No utilice el complemento de lienzo"
+    "IP": "Interfaz IP local"
 }

@@ -8,8 +8,7 @@ export default defineConfig({
     build: {
         outDir: '../public',
         emptyOutDir: true,
-        sourcemap: true,
-        minify: false,
+        sourcemap: false,
     },
     server: {
         proxy: {

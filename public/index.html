@@ -51,6 +51,59 @@
                 align-items: center;
                 gap: 4px;
             }
+            #paste-dialog {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 200;
+                background: rgba(0, 0, 0, 0.6);
+                align-items: center;
+                justify-content: center;
+            }
+            #paste-dialog.visible {
+                display: flex;
+            }
+            #paste-box {
+                background: #252526;
+                border: 1px solid #555;
+                border-radius: 6px;
+                padding: 16px;
+                width: 420px;
+                max-width: 90%;
+            }
+            #paste-box label {
+                color: #d4d4d4;
+                font-family: sans-serif;
+                font-size: 13px;
+                display: block;
+                margin-bottom: 8px;
+            }
+            #paste-area {
+                width: 100%;
+                height: 120px;
+                background: #1e1e1e;
+                color: #d4d4d4;
+                border: 1px solid #555;
+                border-radius: 3px;
+                padding: 6px;
+                font-family: Consolas, "Courier New", monospace;
+                font-size: 13px;
+                resize: vertical;
+                outline: none;
+                box-sizing: border-box;
+            }
+            #paste-area:focus {
+                border-color: #007acc;
+            }
+            #paste-buttons {
+                display: flex;
+                justify-content: flex-end;
+                gap: 8px;
+                margin-top: 10px;
+            }
             #search-input {
                 background: #1e1e1e;
                 color: #d4d4d4;
@@ -109,6 +162,16 @@
                 class="search-btn"
                 id="search-close"
             >&#10005;</button>
+        </div>
+        <div id="paste-dialog">
+            <div id="paste-box">
+                <label>Paste text into terminal (Ctrl+V here, then press Send):</label>
+                <textarea id="paste-area" autofocus></textarea>
+                <div id="paste-buttons">
+                    <button class="search-btn" id="paste-cancel">Cancel</button>
+                    <button class="search-btn" id="paste-send" style="background:#007acc;border-color:#007acc">Send</button>
+                </div>
+            </div>
         </div>
         <div id="terminal"></div>
         <script>
@@ -206,22 +269,89 @@
             searchNext.addEventListener('click', () => searchAddon.findNext(searchInput.value));
             searchClose.addEventListener('click', closeSearch);
 
+            // Copy to clipboard with fallback for HTTP
+            function copyToClipboard(text) {
+                if (navigator.clipboard?.writeText) {
+                    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+                } else {
+                    fallbackCopy(text);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+
             // Copy on select (PuTTY-style)
+            let lastSelection = '';
             term.onSelectionChange(() => {
                 const selected = term.getSelection();
                 if (selected.length) {
-                    navigator.clipboard.writeText(selected).catch(() => {});
+                    lastSelection = selected;
+                    copyToClipboard(selected);
+                }
+            });
+
+            // Paste dialog (fallback for non-secure contexts)
+            const pasteDialog = document.getElementById('paste-dialog');
+            const pasteArea = document.getElementById('paste-area');
+            const pasteSend = document.getElementById('paste-send');
+            const pasteCancel = document.getElementById('paste-cancel');
+
+            function openPasteDialog() {
+                pasteArea.value = '';
+                pasteDialog.classList.add('visible');
+                pasteArea.focus();
+            }
+
+            function closePasteDialog() {
+                pasteDialog.classList.remove('visible');
+                term.focus();
+            }
+
+            function sendPaste() {
+                const text = pasteArea.value;
+                if (text && ws) {
+                    ws.send(JSON.stringify({ method: 'key', key: text }));
+                }
+                closePasteDialog();
+            }
+
+            pasteSend.addEventListener('click', sendPaste);
+            pasteCancel.addEventListener('click', closePasteDialog);
+            pasteArea.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    sendPaste();
+                } else if (e.key === 'Escape') {
+                    closePasteDialog();
+                }
+            });
+            pasteDialog.addEventListener('click', e => {
+                if (e.target === pasteDialog) {
+                    closePasteDialog();
                 }
             });
 
             // Right-click paste
             terminalDiv.addEventListener('contextmenu', event => {
                 event.preventDefault();
-                navigator.clipboard.readText().then(text => {
-                    if (text && ws) {
-                        ws.send(JSON.stringify({ method: 'key', key: text }));
-                    }
-                }).catch(() => {});
+                if (navigator.clipboard?.readText) {
+                    navigator.clipboard.readText().then(text => {
+                        if (text && ws) {
+                            ws.send(JSON.stringify({ method: 'key', key: text }));
+                        }
+                    }).catch(() => openPasteDialog());
+                } else {
+                    openPasteDialog();
+                }
             });
 
             // All keystrokes go straight to the PTY
@@ -231,11 +361,20 @@
                 }
             });
 
-            // Ctrl+Shift+F for search
+            // Ctrl+Shift+F for search, Ctrl+Shift+V for paste dialog
             term.attachCustomKeyEventHandler(e => {
-                if (e.type === 'keydown' && e.ctrlKey && e.shiftKey && e.key === 'F') {
+                if (e.type !== 'keydown' || !e.ctrlKey || !e.shiftKey) {
+                    return true;
+                }
+                if (e.key === 'F') {
                     openSearch();
                     return false;
+                }
+                if (e.key === 'V') {
+                    if (!navigator.clipboard?.readText) {
+                        openPasteDialog();
+                        return false;
+                    }
                 }
                 return true;
             });

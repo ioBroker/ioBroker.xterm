@@ -22,16 +22,16 @@ Based on xterm.js and node-pty packages.
 If the authentication is enabled, only ioBroker "admin" user can log in.
 
 ## Usage
-Adapter support 2 modes: 
-- Starts cmd.exe(windows) or bash(linux). On Linux the bash runs under `iobroker` user, and maybe you should switch to other user with more privilegs (via `su USER`).
-- Or simulate shell with node.js (You can activate this option if the first option does not work)
+The adapter starts cmd.exe (Windows) or bash (Linux) via a real pseudo-terminal (node-pty).
+On Linux, bash runs under the `iobroker` user — you can switch to another user with more privileges via `su USER`.
 
-Note: Some terminal commands with interactivity do not work. E.g. `nano` and some others.  
-
-## TODO
-- Simulation: Ctrl + R (History)
-- Simulation: More encoding pages. If you find code page that suits to your system, please create an issue. Possible coding pages could be found [here](https://github.com/ashtuchkin/iconv-lite/wiki/Supported-Encodings).
-- Support more than one session (Tabs)
+## Keyboard shortcuts
+| Shortcut | Action |
+|---|---|
+| **Ctrl+Shift+V** | Open paste dialog (useful on HTTP connections where clipboard API is not available) |
+| **Ctrl+Shift+F** | Search in terminal scrollback |
+| **Right-click** | Paste from clipboard (HTTPS) or open paste dialog (HTTP) |
+| Select text | Automatically copies to clipboard (PuTTY-style) |
 
 <!--
 	Placeholder for the next version (at the beginning of the line):

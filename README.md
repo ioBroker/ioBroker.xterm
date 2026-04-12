@@ -9,12 +9,12 @@
 [![Translation status](https://weblate.iobroker.net/widgets/adapters/-/xterm/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.xterm.svg)](https://www.npmjs.com/package/iobroker.xterm)
 
-**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and for information on how to disable the error reporting, see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
 
 ## xterm adapter for ioBroker
 This adapter allows executing shell commands on ioBroker host. It replaces the `ioBroker.terminal` adapter.
 
-Terminal server to open command line interface. 
+Terminal server to open the command line interface. 
 Please use it only for administration purposes.
 
 Based on xterm.js and node-pty packages. 
@@ -49,7 +49,7 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 * (bluefox) Minimal supported node.js version is 16
 
 ### 1.1.0 (2022-10-08)
-* (Apollon77) Updated an xterm library
+* (Apollon77) Updated the xterm library
 * (Apollon77) Prepared for future js-controller versions
 
 ### 1.0.0 (2022-08-29)
@@ -63,16 +63,16 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 
 ### 0.3.0 (2022-03-12)
 * (Apollon77) Prevent some warnings in js-controller 3+
-* (Apollon77) Add Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!
+* (Apollon77) Add Fallback to the simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!
 * (Apollon77) Rework `info.connection` status to show that server is connected also as green by using "none" to show that no one is connected
 * (Apollon77) Update all dependencies
 * (Apollon77) Add sentry for crash reporting
 
 ### 0.2.0 (2021-09-18)
-* (bluefox) Added the real terminal (bash or cmd.exe) to simulated one
+* (bluefox) Added the real terminal (bash or cmd.exe) to the simulated one
 
 ### 0.1.0 (2021-09-18)
-* (bluefox) changed type of the connection state to "string"
+* (bluefox) changed the type of the connection state to "string"
 
 ### 0.0.3 (2021-09-16)
 * (ioBroker) first working release
@@ -83,7 +83,7 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 ## License
 MIT License
 
-Copyright (c) 2021-2023 ioBroker <dogafox@gmail.com>
+Copyright (c) 2021-2026 ioBroker <dogafox@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

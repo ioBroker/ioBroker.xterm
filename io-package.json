@@ -1,163 +1,169 @@
 {
   "common": {
-      "name": "xterm",
-      "version": "2.0.2",
-      "news": {
-          "2.0.1": {
-              "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
-              "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
-              "ru": "обновлена библиотека xterm\nMove Lets зашифровать настройки в acme адаптер\nМинимальная поддерживаемая версия node.js 16",
-              "pt": "biblioteca xterm atualizado\nMover Permite criptografar configurações para o adaptador acme\nNode.js com suporte mínimo é 16",
-              "nl": "xterm bibliotheek update\nVerplaats Lets encrypt setting om acme adapter te maken\nMinimale ondersteunde node",
-              "fr": "xterm library updated\nDéplacer permet de chiffrer les paramètres à l'adaptateur acme\nVersion node.js supportée Minimal est 16",
-              "it": "xterm library aggiornato\nSposta Consente di crittografare le impostazioni all'adattatore acme\nMinimal supportato node.js versione è 16",
-              "es": "xterm library updated\nMover Permite encriptar los ajustes para el adaptador de acme\nMinimal soportado node.js versión es 16",
-              "pl": "biblioteki xterm\nMove Lets encrypts adapter to acme adapter\nMinimal supportowana wersja węzła wynosi 16",
-              "uk": "русскийукраїнськабеларускаяoʻzbek tilienglish\nПеремістити налаштування шифрування до адаптера Acme\nMinimal підтримуваний node.js версія 16",
-              "zh-cn": "更新图书馆\n让加密环境适应者\n米切尔支持不dejs版本为16。"
-          },
-          "1.1.0": {
-              "en": "Update xterm library\nPrepare for future js-controller versions",
-              "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",
-              "ru": "Обновление библиотеки xterm\nПодготовьтесь к будущим версиям js-controller",
-              "pt": "Atualizar biblioteca xterm\nPrepare-se para futuras versões js-controller",
-              "nl": "Update Xterm bibliotheek\nBereid je voor op toekomstige Js-controller versie",
-              "fr": "Mettre à jour la bibliothèque xterm\nPréparez-vous pour les versions futures de js-controller",
-              "it": "Aggiornare la libreria xterm\nPrepararsi per le future versioni js-controller",
-              "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
-              "pl": "Biblioteka xterma\nPrepare for future js-controller version",
-              "zh-cn": "更新图书馆\n今后防污版本的编制"
-          },
-          "1.0.0": {
-              "en": "Check only port of the interface and not of all interfaces",
-              "de": "Überprüfen Sie nur den Port der Schnittstelle und nicht alle Schnittstellen",
-              "ru": "Проверьте только порт интерфейса и не все интерфейсы",
-              "pt": "Verifique apenas a porta da interface e não de todas as interfaces",
-              "nl": "Controleer alleen de interface en niet van alle interfaces",
-              "fr": "Vérifiez uniquement le port de l'interface et pas de toutes les interfaces",
-              "it": "Controllare solo la porta dell'interfaccia e non di tutte le interfacce",
-              "es": "Compruebe sólo el puerto de la interfaz y no de todas las interfaces",
-              "pl": "Check jedynie port interfejsu i nie wszystkie interfejsy",
-              "zh-cn": "检查站只是接口的港口,而不是所有接口"
-          },
-          "0.3.2": {
-              "en": "Fix crash cases reported by Sentry",
-              "de": "Von Sentry gemeldete Absturzfälle beheben",
-              "ru": "Исправить случаи сбоев, о которых сообщил Sentry",
-              "pt": "Corrigir casos de travamento relatados pelo Sentinela",
-              "nl": "Herstel crashgevallen gemeld door Sentry",
-              "fr": "Correction des cas de plantage signalés par Sentry",
-              "it": "Risolvi i casi di crash segnalati da Sentry",
-              "es": "Solucionar casos de fallas informados por Sentry",
-              "pl": "Napraw przypadki awarii zgłoszone przez Sentry",
-              "zh-cn": "修复 Sentry 报告的崩溃案例"
-          },
-          "0.3.1": {
-              "en": "Fix a crash case reported by Sentry",
-              "de": "Beheben Sie einen von Sentry gemeldeten Absturzfall",
-              "ru": "Исправление сбоя, о котором сообщил Sentry",
-              "pt": "Corrigir um caso de falha relatado pelo Sentinela",
-              "nl": "Een door Sentry gemeld crashgeval oplossen",
-              "fr": "Correction d'un cas de plantage signalé par Sentry",
-              "it": "Risolvi un caso di crash segnalato da Sentry",
-              "es": "Solucionar un caso de bloqueo informado por Sentry",
-              "pl": "Napraw awarię zgłoszoną przez Sentry",
-              "zh-cn": "修复 Sentry 报告的崩溃案例"
-          },
-          "0.3.0": {
-              "en": "Prevent some warnings in js-controller 3+\nAdd Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!\nRework info.connection status to show that server is connected also as green by using \"none\" to show that noone is connected\nUpdate all dependencies\nAdd sentry for crash reporting",
-              "de": "Einige Warnungen in js-controller 3+ verhindern\nFallback zur simulierten Shell hinzufügen, wenn bash/cmd.exe von node-pty ausgewählt wird, wurde nicht korrekt installiert!\nÜberarbeiten Sie den info.connection-Status, um anzuzeigen, dass der Server verbunden ist, auch als grün, indem Sie \"none\" verwenden, um anzuzeigen, dass niemand verbunden ist\nAktualisieren Sie alle Abhängigkeiten\nSentry für Absturzberichte hinzufügen",
-              "ru": "Предотвратить некоторые предупреждения в js-controller 3+\nДобавьте резервный вариант в смоделированную оболочку, если bash/cmd.exe выбран из-за неправильной установки node-pty!\nПереработать статус info.connection, чтобы показать, что сервер подключен, также зеленым, используя «none», чтобы показать, что никто не подключен.\nОбновить все зависимости\nДобавить часового для отчетов о сбоях",
-              "pt": "Evite alguns avisos no js-controller 3+\nAdicione Fallback ao shell simulado se bash/cmd.exe for selecionado por node-pty não foi instalado corretamente!\nRetrabalhe o status info.connection para mostrar que o servidor também está conectado como verde usando \"none\" para mostrar que ninguém está conectado\nAtualizar todas as dependências\nAdicionar sentinela para relatórios de falhas",
-              "nl": "Voorkom enkele waarschuwingen in js-controller 3+\nVoeg terugval toe aan gesimuleerde shell als bash/cmd.exe is geselecteerd door node-pty niet correct is geïnstalleerd!\nHerwerk de info.connection-status om aan te geven dat de server ook groen is verbonden door \"none\" te gebruiken om aan te geven dat er niemand is verbonden\nAlle afhankelijkheden bijwerken\nEen schildwacht toevoegen voor crashrapportage",
-              "fr": "Empêcher certains avertissements dans js-controller 3+\nAjoutez Fallback au shell simulé si bash/cmd.exe est sélectionné par node-pty n'a pas été installé correctement !\nRetravailler l'état de l'info.connexion pour montrer que le serveur est connecté également en vert en utilisant \"aucun\" pour montrer que personne n'est connecté\nMettre à jour toutes les dépendances\nAjouter une sentinelle pour les rapports de plantage",
-              "it": "Impedisci alcuni avvisi in js-controller 3+\nAggiungi fallback alla shell simulata se bash/cmd.exe è selezionato da node-pty non è stato installato correttamente!\nRielabora lo stato di info.connection per mostrare che il server è connesso anche come verde usando \"none\" per mostrare che nessuno è connesso\nAggiorna tutte le dipendenze\nAggiungi sentinella per la segnalazione degli arresti anomali",
-              "es": "Evite algunas advertencias en js-controller 3+\n¡Agregue Fallback al shell simulado si node-pty seleccionó bash/cmd.exe y no se instaló correctamente!\nVuelva a trabajar en el estado de info.connection para mostrar que el servidor está conectado también como verde usando \"ninguno\" para mostrar que nadie está conectado\nActualizar todas las dependencias\nAgregar centinela para informes de fallas",
-              "pl": "Zapobiegaj niektórym ostrzeżeniom w js-controller 3+\nDodaj Fallback do symulowanej powłoki, jeśli bash/cmd.exe jest wybrany przez node-pty nie został poprawnie zainstalowany!\nZmień stan info.connection, aby pokazać, że serwer jest podłączony również na zielono, używając „brak”, aby pokazać, że nikt nie jest podłączony\nZaktualizuj wszystkie zależności\nDodaj wartownika do zgłaszania awarii",
-              "zh-cn": "防止在 js-controller 3+ 中出现一些警告\n如果 node-pty 选择的 bash/cmd.exe 未正确安装，则将 Fallback 添加到模拟 shell！\n重做 info.connection 状态以显示服务器也已连接为绿色，使用“none”表示没有人连接\n更新所有依赖项\n为崩溃报告添加哨兵"
-          },
-          "0.2.0": {
-              "en": "Added the real terminal (bash or cmd.exe) to simulated one",
-              "de": "Das echte Terminal (bash oder cmd.exe) zum simulierten hinzugefügt",
-              "ru": "Добавлен реальный терминал (bash или cmd.exe) к имитируемому",
-              "pt": "Adicionado o terminal real (bash ou cmd.exe) para simular um",
-              "nl": "De echte terminal (bash of cmd.exe) toegevoegd aan de gesimuleerde",
-              "fr": "Ajout du vrai terminal (bash ou cmd.exe) à un simulé",
-              "it": "Aggiunto il terminale reale (bash o cmd.exe) a quello simulato",
-              "es": "Se agregó la terminal real (bash o cmd.exe) a una simulada",
-              "pl": "Dodano prawdziwy terminal (bash lub cmd.exe) do symulowanego",
-              "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
-          }
+    "name": "xterm",
+    "version": "3.0.0",
+    "news": {
+      "3.0.0": {
+        "en": "Migrated the adapter to Typescript\nAdded multiple terminal sessions",
+        "de": "Den Adapter zu Typescript migrieren\nMehrere Terminalsitzungen hinzugefügt",
+        "ru": "Перенес адаптер на Typescript\nДобавлено несколько терминальных сеансов",
+        "pt": "Migrar o adaptador para escrever\nAdicionadas várias sessões de terminal",
+        "nl": "De adapter migreren naar Typescript\nMeerdere terminalsessies toegevoegd",
+        "fr": "Migré l'adaptateur vers Typescript\nAjout de plusieurs sessions de terminal",
+        "it": "Migrato l'adattatore a Typescript\nAggiunto più sessioni terminali",
+        "es": "Migraron el adaptador a Tiposcript\nSesiones terminales múltiples",
+        "pl": "Przekierowany adapter do Typescript\nDodano wiele sesji terminali",
+        "uk": "Переміграний адаптер до Typescript\nДодано кілька терміналів",
+        "zh-cn": "将适配器移到 Typescript\n添加多个终端会话"
       },
-      "title": "Shell console XTerm",
-      "titleLang": {
-          "en": "Shell console XTerm",
-          "de": "Shell-Konsole XTerm",
-          "ru": "Консоль shell XTerm",
-          "pt": "Console shell XTerm",
-          "nl": "Shell-console XTerm",
-          "fr": "Console coque XTerm",
-          "it": "Console shell XTerm",
-          "es": "Consola de Shell XTerm",
-          "pl": "Konsola powłoki XTerm",
-          "zh-cn": "外壳控制台 XTerm"
+      "2.0.1": {
+        "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
+        "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
+        "ru": "обновлена библиотека xterm\nMove Lets зашифровать настройки в acme адаптер\nМинимальная поддерживаемая версия node.js 16",
+        "pt": "biblioteca xterm atualizado\nMover Permite criptografar configurações para o adaptador acme\nNode.js com suporte mínimo é 16",
+        "nl": "xterm bibliotheek update\nVerplaats Lets encrypt setting om acme adapter te maken\nMinimale ondersteunde node",
+        "fr": "xterm library updated\nDéplacer permet de chiffrer les paramètres à l'adaptateur acme\nVersion node.js supportée Minimal est 16",
+        "it": "xterm library aggiornato\nSposta Consente di crittografare le impostazioni all'adattatore acme\nMinimal supportato node.js versione è 16",
+        "es": "xterm library updated\nMover Permite encriptar los ajustes para el adaptador de acme\nMinimal soportado node.js versión es 16",
+        "pl": "biblioteki xterm\nMove Lets encrypts adapter to acme adapter\nMinimal supportowana wersja węzła wynosi 16",
+        "uk": "русскийукраїнськабеларускаяoʻzbek tilienglish\nПеремістити налаштування шифрування до адаптера Acme\nMinimal підтримуваний node.js версія 16",
+        "zh-cn": "更新图书馆\n让加密环境适应者\n米切尔支持不dejs版本为16。"
       },
-      "desc": {
-          "en": "This adapter allows to execute shell commands on ioBroker host.",
-          "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
-          "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
-          "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
-          "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
-          "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
-          "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
-          "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
-          "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
-          "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
+      "1.1.0": {
+        "en": "Update xterm library\nPrepare for future js-controller versions",
+        "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",
+        "ru": "Обновление библиотеки xterm\nПодготовьтесь к будущим версиям js-controller",
+        "pt": "Atualizar biblioteca xterm\nPrepare-se para futuras versões js-controller",
+        "nl": "Update Xterm bibliotheek\nBereid je voor op toekomstige Js-controller versie",
+        "fr": "Mettre à jour la bibliothèque xterm\nPréparez-vous pour les versions futures de js-controller",
+        "it": "Aggiornare la libreria xterm\nPrepararsi per le future versioni js-controller",
+        "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
+        "pl": "Biblioteka xterma\nPrepare for future js-controller version",
+        "zh-cn": "更新图书馆\n今后防污版本的编制"
       },
-      "authors": ["ioBroker <dogafox@gmail.com>"],
-      "keywords": ["terminal", "ssh"],
-      "licenseInformation": {
-          "type": "free",
-          "license": "MIT"
+      "1.0.0": {
+        "en": "Check only port of the interface and not of all interfaces",
+        "de": "Überprüfen Sie nur den Port der Schnittstelle und nicht alle Schnittstellen",
+        "ru": "Проверьте только порт интерфейса и не все интерфейсы",
+        "pt": "Verifique apenas a porta da interface e não de todas as interfaces",
+        "nl": "Controleer alleen de interface en niet van alle interfaces",
+        "fr": "Vérifiez uniquement le port de l'interface et pas de toutes les interfaces",
+        "it": "Controllare solo la porta dell'interfaccia e non di tutte le interfacce",
+        "es": "Compruebe sólo el puerto de la interfaz y no de todas las interfaces",
+        "pl": "Check jedynie port interfejsu i nie wszystkie interfejsy",
+        "zh-cn": "检查站只是接口的港口,而不是所有接口"
       },
-      "platform": "Javascript/Node.js",
-      "main": "build/main.js",
-      "icon": "xterm.png",
-      "enabled": true,
-      "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
-      "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
-      "loglevel": "info",
-      "mode": "daemon",
-      "type": "utility",
-      "compact": true,
-      "stopBeforeUpdate": true,
-      "localLinks": {
-          "_default": "%protocol%://%ip%:%port%"
+      "0.3.2": {
+        "en": "Fix crash cases reported by Sentry",
+        "de": "Von Sentry gemeldete Absturzfälle beheben",
+        "ru": "Исправить случаи сбоев, о которых сообщил Sentry",
+        "pt": "Corrigir casos de travamento relatados pelo Sentinela",
+        "nl": "Herstel crashgevallen gemeld door Sentry",
+        "fr": "Correction des cas de plantage signalés par Sentry",
+        "it": "Risolvi i casi di crash segnalati da Sentry",
+        "es": "Solucionar casos de fallas informados por Sentry",
+        "pl": "Napraw przypadki awarii zgłoszone przez Sentry",
+        "zh-cn": "修复 Sentry 报告的崩溃案例"
       },
-      "adminTab": {
-          "link": "%protocol%://%ip%:%port%"
+      "0.3.1": {
+        "en": "Fix a crash case reported by Sentry",
+        "de": "Beheben Sie einen von Sentry gemeldeten Absturzfall",
+        "ru": "Исправление сбоя, о котором сообщил Sentry",
+        "pt": "Corrigir um caso de falha relatado pelo Sentinela",
+        "nl": "Een door Sentry gemeld crashgeval oplossen",
+        "fr": "Correction d'un cas de plantage signalé par Sentry",
+        "it": "Risolvi un caso di crash segnalato da Sentry",
+        "es": "Solucionar un caso de bloqueo informado por Sentry",
+        "pl": "Napraw awarię zgłoszoną przez Sentry",
+        "zh-cn": "修复 Sentry 报告的崩溃案例"
       },
-      "adminUI": {
-          "config": "json"
-      },
-      "dependencies": [
-          {
-              "js-controller": ">=2.0.0"
-          }
-      ],
-      "plugins": {
-          "sentry": {
-              "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
-          }
-      },
-      "globalDependencies": [
-          {
-              "admin": ">=5.1.0"
-          }
-      ],
-      "connectionType": "local",
-      "dataSource": "none",
-      "tier": 2
+      "0.3.0": {
+        "en": "Prevent some warnings in js-controller 3+\nAdd Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!\nRework info.connection status to show that server is connected also as green by using \"none\" to show that noone is connected\nUpdate all dependencies\nAdd sentry for crash reporting",
+        "de": "Einige Warnungen in js-controller 3+ verhindern\nFallback zur simulierten Shell hinzufügen, wenn bash/cmd.exe von node-pty ausgewählt wird, wurde nicht korrekt installiert!\nÜberarbeiten Sie den info.connection-Status, um anzuzeigen, dass der Server verbunden ist, auch als grün, indem Sie \"none\" verwenden, um anzuzeigen, dass niemand verbunden ist\nAktualisieren Sie alle Abhängigkeiten\nSentry für Absturzberichte hinzufügen",
+        "ru": "Предотвратить некоторые предупреждения в js-controller 3+\nДобавьте резервный вариант в смоделированную оболочку, если bash/cmd.exe выбран из-за неправильной установки node-pty!\nПереработать статус info.connection, чтобы показать, что сервер подключен, также зеленым, используя «none», чтобы показать, что никто не подключен.\nОбновить все зависимости\nДобавить часового для отчетов о сбоях",
+        "pt": "Evite alguns avisos no js-controller 3+\nAdicione Fallback ao shell simulado se bash/cmd.exe for selecionado por node-pty não foi instalado corretamente!\nRetrabalhe o status info.connection para mostrar que o servidor também está conectado como verde usando \"none\" para mostrar que ninguém está conectado\nAtualizar todas as dependências\nAdicionar sentinela para relatórios de falhas",
+        "nl": "Voorkom enkele waarschuwingen in js-controller 3+\nVoeg terugval toe aan gesimuleerde shell als bash/cmd.exe is geselecteerd door node-pty niet correct is geïnstalleerd!\nHerwerk de info.connection-status om aan te geven dat de server ook groen is verbonden door \"none\" te gebruiken om aan te geven dat er niemand is verbonden\nAlle afhankelijkheden bijwerken\nEen schildwacht toevoegen voor crashrapportage",
+        "fr": "Empêcher certains avertissements dans js-controller 3+\nAjoutez Fallback au shell simulé si bash/cmd.exe est sélectionné par node-pty n'a pas été installé correctement !\nRetravailler l'état de l'info.connexion pour montrer que le serveur est connecté également en vert en utilisant \"aucun\" pour montrer que personne n'est connecté\nMettre à jour toutes les dépendances\nAjouter une sentinelle pour les rapports de plantage",
+        "it": "Impedisci alcuni avvisi in js-controller 3+\nAggiungi fallback alla shell simulata se bash/cmd.exe è selezionato da node-pty non è stato installato correttamente!\nRielabora lo stato di info.connection per mostrare che il server è connesso anche come verde usando \"none\" per mostrare che nessuno è connesso\nAggiorna tutte le dipendenze\nAggiungi sentinella per la segnalazione degli arresti anomali",
+        "es": "Evite algunas advertencias en js-controller 3+\n¡Agregue Fallback al shell simulado si node-pty seleccionó bash/cmd.exe y no se instaló correctamente!\nVuelva a trabajar en el estado de info.connection para mostrar que el servidor está conectado también como verde usando \"ninguno\" para mostrar que nadie está conectado\nActualizar todas las dependencias\nAgregar centinela para informes de fallas",
+        "pl": "Zapobiegaj niektórym ostrzeżeniom w js-controller 3+\nDodaj Fallback do symulowanej powłoki, jeśli bash/cmd.exe jest wybrany przez node-pty nie został poprawnie zainstalowany!\nZmień stan info.connection, aby pokazać, że serwer jest podłączony również na zielono, używając „brak”, aby pokazać, że nikt nie jest podłączony\nZaktualizuj wszystkie zależności\nDodaj wartownika do zgłaszania awarii",
+        "zh-cn": "防止在 js-controller 3+ 中出现一些警告\n如果 node-pty 选择的 bash/cmd.exe 未正确安装，则将 Fallback 添加到模拟 shell！\n重做 info.connection 状态以显示服务器也已连接为绿色，使用“none”表示没有人连接\n更新所有依赖项\n为崩溃报告添加哨兵"
+      }
+    },
+    "title": "Shell console XTerm",
+    "titleLang": {
+      "en": "Shell console XTerm",
+      "de": "Shell-Konsole XTerm",
+      "ru": "Консоль shell XTerm",
+      "pt": "Console shell XTerm",
+      "nl": "Shell-console XTerm",
+      "fr": "Console coque XTerm",
+      "it": "Console shell XTerm",
+      "es": "Consola de Shell XTerm",
+      "pl": "Konsola powłoki XTerm",
+      "zh-cn": "外壳控制台 XTerm"
+    },
+    "desc": {
+      "en": "This adapter allows to execute shell commands on ioBroker host.",
+      "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
+      "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
+      "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
+      "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
+      "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
+      "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
+      "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
+      "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
+      "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
+    },
+    "authors": [
+      "ioBroker <dogafox@gmail.com>"
+    ],
+    "keywords": [
+      "terminal",
+      "ssh"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "main": "build/main.js",
+    "icon": "xterm.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
+    "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "utility",
+    "compact": true,
+    "stopBeforeUpdate": true,
+    "localLinks": {
+      "_default": "%protocol%://%ip%:%port%"
+    },
+    "adminTab": {
+      "link": "%protocol%://%ip%:%port%"
+    },
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=2.0.0"
+      }
+    ],
+    "plugins": {
+      "sentry": {
+        "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
+      }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=5.1.0"
+      }
+    ],
+    "connectionType": "local",
+    "dataSource": "none",
+    "tier": 2
   },
   "native": {
     "bind": "0.0.0.0",

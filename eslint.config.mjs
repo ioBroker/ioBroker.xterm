@@ -25,6 +25,8 @@ export default [
             'build/**/*',
             'admin/**/*',
             'test/**/*',
+            'src-web/**/*',
+            'public/**/*',
             'tmp/**/*',
             '**/*.mjs',
         ],

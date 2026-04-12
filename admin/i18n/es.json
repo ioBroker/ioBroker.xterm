@@ -15,5 +15,7 @@
     "Warning!": "¡Advertencia!",
     "Unsecure_Auth": "La contraseña se enviará sin cifrar a través de una conexión no segura. Para proteger sus contraseñas, habilite la conexión segura (HTTPS).",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
-    "IP": "Interfaz IP local"
+    "IP": "Interfaz IP local",
+    "Start directory": "Directorio de inicio",
+    "Leave empty to use the ioBroker directory": "Dejar vacío para usar el directorio de ioBroker"
 }

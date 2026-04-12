@@ -53,7 +53,7 @@
   ],
   "scripts": {
     "build:tsc": "tsc -p tsconfig.build.json",
-    "build": "npm run build:tsc",
+    "build": "npm run build:tsc && cd src-web && npm install && npm run build",
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit",
     "test:integration": "mocha test/integration --exit",

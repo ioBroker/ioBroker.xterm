@@ -15,5 +15,7 @@
     "Warning!": "Waarschuwing!",
     "Unsecure_Auth": "Het wachtwoord wordt onversleuteld verzonden via een onbeveiligde verbinding. Schakel de beveiligde verbinding (HTTPS) in om uw wachtwoorden te beschermen!",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
-    "IP": "Lokale IP-interface"
+    "IP": "Lokale IP-interface",
+    "Start directory": "Startmap",
+    "Leave empty to use the ioBroker directory": "Laat leeg om de ioBroker-map te gebruiken"
 }

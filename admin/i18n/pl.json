@@ -15,5 +15,7 @@
     "Warning!": "Ostrzeżenie!",
     "Unsecure_Auth": "Hasło zostanie wysłane w postaci niezaszyfrowanej przez niezabezpieczone połączenie. Aby chronić swoje hasła, włącz bezpieczne połączenie (HTTPS)!",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
-    "IP": "Lokalny interfejs IP"
+    "IP": "Lokalny interfejs IP",
+    "Start directory": "Katalog startowy",
+    "Leave empty to use the ioBroker directory": "Pozostaw puste, aby użyć katalogu ioBroker"
 }

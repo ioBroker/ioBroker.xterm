@@ -15,5 +15,7 @@
     "Warning!": "警告！",
     "Unsecure_Auth": "密码将通过不安全的连接以未加密的方式发送。为了保护您的密码，请启用安全连接 (HTTPS)！",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
-    "IP": "本地IP接口"
+    "IP": "本地IP接口",
+    "Start directory": "起始目录",
+    "Leave empty to use the ioBroker directory": "留空以使用 ioBroker 目录"
 }

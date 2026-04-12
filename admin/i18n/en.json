@@ -15,5 +15,7 @@
     "Warning!": "Warning!",
     "Unsecure_Auth": "The password will be sent unencrypted via an unsecure connection. To protect your passwords enable the secure connection (HTTPS)!",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
-    "IP": "Local IP interface"
+    "IP": "Local IP interface",
+    "Start directory": "Start directory",
+    "Leave empty to use the ioBroker directory": "Leave empty to use the ioBroker directory"
 }

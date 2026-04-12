@@ -163,7 +163,8 @@
     "bind": "0.0.0.0",
     "port": "8099",
     "secure": false,
-    "auth": true
+    "auth": true,
+    "cwd": ""
   },
   "objects": [],
   "instanceObjects": [

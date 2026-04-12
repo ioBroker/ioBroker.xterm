@@ -1,6 +1,6 @@
 import { Adapter, type AdapterOptions, EXIT_CODES, getAbsoluteDefaultDataDir } from '@iobroker/adapter-core';
 import { WebServer as IoBWebServer } from '@iobroker/webserver';
-import fs from 'node:fs';
+import path from 'node:path';
 import os from 'node:os';
 import express from 'express';
 import { WebSocketServer, type WebSocket } from 'ws';
@@ -11,16 +11,9 @@ import type { Server as HttpsServer } from 'node:https';
 
 import type { XtermAdapterConfig } from './types';
 
-interface FileEntry {
-    path: string;
-    contentType: string;
-    data?: string | Buffer;
-}
-
 interface IobrokerMeta {
-    cwd: string;
     address: string;
-    ptyProcess?: pty.IPty;
+    tabs: Map<string, pty.IPty>;
 }
 
 interface XtermWebSocket extends WebSocket {
@@ -49,6 +42,7 @@ function findIoBrokerDirectory(): string {
     const dir = getAbsoluteDefaultDataDir().replace(/\\/g, '/');
     const parts = dir.split('/');
     parts.pop();
+    parts.pop();
     return parts.join('/');
 }
 
@@ -59,7 +53,6 @@ class XtermAdapter extends Adapter {
     private connectedIPs: string[] = [];
     private bruteForce: Record<string, BruteForceEntry> = {};
     private IOB_DIR: string = findIoBrokerDirectory();
-    private files: Record<string, FileEntry> = {};
     private cache: AuthCache | null = null;
 
     public constructor(options: Partial<AdapterOptions> = {}) {
@@ -73,46 +66,15 @@ class XtermAdapter extends Adapter {
                 this.onUnload(callback);
             },
         });
-
-        this.initFileMap();
-    }
-
-    private initFileMap(): void {
-        const locationXterm = require.resolve('@xterm/xterm').replace(/\\/g, '/');
-        const locationXtermFit = require.resolve('@xterm/addon-fit').replace(/\\/g, '/');
-        const locationXtermWebgl = require.resolve('@xterm/addon-webgl').replace(/\\/g, '/');
-        const locationXtermWebLinks = require.resolve('@xterm/addon-web-links').replace(/\\/g, '/');
-        const locationXtermSearch = require.resolve('@xterm/addon-search').replace(/\\/g, '/');
-
-        this.files = {
-            'xterm.js': { path: locationXterm, contentType: 'text/javascript' },
-            'xterm.js.map': { path: `${locationXterm}.map`, contentType: 'text/javascript' },
-            'xterm.css': {
-                path: locationXterm.replace('/lib/xterm.js', '/css/xterm.css'),
-                contentType: 'text/css',
-            },
-            'xterm-addon-fit.js': { path: locationXtermFit, contentType: 'text/javascript' },
-            'xterm-addon-fit.js.map': { path: `${locationXtermFit}.map`, contentType: 'text/javascript' },
-            'xterm-addon-webgl.js': { path: locationXtermWebgl, contentType: 'text/javascript' },
-            'xterm-addon-webgl.js.map': { path: `${locationXtermWebgl}.map`, contentType: 'text/javascript' },
-            'xterm-addon-web-links.js': { path: locationXtermWebLinks, contentType: 'text/javascript' },
-            'xterm-addon-web-links.js.map': { path: `${locationXtermWebLinks}.map`, contentType: 'text/javascript' },
-            'xterm-addon-search.js': { path: locationXtermSearch, contentType: 'text/javascript' },
-            'xterm-addon-search.js.map': { path: `${locationXtermSearch}.map`, contentType: 'text/javascript' },
-            'index.html': { path: `${__dirname}/../public/index.html`, contentType: 'text/html' },
-            'favicon.ico': { path: `${__dirname}/../public/favicon.ico`, contentType: 'image/x-icon' },
-        };
     }
 
     private onUnload(callback: () => void): void {
         try {
-            // First sweep, soft close
             if (this.server?.io) {
                 this.server.io.clients.forEach(socket => socket.close());
             }
 
             setTimeout(() => {
-                // Second sweep, hard close for everyone who's left
                 if (this.server?.io) {
                     this.server.io.clients.forEach(socket => {
                         if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
@@ -214,34 +176,41 @@ class XtermAdapter extends Adapter {
         });
     }
 
-    private startShell(ws: XtermWebSocket): void {
+    private startShellForTab(ws: XtermWebSocket, tabId: string): void {
         const shell = os.platform() === 'win32' ? 'cmd.exe' : 'bash';
 
         if (!ws?.__iobroker) {
             return;
         }
 
-        ws.__iobroker.ptyProcess = pty.spawn(shell, [], {
+        const ptyProcess = pty.spawn(shell, [], {
             name: 'xterm-256color',
             cols: 80,
             rows: 30,
-            cwd: this.IOB_DIR,
+            cwd: this.config.cwd || this.IOB_DIR,
             env: process.env as Record<string, string>,
         });
 
-        ws.__iobroker.ptyProcess.onData((data: string) => ws.send(JSON.stringify({ data })));
+        ws.__iobroker.tabs.set(tabId, ptyProcess);
 
-        ws.__iobroker.ptyProcess.onExit(() => {
-            if (ws.__iobroker) {
-                this.startShell(ws);
+        ptyProcess.onData((data: string) => {
+            ws.send(JSON.stringify({ method: 'data', tabId, data }));
+        });
+
+        ptyProcess.onExit(() => {
+            if (ws.__iobroker?.tabs.has(tabId)) {
+                // Shell exited — restart it
+                this.startShellForTab(ws, tabId);
             }
         });
+
+        ws.send(JSON.stringify({ method: 'created', tabId }));
     }
 
     private initSocketConnection(ws: XtermWebSocket): void {
         ws.__iobroker = {
-            cwd: this.IOB_DIR,
             address: (ws._socket.address() as AddressInfo).address,
+            tabs: new Map(),
         };
 
         if (this.config.auth && !ws._socket.___auth) {
@@ -249,8 +218,6 @@ class XtermAdapter extends Adapter {
             this.log.error('Cannot establish socket connection as no credentials found!');
             return;
         }
-
-        this.startShell(ws);
 
         if (!this.connectedIPs.includes(ws.__iobroker.address)) {
             this.connectedIPs.push(ws.__iobroker.address);
@@ -262,22 +229,39 @@ class XtermAdapter extends Adapter {
                 return;
             }
             const message = JSON.parse(rawMessage.toString());
-            if (message.method === 'resize') {
-                ws.__iobroker.ptyProcess?.resize(message.cols, message.rows);
-            } else if (message.method === 'key') {
-                ws.__iobroker.ptyProcess?.write(message.key);
+
+            if (message.method === 'create' && message.tabId) {
+                this.startShellForTab(ws, message.tabId);
+            } else if (message.method === 'key' && message.tabId) {
+                ws.__iobroker.tabs.get(message.tabId)?.write(message.key);
+            } else if (message.method === 'resize' && message.tabId) {
+                ws.__iobroker.tabs.get(message.tabId)?.resize(message.cols, message.rows);
+            } else if (message.method === 'close' && message.tabId) {
+                const ptyProcess = ws.__iobroker.tabs.get(message.tabId);
+                if (ptyProcess) {
+                    ws.__iobroker.tabs.delete(message.tabId);
+                    try {
+                        ptyProcess.kill();
+                    } catch {
+                        // ignore
+                    }
+                }
+                ws.send(JSON.stringify({ method: 'closed', tabId: message.tabId }));
             }
         });
 
         ws.on('close', () => {
-            if (ws.__iobroker?.ptyProcess) {
-                try {
-                    ws.__iobroker.ptyProcess.kill();
-                } catch {
-                    // ignore
-                }
-            }
             if (ws.__iobroker) {
+                // Kill all PTY processes for this connection
+                for (const [, ptyProcess] of ws.__iobroker.tabs) {
+                    try {
+                        ptyProcess.kill();
+                    } catch {
+                        // ignore
+                    }
+                }
+                ws.__iobroker.tabs.clear();
+
                 const pos = this.connectedIPs.indexOf(ws.__iobroker.address);
                 if (pos !== -1) {
                     this.connectedIPs.splice(pos, 1);
@@ -349,27 +333,11 @@ class XtermAdapter extends Adapter {
                     });
                 }
 
-                serverObj.app.use((req: express.Request, res: express.Response) => {
-                    let file = req.url.split('?')[0];
-                    file = file.split('/').pop()!;
-
-                    if (this.files[file]) {
-                        res.setHeader('Content-Type', this.files[file].contentType);
-                        if (this.files[file].data) {
-                            res.send(this.files[file].data);
-                        } else {
-                            res.send(fs.readFileSync(this.files[file].path));
-                        }
-                    } else if (!file || file === '/') {
-                        res.setHeader('Content-Type', this.files['index.html'].contentType);
-                        if (this.files['index.html'].data) {
-                            res.send(this.files['index.html'].data);
-                        } else {
-                            res.send(fs.readFileSync(this.files['index.html'].path));
-                        }
-                    } else {
-                        res.status(404).json({ error: 'not found' });
-                    }
+                // Serve static files from public/
+                serverObj.app.use(express.static(path.join(__dirname, '..', 'public')));
+                // SPA fallback
+                serverObj.app.use((_req: express.Request, res: express.Response) => {
+                    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
                 });
 
                 try {
@@ -419,7 +387,6 @@ class XtermAdapter extends Adapter {
                     }
                 });
 
-                // Start the web server
                 serverObj.server.listen(
                     settings.port,
                     !settings.bind || settings.bind === '0.0.0.0' ? undefined : settings.bind || undefined,
@@ -429,7 +396,6 @@ class XtermAdapter extends Adapter {
                     },
                 );
 
-                // upgrade socket
                 serverObj.server.on('upgrade', (request, socket: Socket & { ___auth?: boolean }, head: Buffer) => {
                     if (this.config.auth) {
                         this.auth(request, result => {

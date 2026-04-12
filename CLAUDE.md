@@ -4,13 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ioBroker.xterm is an ioBroker adapter that provides a web-based shell terminal (xterm.js) for executing commands on the ioBroker host. It replaces the legacy `ioBroker.terminal` adapter. The adapter runs as a daemon, serving an Express/WebSocket server that connects a browser-based xterm.js frontend to a real PTY shell via `node-pty`.
+ioBroker.xterm is an ioBroker adapter that provides a web-based multi-tab shell terminal (xterm.js + React) for executing commands on the ioBroker host. The adapter runs as a daemon, serving an Express/WebSocket server that connects a React frontend to real PTY shells via `node-pty`.
 
 ## Build & Development Commands
 
 ```bash
-npm run build           # Compile TypeScript (src/ → build/)
-npm run lint            # ESLint check
+npm run build           # Build frontend (Vite) + backend (tsc)
+npm run build:web       # Build React frontend only (src-web/ → public/)
+npm run build:tsc       # Build TypeScript backend only (src/ → build/)
+npm run dev:web         # Vite dev server with HMR for frontend
+npm run lint            # ESLint check (backend only, src-web is excluded)
 npm run test            # Package validation tests
 npm run test:unit       # Unit tests (mocha)
 npm run test:integration # Integration tests (mocha)
@@ -18,34 +21,35 @@ npm run test:integration # Integration tests (mocha)
 
 ## Architecture
 
-**Single-file adapter:** All server logic lives in `src/main.ts` — a class `XtermAdapter` extending ioBroker's `Adapter`. There is no multi-module backend structure.
+**Backend** (`src/main.ts`): Single-file adapter class `XtermAdapter` extending ioBroker's `Adapter`. Serves static files from `public/` via `express.static()` and manages WebSocket connections with multiplexed PTY sessions.
 
-**PTY-only terminal:** Spawns a real bash (Linux) or cmd.exe (Windows) via `node-pty`. All I/O is direct pass-through — the backend does no command parsing or simulation.
+**Frontend** (`src-web/`): React + TypeScript app built with Vite to `public/`. Multi-tab terminal using xterm.js. Each tab has its own PTY process on the server.
 
-**Frontend:** `public/index.html` is a standalone HTML+JS file (no build step) using `@xterm/xterm` libraries served dynamically from node_modules. Features: dark theme, WebGL rendering, clickable URLs (web-links addon), Ctrl+Shift+F search, copy-on-select, right-click paste.
-
-**WebSocket protocol:**
-- Server→Client: `{ data }` (terminal output)
-- Client→Server: `{ method: "key", key }` (keystrokes), `{ method: "resize", cols, rows }` (terminal resize)
+**Multi-tab WebSocket protocol** — single connection, multiplexed by `tabId`:
+- Client→Server: `{ method: "create", tabId }`, `{ method: "key", tabId, key }`, `{ method: "resize", tabId, cols, rows }`, `{ method: "close", tabId }`
+- Server→Client: `{ method: "data", tabId, data }`, `{ method: "created", tabId }`, `{ method: "closed", tabId }`
 
 **Authentication:** Basic HTTP auth against ioBroker's admin user, with brute-force protection (escalating delays) and a 10-second auth cache.
 
-**Static file serving:** xterm library files are resolved dynamically from npm module paths at runtime (`require.resolve`), not copied or bundled.
-
 ## Key Files
 
-- `src/main.ts` — All adapter/server logic
+- `src/main.ts` — Backend: Express server, WebSocket handler, PTY management
 - `src/types.d.ts` — `XtermAdapterConfig` interface
-- `public/index.html` — Frontend terminal UI (vanilla JS, no build)
-- `admin/jsonConfig.json` — Adapter settings panel
-- `io-package.json` — ioBroker adapter metadata and default config
-- `tsconfig.build.json` — Build config (extends tsconfig.json, outputs CommonJS to `build/`)
+- `src-web/App.tsx` — Main React component: tab state, WebSocket integration, data routing
+- `src-web/components/TerminalPane.tsx` — xterm.js terminal lifecycle per tab
+- `src-web/components/TabBar.tsx` — Tab strip UI
+- `src-web/components/SearchBar.tsx` — Ctrl+Shift+F search overlay
+- `src-web/components/PasteDialog.tsx` — Ctrl+Shift+V paste modal
+- `src-web/hooks/useWebSocket.ts` — WebSocket connection manager with auto-reconnect
+- `src-web/theme.ts` — xterm.js dark theme constant
+- `src-web/types.ts` — Protocol message types
+- `src-web/vite.config.ts` — Vite build config (root: src-web, output: ../public)
 
 ## TypeScript
 
-- Target: ES2022, Module: Node16, strict mode
-- Source in `src/`, output in `build/`
-- Only two source files: `main.ts` and `types.d.ts`
+- Backend: ES2022, Node16 modules, strict mode. Source in `src/`, output in `build/`
+- Frontend: ES2020, ESNext modules, react-jsx. Source in `src-web/`, output in `public/` (via Vite)
+- Separate tsconfig files: `tsconfig.build.json` (backend), `src-web/tsconfig.json` (frontend)
 
 ## Testing
 

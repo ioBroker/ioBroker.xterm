@@ -1,0 +1,89 @@
+@import '@xterm/xterm/css/xterm.css';
+
+/* Dark theme (default) */
+:root,
+.theme-dark {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d2d;
+    --bg-hover: #363636;
+    --bg-input: #1e1e1e;
+    --fg-primary: #d4d4d4;
+    --fg-secondary: #969696;
+    --border-color: #555;
+    --border-subtle: #1e1e1e;
+    --accent: #007acc;
+    --scrollbar-track: #1e1e1e;
+    --scrollbar-thumb: #444;
+    --btn-bg: #333;
+    --btn-hover: #444;
+    --tab-close-hover: #555;
+    --term-bg: #1e1e1e;
+    --overlay-bg: rgba(0, 0, 0, 0.6);
+}
+
+/* Light theme */
+.theme-light {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f3f3;
+    --bg-tertiary: #e8e8e8;
+    --bg-hover: #dcdcdc;
+    --bg-input: #ffffff;
+    --fg-primary: #333333;
+    --fg-secondary: #666666;
+    --border-color: #c8c8c8;
+    --border-subtle: #e0e0e0;
+    --accent: #007acc;
+    --scrollbar-track: #f3f3f3;
+    --scrollbar-thumb: #c1c1c1;
+    --btn-bg: #e0e0e0;
+    --btn-hover: #d0d0d0;
+    --tab-close-hover: #c8c8c8;
+    --term-bg: #ffffff;
+    --overlay-bg: rgba(0, 0, 0, 0.3);
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.app.disconnected .terminals-container {
+    opacity: 0.2;
+}
+
+.terminals-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Scrollbar */
+*::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track);
+}
+*::-webkit-scrollbar {
+    width: 10px;
+    background-color: var(--scrollbar-track);
+}
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 4px;
+}

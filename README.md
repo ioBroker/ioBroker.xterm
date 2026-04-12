@@ -26,12 +26,12 @@ The adapter starts cmd.exe (Windows) or bash (Linux) via a real pseudo-terminal 
 On Linux, bash runs under the `iobroker` user — you can switch to another user with more privileges via `su USER`.
 
 ## Keyboard shortcuts
-| Shortcut | Action |
-|---|---|
+| Shortcut         | Action                                                                              |
+|------------------|-------------------------------------------------------------------------------------|
 | **Ctrl+Shift+V** | Open paste dialog (useful on HTTP connections where clipboard API is not available) |
-| **Ctrl+Shift+F** | Search in terminal scrollback |
-| **Right-click** | Paste from clipboard (HTTPS) or open paste dialog (HTTP) |
-| Select text | Automatically copies to clipboard (PuTTY-style) |
+| **Ctrl+Shift+F** | Search in terminal scrollback                                                       |
+| **Right-click**  | Paste from clipboard (HTTPS) or open paste dialog (HTTP)                            |
+| Select text      | Automatically copies to clipboard (PuTTY-style)                                     |
 
 <!--
 	Placeholder for the next version (at the beginning of the line):
@@ -39,14 +39,18 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 -->
 
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) Migrated the adapter to Typescript
+* (bluefox) Added multiple terminal sessions
+
 ### 2.0.1 (2023-09-18)
 * (bluefox) xterm library updated
 * (bluefox) Move Lets encrypt settings to acme adapter
 * (bluefox) Minimal supported node.js version is 16
 
 ### 1.1.0 (2022-10-08)
-* (Apollon77) Update xterm library
-* (Apollon77) Prepare for future js-controller versions
+* (Apollon77) Updated an xterm library
+* (Apollon77) Prepared for future js-controller versions
 
 ### 1.0.0 (2022-08-29)
 * (bluefox) Check only port of the interface and not of all interfaces

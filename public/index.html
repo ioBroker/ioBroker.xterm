@@ -1,359 +1,368 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+    <head>
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="/favicon.ico"
+        />
 
-    <link rel="stylesheet" href="./xterm.css" />
-    <script src="./xterm.js"></script>
-    <script src="./xterm-addon-fit.js"></script>
-    <script src="./xterm-addon-canvas.js"></script>
-    <style>
-        html, body {
-            width:  100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        #terminal {
-            width: calc(100% - 8px);
-            height: calc(100% - 8px);
-            overflow: hidden;
-        }
-        .disconnected {
-            opacity: 0.2;
-        }
-        /* scrollbar */
-        *::-webkit-scrollbar-track {
-            background-color: #ccc;
-        }
-        *::-webkit-scrollbar {
-            width: 6px;
-            background-color: #ccc;
-        }
-        *::-webkit-scrollbar-thumb {
-            background-color: #575757;
-        }
-    </style>
-</head>
-<body>
-<div id="terminal"></div>
-<script>
-    var resizeTimeout;
-    var ws;
-    var connectTimer;
-    var connectingTimeout;
-    var terminalDiv = document.getElementById('terminal');
-    var currentLine = '';
-    var isExecuting = false;
-    var entries = [];
-    var completion = {};
-    var cmdHistory = window.localStorage.getItem('xterm.history') || '[]';
-    var historyPosition = -1;
-    var copied = '';
-    var puttyMode = true;
-    var resizeSent = null;
+        <link
+            rel="stylesheet"
+            href="./xterm.css"
+        />
+        <script src="./xterm.js"></script>
+        <script src="./xterm-addon-fit.js"></script>
+        <script src="./xterm-addon-canvas.js"></script>
+        <style>
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+            #terminal {
+                width: calc(100% - 8px);
+                height: calc(100% - 8px);
+                overflow: hidden;
+            }
+            .disconnected {
+                opacity: 0.2;
+            }
+            /* scrollbar */
+            *::-webkit-scrollbar-track {
+                background-color: #ccc;
+            }
+            *::-webkit-scrollbar {
+                width: 6px;
+                background-color: #ccc;
+            }
+            *::-webkit-scrollbar-thumb {
+                background-color: #575757;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="terminal"></div>
+        <script>
+            let resizeTimeout;
+            let ws;
+            let connectTimer;
+            let connectingTimeout;
+            const terminalDiv = document.getElementById('terminal');
+            let currentLine = '';
+            let isExecuting = false;
+            const entries = [];
+            const completion = {};
+            let cmdHistory = [];
+            let historyPosition = -1;
+            let copied = '';
+            let puttyMode = true;
+            let resizeSent = null;
 
-    try {
-        cmdHistory = JSON.parse(cmdHistory);
-    } catch (e) {
-        cmdHistory = [];
-    }
+            try {
+                cmdHistory = JSON.parse(window.localStorage.getItem('xterm.history') || '[]');
+            } catch (e) {
+                // ignore
+            }
 
-    function findOption() {
-        if (!completion || !completion.options) {
-            return '';
-        } else {
-            if (completion.lastSearch === currentLine) {
-                completion.index++;
-                if (completion.index >= completion.filteredOptions.length) {
-                    completion.index = 0;
+            function findOption() {
+                if (!completion || !completion.options) {
+                    return '';
                 }
-                return completion.filteredOptions[completion.index] || '';
-            } else {
-                var word = currentLine.split(' ').pop();
+                if (completion.lastSearch === currentLine) {
+                    completion.index++;
+                    if (completion.index >= completion.filteredOptions.length) {
+                        completion.index = 0;
+                    }
+                    return completion.filteredOptions[completion.index] || '';
+                }
+                const word = currentLine.split(' ').pop();
                 completion.filteredOptions = completion.options.filter(a => a.startsWith(word));
                 completion.lastSearch = currentLine;
                 completion.index = 0;
                 return completion.filteredOptions[completion.index] || '';
             }
-        }
-    }
 
-    function reconnect(noWait) {
-        terminalDiv.className = 'disconnected';
-        isExecuting = false;
+            function reconnect(noWait) {
+                terminalDiv.className = 'disconnected';
+                isExecuting = false;
 
-        connectTimer = connectTimer || setTimeout(() => {
-            connectTimer = null;
-            connectingTimeout && clearTimeout(connectingTimeout);
-            connectingTimeout = setTimeout(() => {
-                console.log('Connect timeout');
-                reconnect();
-            }, 5000);
+                connectTimer =
+                    connectTimer ||
+                    setTimeout(
+                        () => {
+                            connectTimer = null;
+                            connectingTimeout && clearTimeout(connectingTimeout);
+                            connectingTimeout = setTimeout(() => {
+                                console.log('Connect timeout');
+                                reconnect();
+                            }, 5000);
 
-            ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:${window.location.port}`);
-            ws.onopen = function (event) {
-                connectingTimeout && clearTimeout(connectingTimeout);
-                connectingTimeout = null;
-                //ws.send(JSON.stringify({method: 'prompt'}));
-                console.log('Connected')
-                terminalDiv.className = '';
-            };
+                            ws = new WebSocket(
+                                `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:${window.location.port}`,
+                            );
+                            ws.onopen = function (event) {
+                                connectingTimeout && clearTimeout(connectingTimeout);
+                                connectingTimeout = null;
+                                //ws.send(JSON.stringify({method: 'prompt'}));
+                                console.log('Connected');
+                                terminalDiv.className = '';
+                            };
 
-            ws.onerror = function (error) {
-                console.error('Cannot connect: ' + error);
-                try {
-                    ws.close();
-                    ws = null;
-                } catch (e) {
+                            ws.onerror = function (error) {
+                                console.error('Cannot connect: ' + error);
+                                try {
+                                    ws.close();
+                                    ws = null;
+                                } catch (e) {}
 
-                }
+                                reconnect();
+                            };
 
-                reconnect();
-            };
+                            ws.onclose = function (event) {
+                                try {
+                                    ws.close();
+                                    ws = null;
+                                } catch (e) {}
+                                reconnect();
+                            };
 
-            ws.onclose = function (event) {
-                try {
-                    ws.close();
-                    ws = null;
-                } catch (e) {
+                            // Receive data from socket
+                            ws.onmessage = msg => {
+                                msg = JSON.parse(msg.data);
+                                if (msg.mode === 'pty') {
+                                    puttyMode = true;
+                                    return;
+                                } else if (msg.mode === 'simulate') {
+                                    puttyMode = false;
+                                    return;
+                                }
 
-                }
-                reconnect();
-            };
+                                if (msg.isExecuting !== undefined) {
+                                    isExecuting = msg.isExecuting;
+                                    if (!isExecuting) {
+                                        currentLine = '';
+                                    }
+                                }
+                                if (msg.completion) {
+                                    completion = { options: msg.completion };
+                                    processTab();
+                                }
 
-            // Receive data from socket
-            ws.onmessage = msg => {
-                msg = JSON.parse(msg.data);
-                if (msg.mode === 'pty') {
-                    puttyMode = true;
-                    return;
-                } else if (msg.mode === 'simulate') {
-                    puttyMode = false;
-                    return;
-                }
+                                if (msg.data !== undefined) {
+                                    if (puttyMode || isExecuting) {
+                                        if (puttyMode && resizeSent && Date.now() - resizeSent < 500) {
+                                            resizeSent = null;
+                                            // ignore this line as it is duplicated
+                                            return;
+                                        }
 
-                if (msg.isExecuting !== undefined) {
-                    isExecuting = msg.isExecuting;
-                    if (!isExecuting) {
-                        currentLine = '';
-                    }
-                }
-                if (msg.completion) {
-                    completion = {options: msg.completion};
-                    processTab();
-                }
+                                        if (msg.error) {
+                                            term.write(msg.data); // TODO: change color
+                                        } else {
+                                            term.write(msg.data);
+                                        }
+                                    } else {
+                                        if (msg.error) {
+                                            term.write('\r\n' + msg.data); // TODO: change color
+                                        } else {
+                                            term.write('\r\n' + msg.data);
+                                        }
+                                    }
+                                }
 
-                if (msg.data !== undefined) {
-                    if (puttyMode || isExecuting) {
-                        if (puttyMode && resizeSent && Date.now() - resizeSent < 500) {
-                            resizeSent = null;
-                            // ignore this line as it is duplicated
-                            return;
-                        }
+                                if (msg.prompt === true) {
+                                    term.write('\r\nweb shell $ ');
+                                    currentLine = '';
+                                } else if (msg.prompt) {
+                                    term.write('\r\n' + msg.prompt + ' ');
+                                    currentLine = '';
+                                }
+                            };
 
-                        if (msg.error) {
-                            term.write(msg.data); // TODO: change color
-                        } else {
-                            term.write(msg.data);
-                        }
+                            setTimeout(function () {
+                                resizeSent = Date.now();
+                                ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
+                            }, 200);
+                        },
+                        noWait ? 0 : 5000,
+                    );
+            }
+
+            const term = new Terminal({
+                cursorBlink: 'block',
+                width: '100%',
+                height: '100%',
+                convertEol: true,
+                rendererType: 'dom',
+            });
+
+            terminalDiv.className = 'disconnected';
+
+            terminalDiv.addEventListener('contextmenu', event => {
+                event.preventDefault();
+
+                if (term.hasSelection()) {
+                    copied = term.getSelection();
+                    document.execCommand('copy');
+                    term.select(0, 0, 0);
+                } else {
+                    if (copied) {
+                        currentLine += copied;
+                        term.write(copied);
                     } else {
-                        if (msg.error) {
-                            term.write('\r\n' + msg.data); // TODO: change color
-                        } else {
-                            term.write('\r\n' + msg.data);
+                        try {
+                            window.navigator.clipboard.readText().then(clipText => {
+                                currentLine += clipText;
+                                term.write(clipText);
+                            });
+                        } catch (e) {
+                            window.alert('Cannot access clipboard!');
                         }
                     }
                 }
+            });
 
-                if (msg.prompt === true) {
-                    term.write('\r\nweb shell $ ');
-                    currentLine = '';
-                } else if (msg.prompt) {
-                    term.write('\r\n' + msg.prompt + ' ');
-                    currentLine = '';
-                }
-            };
-
-            setTimeout(function () {
-                resizeSent = Date.now();
-                ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
-            }, 200);
-        }, noWait ? 0 : 5000);
-    }
-
-    var term = new Terminal({
-        cursorBlink: 'block',
-        width: '100%',
-        height: '100%',
-        convertEol: true,
-        rendererType: 'dom',
-    });
-
-    terminalDiv.className = 'disconnected';
-
-    terminalDiv.addEventListener('contextmenu', event => {
-        event.preventDefault();
-
-        if (term.hasSelection()) {
-            copied = term.getSelection();
-            document.execCommand('copy');
-            term.select(0, 0, 0);
-        } else {
-            if (copied) {
-                currentLine += copied;
-                term.write(copied);
-            } else {
-                try {
-                    window.navigator.clipboard.readText()
-                        .then(clipText => {
-                            currentLine += clipText;
-                            term.write(clipText);
-                        });
-                } catch (e) {
-                    window.alert('Cannot access clipboard!');
-                }
+            const fitAddon = new FitAddon.FitAddon();
+            let canvasAddon;
+            if (typeof CanvasAddon !== 'undefined') {
+                canvasAddon = new CanvasAddon.CanvasAddon();
             }
-        }
-    });
 
-    var fitAddon = new FitAddon.FitAddon();
-    var canvasAddon;
-    if (typeof CanvasAddon !== 'undefined') {
-        canvasAddon = new CanvasAddon.CanvasAddon();
-    }
+            // webglAddon.onContextLoss(function (e) {
+            //     webglAddon.dispose();
+            // });
 
-    // webglAddon.onContextLoss(function (e) {
-    //     webglAddon.dispose();
-    // });
+            term.loadAddon(fitAddon);
+            canvasAddon && term.loadAddon(canvasAddon);
 
-    term.loadAddon(fitAddon);
-    canvasAddon && term.loadAddon(canvasAddon);
+            term.open(terminalDiv);
 
-    term.open(terminalDiv);
-
-    fitAddon.fit();
-
-    term.prompt = () => {
-        var data = { method: 'command', command: currentLine };
-        ws.send(JSON.stringify(data));
-    };
-
-    term.onSelectionChange(() => {
-        copied = term.getSelection();
-        if (copied.length) {
-            document.execCommand('copy');
-        }
-    });
-
-    function replaceCurrentInput(newText) {
-        if (currentLine) {
-            term.write(Array(currentLine.length + 1).join('\b \b'));
-        }
-        currentLine = newText;
-        term.write(currentLine);
-    }
-
-    function processTab() {
-        // remove actual tab text
-        if (completion.inputLength) {
-            var toDelete = currentLine.length - completion.inputLength;
-            currentLine = currentLine.substring(0, completion.inputLength);
-            term.write(Array(toDelete + 1).join('\b \b'));
-        }
-
-        var line = findOption();
-        // remove actual text
-        if (line) {
-            completion.inputLength = currentLine.length;
-            var words = currentLine.split(' ');
-            var lastWord = words.pop();
-            var addedText = line.substring(lastWord.length);
-            currentLine += addedText;
-            term.write(addedText);
-        }
-    }
-
-    term.onKey(function (key) {
-        if (puttyMode || isExecuting) {
-            !puttyMode && term.write(key.key);
-            return ws.send(JSON.stringify({ method: 'key', key: key.key }));
-        }
-        if (key.domEvent.key === 'Tab') {
-            if (!completion || !completion.options) {
-                ws.send(JSON.stringify({ method: 'tab' }));
-            } else {
-                processTab();
-            }
-        } else
-        // UP
-        if (key.domEvent.key === 'ArrowUp') {
-            if (historyPosition < cmdHistory.length - 1) {
-                historyPosition++;
-                replaceCurrentInput(cmdHistory[historyPosition]);
-            }
-        }  else
-        // Down
-        if (key.domEvent.key === 'ArrowDown') {
-            if (historyPosition > 0) {
-                historyPosition--;
-                replaceCurrentInput(cmdHistory[historyPosition]);
-            }
-        } else
-        //Enter
-        if (key.domEvent.key === 'Enter') {
-            completion = null;
-            if (currentLine) {
-                historyPosition = -1;
-                cmdHistory.unshift(currentLine);
-                window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
-                entries.push(currentLine);
-            }
-            term.write('\r\n');
-
-            if (currentLine.trim() === 'cls') {
-                currentLine = '';
-                term.clear();
-            } else if (currentLine.trim() === 'history') {
-                currentLine = '';
-                term.write(cmdHistory.map((line, i) => ` ${(i + 1).toString().padStart(3)}  ${line}`).join('\r\n'));
-            } else if (currentLine.trim() === 'history -c') {
-                currentLine = '';
-                cmdHistory = [];
-                window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
-            }
-            term.prompt();
-        } else if (key.domEvent.key === 'Backspace') {
-            completion = null;
-            // Backspace
-            if (currentLine) {
-                currentLine = currentLine.slice(0, currentLine.length - 1);
-                term.write('\b \b');
-            }
-        } else {
-            historyPosition = -1;
-            completion = null;
-            currentLine += key.key;
-            term.write(key.key);
-        }
-    });
-
-    window.addEventListener('resize', function () {
-        resizeTimeout && clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function () {
-            resizeTimeout = null;
             fitAddon.fit();
 
-            // update server terminal with new size
-            try {
-                resizeSent = Date.now();
-                ws && ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
-            } catch (e) {
+            term.prompt = () => {
+                const data = { method: 'command', command: currentLine };
+                ws.send(JSON.stringify(data));
+            };
 
+            term.onSelectionChange(() => {
+                copied = term.getSelection();
+                if (copied.length) {
+                    document.execCommand('copy');
+                }
+            });
+
+            function replaceCurrentInput(newText) {
+                if (currentLine) {
+                    term.write(Array(currentLine.length + 1).join('\b \b'));
+                }
+                currentLine = newText;
+                term.write(currentLine);
             }
-        });
-    }, true);
 
-    reconnect(true);
-</script>
-</body>
+            function processTab() {
+                // remove actual tab text
+                if (completion.inputLength) {
+                    const toDelete = currentLine.length - completion.inputLength;
+                    currentLine = currentLine.substring(0, completion.inputLength);
+                    term.write(Array(toDelete + 1).join('\b \b'));
+                }
+
+                const line = findOption();
+                // remove actual text
+                if (line) {
+                    completion.inputLength = currentLine.length;
+                    const words = currentLine.split(' ');
+                    const lastWord = words.pop();
+                    const addedText = line.substring(lastWord.length);
+                    currentLine += addedText;
+                    term.write(addedText);
+                }
+            }
+
+            term.onKey(key => {
+                if (puttyMode || isExecuting) {
+                    !puttyMode && term.write(key.key);
+                    return ws.send(JSON.stringify({ method: 'key', key: key.key }));
+                }
+                if (key.domEvent.key === 'Tab') {
+                    if (!completion || !completion.options) {
+                        ws.send(JSON.stringify({ method: 'tab' }));
+                    } else {
+                        processTab();
+                    }
+                } else if (key.domEvent.key === 'ArrowUp') {
+                    // UP
+                    if (historyPosition < cmdHistory.length - 1) {
+                        historyPosition++;
+                        replaceCurrentInput(cmdHistory[historyPosition]);
+                    }
+                } else if (key.domEvent.key === 'ArrowDown') {
+                    // Down
+                    if (historyPosition > 0) {
+                        historyPosition--;
+                        replaceCurrentInput(cmdHistory[historyPosition]);
+                    }
+                } else if (key.domEvent.key === 'Enter') {
+                    //Enter
+                    completion = null;
+                    if (currentLine) {
+                        historyPosition = -1;
+                        cmdHistory.unshift(currentLine);
+                        window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
+                        entries.push(currentLine);
+                    }
+                    term.write('\r\n');
+
+                    if (currentLine.trim() === 'cls') {
+                        currentLine = '';
+                        term.clear();
+                    } else if (currentLine.trim() === 'history') {
+                        currentLine = '';
+                        term.write(
+                            cmdHistory.map((line, i) => ` ${(i + 1).toString().padStart(3)}  ${line}`).join('\r\n'),
+                        );
+                    } else if (currentLine.trim() === 'history -c') {
+                        currentLine = '';
+                        cmdHistory = [];
+                        window.localStorage.setItem('xterm.history', JSON.stringify(cmdHistory));
+                    }
+                    term.prompt();
+                } else if (key.domEvent.key === 'Backspace') {
+                    completion = null;
+                    // Backspace
+                    if (currentLine) {
+                        currentLine = currentLine.slice(0, currentLine.length - 1);
+                        term.write('\b \b');
+                    }
+                } else {
+                    historyPosition = -1;
+                    completion = null;
+                    currentLine += key.key;
+                    term.write(key.key);
+                }
+            });
+
+            window.addEventListener(
+                'resize',
+                () => {
+                    resizeTimeout && clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(function () {
+                        resizeTimeout = null;
+                        fitAddon.fit();
+
+                        // update server terminal with new size
+                        try {
+                            resizeSent = Date.now();
+                            ws && ws.send(JSON.stringify({ method: 'resize', cols: term.cols, rows: term.rows }));
+                        } catch (e) {}
+                    });
+                },
+                true,
+            );
+
+            reconnect(true);
+        </script>
+    </body>
 </html>

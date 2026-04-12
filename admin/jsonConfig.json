@@ -1,109 +1,107 @@
 {
-  "type": "tabs",
-  "i18n": true,
-  "items": {
-    "mainTab": {
-      "type": "panel",
-      "label": "Main settings",
-      "items": {
-        "bind": {
-          "type": "ip",
-          "listenOnAllPorts": true,
-          "label": "IP",
-          "sm": 12,
-          "md": 8,
-          "lg": 5
+    "type": "tabs",
+    "i18n": true,
+    "items": {
+        "mainTab": {
+            "type": "panel",
+            "label": "Main settings",
+            "items": {
+                "bind": {
+                    "type": "ip",
+                    "listenOnAllPorts": true,
+                    "label": "IP",
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 5
+                },
+                "port": {
+                    "type": "number",
+                    "min": 1,
+                    "max": 65565,
+                    "label": "Port",
+                    "sm": 12,
+                    "md": 4,
+                    "lg": 3
+                },
+                "secure": {
+                    "newLine": true,
+                    "type": "checkbox",
+                    "label": "Secure(HTTPS)",
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 2
+                },
+                "auth": {
+                    "newLine": true,
+                    "type": "checkbox",
+                    "confirm": {
+                        "condition": "!data.secure && data.auth",
+                        "title": "Warning!",
+                        "text": "Unsecure_Auth",
+                        "ok": "Ignore warning",
+                        "cancel": "Disable authentication",
+                        "type": "warning",
+                        "alsoDependsOn": ["secure"]
+                    },
+                    "label": "Authentication",
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 2
+                },
+                "pty": {
+                    "newLine": true,
+                    "type": "checkbox",
+                    "label": "Use Bash or cmd.exe",
+                    "help": "If unchecked, the shell will be simulated",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 4
+                },
+                "encoding": {
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 2,
+                    "hidden": "data.pty===true",
+                    "newLine": true,
+                    "type": "select",
+                    "label": "Terminal encoding",
+                    "noTranslation": true,
+                    "options": [
+                        { "label": "utf-8", "value": "utf-8" },
+                        { "label": "cp850 - german", "value": "cp850" },
+                        { "label": "cp1251 - russin", "value": "cp1251" }
+                    ]
+                },
+                "doNotUseCanvas": {
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 2,
+                    "newLine": true,
+                    "type": "checkbox",
+                    "label": "Do not use canvas plugin"
+                }
+            }
         },
-        "port": {
-          "type": "number",
-          "min": 1,
-          "max": 65565,
-          "label": "Port",
-          "sm": 12,
-          "md": 4,
-          "lg": 3
-        },
-        "secure": {
-          "newLine": true,
-          "type": "checkbox",
-          "label": "Secure(HTTPS)",
-          "sm": 12,
-          "md": 6,
-          "lg": 2
-        },
-        "auth": {
-          "newLine": true,
-          "type": "checkbox",
-          "confirm": {
-            "condition": "!data.secure && data.auth",
-            "title": "Warning!",
-            "text": "Unsecure_Auth",
-            "ok": "Ignore warning",
-            "cancel": "Disable authentication",
-            "type": "warning",
-            "alsoDependsOn": [
-              "secure"
-            ]
-          },
-          "label": "Authentication",
-          "sm": 12,
-          "md": 6,
-          "lg": 2
-        },
-        "pty": {
-          "newLine": true,
-          "type": "checkbox",
-          "label": "Use Bash or cmd.exe",
-          "help": "If unchecked, the shell will be simulated",
-          "sm": 12,
-          "md": 12,
-          "lg": 4
-        },
-        "encoding": {
-          "sm": 12,
-          "md": 6,
-          "lg": 2,
-          "hidden": "data.pty===true",
-          "newLine": true,
-          "type": "select",
-          "label": "Terminal encoding",
-          "noTranslation": true,
-          "options": [
-            {"label": "utf-8", "value": "utf-8"},
-            {"label": "cp850 - german", "value": "cp850"},
-            {"label": "cp1251 - russin", "value": "cp1251"}
-          ]
-        },
-        "doNotUseCanvas": {
-          "sm": 12,
-          "md": 6,
-          "lg": 2,
-          "newLine": true,
-          "type": "checkbox",
-          "label": "Do not use canvas plugin"
+        "leTab": {
+            "type": "panel",
+            "label": "Let's Encrypt SSL",
+            "hidden": "!data.secure",
+            "items": {
+                "_image": {
+                    "type": "staticImage",
+                    "tooltip": "Read about Let's Encrypt certificates",
+                    "href": "https://github.com/ioBroker/ioBroker.admin/blob/master/README.md#lets-encrypt-certificates",
+                    "src": "../../img/le.png",
+                    "style": {
+                        "width": 200,
+                        "height": 59
+                    }
+                },
+                "_staticText": {
+                    "type": "staticText",
+                    "text": "ra_Use iobroker.acme adapter for letsencrypt certificates"
+                }
+            }
         }
-      }
-    },
-    "leTab": {
-      "type": "panel",
-      "label": "Let's Encrypt SSL",
-      "hidden": "!data.secure",
-      "items": {
-        "_image": {
-          "type": "staticImage",
-          "tooltip": "Read about Let's Encrypt certificates",
-          "href": "https://github.com/ioBroker/ioBroker.admin/blob/master/README.md#lets-encrypt-certificates",
-          "src": "../../img/le.png",
-          "style": {
-            "width": 200,
-            "height": 59
-          }
-        },
-        "_staticText": {
-          "type": "staticText",
-          "text": "ra_Use iobroker.acme adapter for letsencrypt certificates"
-        }
-      }
     }
-  }
 }

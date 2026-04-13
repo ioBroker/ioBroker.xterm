@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "xterm",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "news": {
+      "3.0.1": {
+        "en": "Added the icon in the GUI",
+        "de": "Das Icon in der GUI hinzugefügt",
+        "ru": "Добавлена иконка в GUI",
+        "pt": "Adicionado o ícone na interface gráfica",
+        "nl": "Het pictogram in de GUI toegevoegd",
+        "fr": "Ajout de l'icône dans l'interface graphique",
+        "it": "Aggiunto l'icona nella GUI",
+        "es": "Añadido el icono en el GUI",
+        "pl": "Dodano ikonę w GUI",
+        "uk": "Додано іконку в GUI",
+        "zh-cn": "在图形界面中添加图标"
+      },
       "3.0.0": {
         "en": "Migrated the adapter to Typescript\nAdded multiple terminal sessions",
         "de": "Den Adapter zu Typescript migrieren\nMehrere Terminalsitzungen hinzugefügt",
@@ -76,18 +89,6 @@
         "es": "Solucionar un caso de bloqueo informado por Sentry",
         "pl": "Napraw awarię zgłoszoną przez Sentry",
         "zh-cn": "修复 Sentry 报告的崩溃案例"
-      },
-      "0.3.0": {
-        "en": "Prevent some warnings in js-controller 3+\nAdd Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!\nRework info.connection status to show that server is connected also as green by using \"none\" to show that noone is connected\nUpdate all dependencies\nAdd sentry for crash reporting",
-        "de": "Einige Warnungen in js-controller 3+ verhindern\nFallback zur simulierten Shell hinzufügen, wenn bash/cmd.exe von node-pty ausgewählt wird, wurde nicht korrekt installiert!\nÜberarbeiten Sie den info.connection-Status, um anzuzeigen, dass der Server verbunden ist, auch als grün, indem Sie \"none\" verwenden, um anzuzeigen, dass niemand verbunden ist\nAktualisieren Sie alle Abhängigkeiten\nSentry für Absturzberichte hinzufügen",
-        "ru": "Предотвратить некоторые предупреждения в js-controller 3+\nДобавьте резервный вариант в смоделированную оболочку, если bash/cmd.exe выбран из-за неправильной установки node-pty!\nПереработать статус info.connection, чтобы показать, что сервер подключен, также зеленым, используя «none», чтобы показать, что никто не подключен.\nОбновить все зависимости\nДобавить часового для отчетов о сбоях",
-        "pt": "Evite alguns avisos no js-controller 3+\nAdicione Fallback ao shell simulado se bash/cmd.exe for selecionado por node-pty não foi instalado corretamente!\nRetrabalhe o status info.connection para mostrar que o servidor também está conectado como verde usando \"none\" para mostrar que ninguém está conectado\nAtualizar todas as dependências\nAdicionar sentinela para relatórios de falhas",
-        "nl": "Voorkom enkele waarschuwingen in js-controller 3+\nVoeg terugval toe aan gesimuleerde shell als bash/cmd.exe is geselecteerd door node-pty niet correct is geïnstalleerd!\nHerwerk de info.connection-status om aan te geven dat de server ook groen is verbonden door \"none\" te gebruiken om aan te geven dat er niemand is verbonden\nAlle afhankelijkheden bijwerken\nEen schildwacht toevoegen voor crashrapportage",
-        "fr": "Empêcher certains avertissements dans js-controller 3+\nAjoutez Fallback au shell simulé si bash/cmd.exe est sélectionné par node-pty n'a pas été installé correctement !\nRetravailler l'état de l'info.connexion pour montrer que le serveur est connecté également en vert en utilisant \"aucun\" pour montrer que personne n'est connecté\nMettre à jour toutes les dépendances\nAjouter une sentinelle pour les rapports de plantage",
-        "it": "Impedisci alcuni avvisi in js-controller 3+\nAggiungi fallback alla shell simulata se bash/cmd.exe è selezionato da node-pty non è stato installato correttamente!\nRielabora lo stato di info.connection per mostrare che il server è connesso anche come verde usando \"none\" per mostrare che nessuno è connesso\nAggiorna tutte le dipendenze\nAggiungi sentinella per la segnalazione degli arresti anomali",
-        "es": "Evite algunas advertencias en js-controller 3+\n¡Agregue Fallback al shell simulado si node-pty seleccionó bash/cmd.exe y no se instaló correctamente!\nVuelva a trabajar en el estado de info.connection para mostrar que el servidor está conectado también como verde usando \"ninguno\" para mostrar que nadie está conectado\nActualizar todas las dependencias\nAgregar centinela para informes de fallas",
-        "pl": "Zapobiegaj niektórym ostrzeżeniom w js-controller 3+\nDodaj Fallback do symulowanej powłoki, jeśli bash/cmd.exe jest wybrany przez node-pty nie został poprawnie zainstalowany!\nZmień stan info.connection, aby pokazać, że serwer jest podłączony również na zielono, używając „brak”, aby pokazać, że nikt nie jest podłączony\nZaktualizuj wszystkie zależności\nDodaj wartownika do zgłaszania awarii",
-        "zh-cn": "防止在 js-controller 3+ 中出现一些警告\n如果 node-pty 选择的 bash/cmd.exe 未正确安装，则将 Fallback 添加到模拟 shell！\n重做 info.connection 状态以显示服务器也已连接为绿色，使用“none”表示没有人连接\n更新所有依赖项\n为崩溃报告添加哨兵"
       }
     },
     "title": "Shell console XTerm",

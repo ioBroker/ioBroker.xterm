@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "xterm",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "news": {
+      "3.0.2": {
+        "en": "Added the icon in the GUI\nAdded possibility to run under specified user on Linux",
+        "de": "Das Icon in der GUI hinzugefügt\nZusätzliche Möglichkeit, unter bestimmten Benutzer auf Linux laufen",
+        "ru": "Добавлена иконка в GUI\nДобавлена возможность запуска под указанным пользователем на Linux",
+        "pt": "Adicionado o ícone na interface gráfica\nAdicionada possibilidade de execução sob o usuário especificado no Linux",
+        "nl": "Het pictogram in de GUI toegevoegd\nToegevoegde mogelijkheid om te draaien onder opgegeven gebruiker op Linux",
+        "fr": "Ajout de l'icône dans l'interface graphique\nAjout de la possibilité d'exécuter sous l'utilisateur spécifié sur Linux",
+        "it": "Aggiunto l'icona nella GUI\nAggiunta possibilità di eseguire sotto utente specificato su Linux",
+        "es": "Añadido el icono en el GUI\nPosibilidad de ejecutar bajo el usuario especificado en Linux",
+        "pl": "Dodano ikonę w GUI\nDodano możliwość uruchomienia pod określonym użytkownikiem na Linuksie",
+        "uk": "Додано іконку в GUI\nДодано можливість запуску за вказаною користувачем на Linux",
+        "zh-cn": "在图形界面中添加图标\n添加在 Linux 上指定用户下运行的可能性"
+      },
       "3.0.1": {
         "en": "Added the icon in the GUI",
         "de": "Das Icon in der GUI hinzugefügt",
@@ -76,18 +89,6 @@
         "it": "Risolvi i casi di crash segnalati da Sentry",
         "es": "Solucionar casos de fallas informados por Sentry",
         "pl": "Napraw przypadki awarii zgłoszone przez Sentry",
-        "zh-cn": "修复 Sentry 报告的崩溃案例"
-      },
-      "0.3.1": {
-        "en": "Fix a crash case reported by Sentry",
-        "de": "Beheben Sie einen von Sentry gemeldeten Absturzfall",
-        "ru": "Исправление сбоя, о котором сообщил Sentry",
-        "pt": "Corrigir um caso de falha relatado pelo Sentinela",
-        "nl": "Een door Sentry gemeld crashgeval oplossen",
-        "fr": "Correction d'un cas de plantage signalé par Sentry",
-        "it": "Risolvi un caso di crash segnalato da Sentry",
-        "es": "Solucionar un caso de bloqueo informado por Sentry",
-        "pl": "Napraw awarię zgłoszoną przez Sentry",
         "zh-cn": "修复 Sentry 报告的崩溃案例"
       }
     },

@@ -70,3 +70,15 @@
     color: var(--fg-primary);
     background: var(--bg-hover);
 }
+
+.tab-bar-spacer {
+    flex: 1;
+}
+
+.tab-bar-icon {
+    height: 24px;
+    width: 24px;
+    margin: 6px 8px;
+    flex-shrink: 0;
+    object-fit: contain;
+}

@@ -40,13 +40,8 @@ export default function App(): React.JSX.Element {
     }, []);
 
     const onConnected = useCallback(() => {
-        // Send 'create' for all existing tabs on (re)connect
-        const currentTabs = tabsRef.current;
-        // Mark all tabs as not ready so they get re-created
+        // Mark all tabs as not ready so the useEffect re-sends 'create' for them
         setTabs(prev => prev.map(t => ({ ...t, ready: false })));
-        for (const tab of currentTabs) {
-            sendRef.current({ method: 'create', tabId: tab.id });
-        }
     }, []);
 
     const { connected, send } = useWebSocket({ onMessage, onConnected });

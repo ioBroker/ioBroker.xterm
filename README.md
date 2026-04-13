@@ -39,8 +39,9 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 -->
 
 ## Changelog
-### 3.0.1 (2026-04-13)
+### **WORK IN PROGRESS**
 * (bluefox) Added the icon in the GUI
+* (bluefox) Added possibility to run under specified user on Linux
 
 ### 3.0.0 (2026-04-12)
 * (bluefox) Migrated the adapter to Typescript

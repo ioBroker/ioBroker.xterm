@@ -17,5 +17,7 @@
     "Let's Encrypt SSL": "Let's Encrypt SSL",
     "IP": "Lokale IP-Schnittstelle",
     "Start directory": "Startverzeichnis",
-    "Leave empty to use the ioBroker directory": "Leer lassen, um das ioBroker-Verzeichnis zu verwenden"
+    "Leave empty to use the ioBroker directory": "Leer lassen, um das ioBroker-Verzeichnis zu verwenden",
+    "Shell user": "Shell-Benutzer",
+    "Leave empty to use the ioBroker process user": "Leer lassen, um den ioBroker-Prozessbenutzer zu verwenden"
 }

@@ -4,5 +4,6 @@ export interface XtermAdapterConfig {
     secure: boolean;
     auth: boolean;
     cwd: string;
+    shellUser: string;
     findNextPort?: boolean;
 }

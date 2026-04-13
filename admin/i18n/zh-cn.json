@@ -17,5 +17,7 @@
     "Let's Encrypt SSL": "Let's Encrypt SSL",
     "IP": "本地IP接口",
     "Start directory": "起始目录",
-    "Leave empty to use the ioBroker directory": "留空以使用 ioBroker 目录"
+    "Leave empty to use the ioBroker directory": "留空以使用 ioBroker 目录",
+    "Shell user": "Shell 用户",
+    "Leave empty to use the ioBroker process user": "留空以使用 ioBroker 进程用户"
 }

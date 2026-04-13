@@ -171,7 +171,8 @@
     "port": "8099",
     "secure": false,
     "auth": true,
-    "cwd": ""
+    "cwd": "",
+    "shellUser": ""
   },
   "objects": [],
   "instanceObjects": [

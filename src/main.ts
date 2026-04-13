@@ -177,13 +177,35 @@ class XtermAdapter extends Adapter {
     }
 
     private startShellForTab(ws: XtermWebSocket, tabId: string): void {
-        const shell = os.platform() === 'win32' ? 'cmd.exe' : 'bash';
-
         if (!ws?.__iobroker) {
             return;
         }
 
-        const ptyProcess = pty.spawn(shell, [], {
+        // Kill existing PTY for this tab (e.g. on reconnect or duplicate create)
+        const existing = ws.__iobroker.tabs.get(tabId);
+        if (existing) {
+            ws.__iobroker.tabs.delete(tabId);
+            try {
+                existing.kill();
+            } catch {
+                // ignore
+            }
+        }
+
+        let shell: string;
+        let args: string[];
+        if (os.platform() === 'win32') {
+            shell = 'cmd.exe';
+            args = [];
+        } else if (this.config.shellUser) {
+            shell = 'su';
+            args = ['-', this.config.shellUser];
+        } else {
+            shell = 'bash';
+            args = [];
+        }
+
+        const ptyProcess = pty.spawn(shell, args, {
             name: 'xterm-256color',
             cols: 80,
             rows: 30,
@@ -198,7 +220,8 @@ class XtermAdapter extends Adapter {
         });
 
         ptyProcess.onExit(() => {
-            if (ws.__iobroker?.tabs.has(tabId)) {
+            // Only restart if this PTY is still the active one for this tab
+            if (ws.__iobroker?.tabs.get(tabId) === ptyProcess) {
                 // Shell exited — restart it
                 this.startShellForTab(ws, tabId);
             }

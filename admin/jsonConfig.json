@@ -57,6 +57,16 @@
                     "sm": 12,
                     "md": 8,
                     "lg": 6
+                },
+                "shellUser": {
+                    "newLine": true,
+                    "type": "text",
+                    "label": "Shell user",
+                    "help": "Leave empty to use the ioBroker process user",
+                    "placeholder": "root",
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6
                 }
             }
         },

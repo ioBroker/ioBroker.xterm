@@ -92,7 +92,6 @@
         "zh-cn": "修复 Sentry 报告的崩溃案例"
       }
     },
-    "title": "Shell console XTerm",
     "titleLang": {
       "en": "Shell console XTerm",
       "de": "Shell-Konsole XTerm",

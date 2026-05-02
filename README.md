@@ -39,6 +39,9 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 -->
 
 ## Changelog
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 3.0.2 (2026-04-13)
 * (bluefox) Added the icon in the GUI
 * (bluefox) Added possibility to run under specified user on Linux

@@ -84,6 +84,8 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 ### 0.0.1
 * (ioBroker) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 

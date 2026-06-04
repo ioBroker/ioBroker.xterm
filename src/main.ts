@@ -47,7 +47,15 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
     for (const pair of cookieHeader.split(';')) {
         const idx = pair.indexOf('=');
         if (idx > 0) {
-            cookies[pair.substring(0, idx).trim()] = pair.substring(idx + 1).trim();
+            const value = pair.substring(idx + 1).trim();
+            let decoded: string;
+            try {
+                // Express' res.cookie URL-encodes the value (e.g. base64 "==" → "%3D%3D"), so decode it back
+                decoded = decodeURIComponent(value);
+            } catch {
+                decoded = value;
+            }
+            cookies[pair.substring(0, idx).trim()] = decoded;
         }
     }
     return cookies;

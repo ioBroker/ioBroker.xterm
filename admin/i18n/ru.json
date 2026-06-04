@@ -19,5 +19,8 @@
     "Start directory": "Начальный каталог",
     "Leave empty to use the ioBroker directory": "Оставьте пустым, чтобы использовать каталог ioBroker",
     "Shell user": "Пользователь оболочки",
-    "Leave empty to use the ioBroker process user": "Оставьте пустым, чтобы использовать пользователя процесса ioBroker"
+    "Leave empty to use the ioBroker process user": "Оставьте пустым, чтобы использовать пользователя процесса ioBroker",
+    "Authentication type": "Тип аутентификации",
+    "auth_type_basic": "Basic (диалог браузера)",
+    "auth_type_digest": "Digest (страница входа)"
 }

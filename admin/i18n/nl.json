@@ -19,5 +19,8 @@
     "Start directory": "Startmap",
     "Leave empty to use the ioBroker directory": "Laat leeg om de ioBroker-map te gebruiken",
     "Shell user": "Shell-gebruiker",
-    "Leave empty to use the ioBroker process user": "Laat leeg om de ioBroker-procesgebruiker te gebruiken"
+    "Leave empty to use the ioBroker process user": "Laat leeg om de ioBroker-procesgebruiker te gebruiken",
+    "Authentication type": "Verificatietype",
+    "auth_type_basic": "Basic (browserdialoog)",
+    "auth_type_digest": "Digest (inlogpagina)"
 }

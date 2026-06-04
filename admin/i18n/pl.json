@@ -19,5 +19,8 @@
     "Start directory": "Katalog startowy",
     "Leave empty to use the ioBroker directory": "Pozostaw puste, aby użyć katalogu ioBroker",
     "Shell user": "Użytkownik powłoki",
-    "Leave empty to use the ioBroker process user": "Pozostaw puste, aby użyć użytkownika procesu ioBroker"
+    "Leave empty to use the ioBroker process user": "Pozostaw puste, aby użyć użytkownika procesu ioBroker",
+    "Authentication type": "Typ uwierzytelniania",
+    "auth_type_basic": "Basic (okno dialogowe przeglądarki)",
+    "auth_type_digest": "Digest (strona logowania)"
 }

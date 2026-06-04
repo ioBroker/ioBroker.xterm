@@ -172,6 +172,7 @@
     "port": "8099",
     "secure": false,
     "auth": true,
+    "authType": "basic",
     "cwd": "",
     "shellUser": ""
   },

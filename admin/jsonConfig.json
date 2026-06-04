@@ -48,6 +48,19 @@
                     "md": 6,
                     "lg": 2
                 },
+                "authType": {
+                    "type": "select",
+                    "label": "Authentication type",
+                    "options": [
+                        { "label": "auth_type_basic", "value": "basic" },
+                        { "label": "auth_type_digest", "value": "digest" }
+                    ],
+                    "default": "basic",
+                    "hidden": "!data.auth",
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4
+                },
                 "cwd": {
                     "newLine": true,
                     "type": "text",

@@ -39,7 +39,7 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 -->
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.1.0 (2026-06-04)
 * (bluefox) Added the icon in the GUI
 * (bluefox) Added possibility to run under a specified user on Linux
 * (bluefox) Implemented paste on right mouse click

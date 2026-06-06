@@ -5,7 +5,6 @@ tmp
 
 # Build output
 build
-public
 
 # i18n intermediate files
 admin/i18n/flat.txt

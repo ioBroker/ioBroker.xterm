@@ -1,6 +1,6 @@
 {
   "name": "iobroker.xterm",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "This adapter allows to execute shell commands on ioBroker host.",
   "author": {
     "name": "ioBroker",
@@ -22,27 +22,28 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.3.2",
-    "@iobroker/webserver": "^1.3.3",
-    "@xterm/addon-fit": "^0.10.0",
-    "@xterm/addon-search": "^0.15.0",
-    "@xterm/addon-web-links": "^0.11.0",
-    "@xterm/addon-webgl": "^0.18.0",
-    "@xterm/xterm": "^5.5.0",
+    "@iobroker/webserver": "^1.4.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-search": "^0.16.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/addon-webgl": "^0.19.0",
+    "@xterm/xterm": "^6.0.0",
     "express": "^5.2.1",
     "node-pty": "^1.1.0",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
-    "@alcalzone/release-script": "^5.1.1",
-    "@alcalzone/release-script-plugin-iobroker": "^5.1.2",
-    "@alcalzone/release-script-plugin-license": "^5.1.1",
+    "@alcalzone/release-script": "^5.2.1",
+    "@alcalzone/release-script-plugin-iobroker": "^5.2.0",
+    "@alcalzone/release-script-plugin-license": "^5.2.0",
     "@iobroker/adapter-dev": "^1.5.0",
-    "@iobroker/eslint-config": "^2.2.0",
+    "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/testing": "^5.2.2",
     "@tsconfig/node20": "^20.1.9",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.6.0",
-    "@types/ws": "^8.18.1"
+    "@types/node": "^22.19.19",
+    "@types/ws": "^8.18.1",
+    "typescript": "^6.0.3"
   },
   "main": "build/main.js",
   "files": [

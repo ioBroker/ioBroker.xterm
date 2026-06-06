@@ -22,7 +22,10 @@ interface TerminalPaneProps {
     send: (msg: ClientMessage) => void;
 }
 
+let internalClipboard = '';
+
 function copyToClipboard(text: string): void {
+    internalClipboard = text;
     if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
     } else {
@@ -39,6 +42,30 @@ function fallbackCopy(text: string): void {
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
+}
+
+async function getTextFromClipboard(): Promise<string> {
+    if (navigator.clipboard?.readText) {
+        return navigator.clipboard.readText();
+    }
+    const textArea = document.createElement('textarea');
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    document.execCommand('paste');
+    const value = textArea.value || internalClipboard;
+    document.body.removeChild(textArea);
+    return value;
 }
 
 export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(
@@ -121,10 +148,16 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(
                     return false;
                 }
                 if (e.key === 'V') {
-                    if (!navigator.clipboard?.readText) {
-                        setPasteVisible(true);
-                        return false;
-                    }
+                    getTextFromClipboard()
+                        .then(text => {
+                            if (text) {
+                                send({ method: 'key', tabId, key: text });
+                            } else {
+                                setPasteVisible(true);
+                            }
+                        })
+                        .catch(() => setPasteVisible(true));
+                    return false;
                 }
                 return true;
             });
@@ -161,18 +194,15 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(
 
             const handler = (event: MouseEvent): void => {
                 event.preventDefault();
-                if (navigator.clipboard?.readText) {
-                    navigator.clipboard
-                        .readText()
-                        .then(text => {
-                            if (text) {
-                                send({ method: 'key', tabId, key: text });
-                            }
-                        })
-                        .catch(() => setPasteVisible(true));
-                } else {
-                    setPasteVisible(true);
-                }
+                getTextFromClipboard()
+                    .then(text => {
+                        if (text) {
+                            send({ method: 'key', tabId, key: text });
+                        } else {
+                            setPasteVisible(true);
+                        }
+                    })
+                    .catch(() => setPasteVisible(true));
             };
 
             container.addEventListener('contextmenu', handler);

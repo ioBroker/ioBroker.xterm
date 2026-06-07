@@ -2,11 +2,12 @@ import { Adapter, type AdapterOptions, EXIT_CODES, getAbsoluteDefaultDataDir } f
 import { WebServer as IoBWebServer } from '@iobroker/webserver';
 import path from 'node:path';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import express from 'express';
 import { WebSocketServer, type WebSocket } from 'ws';
 import * as pty from 'node-pty';
 import type { Socket, AddressInfo } from 'node:net';
-import type { Server as HttpServer } from 'node:http';
+import type { IncomingMessage, Server as HttpServer } from 'node:http';
 import type { Server as HttpsServer } from 'node:https';
 
 import type { XtermAdapterConfig } from './types';
@@ -38,6 +39,70 @@ interface AuthCache {
     ts: number;
 }
 
+function parseCookies(cookieHeader: string | undefined): Record<string, string> {
+    const cookies: Record<string, string> = {};
+    if (!cookieHeader) {
+        return cookies;
+    }
+    for (const pair of cookieHeader.split(';')) {
+        const idx = pair.indexOf('=');
+        if (idx > 0) {
+            const value = pair.substring(idx + 1).trim();
+            let decoded: string;
+            try {
+                // Express' res.cookie URL-encodes the value (e.g. base64 "==" → "%3D%3D"), so decode it back
+                decoded = decodeURIComponent(value);
+            } catch {
+                decoded = value;
+            }
+            cookies[pair.substring(0, idx).trim()] = decoded;
+        }
+    }
+    return cookies;
+}
+
+const LOGIN_PAGE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>xterm - Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1e1e1e;color:#ccc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.login-box{background:#252526;border:1px solid #3c3c3c;border-radius:8px;padding:2rem;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+h2{text-align:center;margin-bottom:1.5rem;color:#fff;font-weight:500}
+.form-group{margin-bottom:1rem}
+label{display:block;margin-bottom:.4rem;font-size:.85rem;color:#999}
+input{width:100%;padding:.55rem .75rem;background:#1e1e1e;border:1px solid #3c3c3c;border-radius:4px;color:#ccc;font-size:.95rem;outline:none;transition:border-color .2s}
+input:focus{border-color:#007acc}
+button{width:100%;padding:.6rem;margin-top:.5rem;background:#007acc;border:none;border-radius:4px;color:#fff;font-size:.95rem;cursor:pointer;transition:background .2s}
+button:hover{background:#005fa3}
+button:disabled{background:#555;cursor:not-allowed}
+.error{background:rgba(244,71,71,.1);border:1px solid #f44747;border-radius:4px;padding:.5rem .75rem;margin-bottom:1rem;font-size:.85rem;color:#f44747;display:none}
+</style>
+</head>
+<body>
+<div class="login-box">
+<h2>xterm Login</h2>
+<div class="error" id="error"></div>
+<form id="loginForm">
+<div class="form-group"><label for="username">Username</label><input type="text" id="username" name="username" autocomplete="username" required autofocus></div>
+<div class="form-group"><label for="password">Password</label><input type="password" id="password" name="password" autocomplete="current-password" required></div>
+<button type="submit" id="submitBtn">Login</button>
+</form>
+</div>
+<script>
+document.getElementById("loginForm").addEventListener("submit",function(e){
+e.preventDefault();
+var err=document.getElementById("error"),btn=document.getElementById("submitBtn");
+err.style.display="none";btn.disabled=true;btn.textContent="Logging in\\u2026";
+fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value})}).then(function(r){if(r.ok){window.location.href="/"}else{return r.json().then(function(d){err.textContent=d.error||"Login failed";err.style.display="block"})}}).catch(function(){err.textContent="Connection error";err.style.display="block"}).finally(function(){btn.disabled=false;btn.textContent="Login"});
+});
+</script>
+</body>
+</html>`;
+
 function findIoBrokerDirectory(): string {
     const dir = getAbsoluteDefaultDataDir().replace(/\\/g, '/');
     const parts = dir.split('/');
@@ -54,6 +119,7 @@ class XtermAdapter extends Adapter {
     private bruteForce: Record<string, BruteForceEntry> = {};
     private IOB_DIR: string = findIoBrokerDirectory();
     private cache: AuthCache | null = null;
+    private sessionSecret: string = crypto.randomBytes(32).toString('hex');
 
     public constructor(options: Partial<AdapterOptions> = {}) {
         super({
@@ -108,7 +174,86 @@ class XtermAdapter extends Adapter {
         await this.setStateChangedAsync('info.connection', 'none', true);
     }
 
-    private auth(req: express.Request, callback: (result: boolean, text?: string) => void): void {
+    private createSessionToken(username: string): string {
+        const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+        const payload = `${username}:${expiry}`;
+        const sig = crypto.createHmac('sha256', this.sessionSecret).update(payload).digest('hex');
+        return `${Buffer.from(payload).toString('base64')}.${sig}`;
+    }
+
+    private verifySessionToken(token: string): string | null {
+        const dotIndex = token.indexOf('.');
+        if (dotIndex === -1) {
+            return null;
+        }
+        const payloadB64 = token.substring(0, dotIndex);
+        const sig = token.substring(dotIndex + 1);
+
+        let payload: string;
+        try {
+            payload = Buffer.from(payloadB64, 'base64').toString();
+        } catch {
+            return null;
+        }
+
+        const expected = crypto.createHmac('sha256', this.sessionSecret).update(payload).digest('hex');
+        if (sig.length !== expected.length) {
+            return null;
+        }
+        if (!crypto.timingSafeEqual(Buffer.from(sig, 'utf8'), Buffer.from(expected, 'utf8'))) {
+            return null;
+        }
+
+        const colonIndex = payload.indexOf(':');
+        if (colonIndex === -1) {
+            return null;
+        }
+        const username = payload.substring(0, colonIndex);
+        const expiry = parseInt(payload.substring(colonIndex + 1), 10);
+        if (isNaN(expiry) || Date.now() > expiry) {
+            return null;
+        }
+
+        return username;
+    }
+
+    private getBruteForceDelay(username: string): string | null {
+        if (!this.bruteForce[username] || this.bruteForce[username].errors <= 4) {
+            return null;
+        }
+
+        let minutes: number = Date.now() - this.bruteForce[username].time;
+        if (this.bruteForce[username].errors < 7) {
+            if (Date.now() - this.bruteForce[username].time < 60000) {
+                minutes = 1;
+            } else {
+                minutes = 0;
+            }
+        } else if (this.bruteForce[username].errors < 10) {
+            if (Date.now() - this.bruteForce[username].time < 180000) {
+                minutes = Math.ceil((180000 - minutes) / 60000);
+            } else {
+                minutes = 0;
+            }
+        } else if (this.bruteForce[username].errors < 15) {
+            if (Date.now() - this.bruteForce[username].time < 600000) {
+                minutes = Math.ceil((600000 - minutes) / 60000);
+            } else {
+                minutes = 0;
+            }
+        } else if (Date.now() - this.bruteForce[username].time < 3600000) {
+            minutes = Math.ceil((3600000 - minutes) / 60000);
+        } else {
+            minutes = 0;
+        }
+
+        if (minutes) {
+            return `Too many errors. Try again in ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}.`;
+        }
+        return null;
+    }
+
+    private auth(req: IncomingMessage, callback: (result: boolean, text?: string) => void): void {
         const str = (req.headers.Authorization || req.headers.authorization) as string;
         if (this.cache && Date.now() - this.cache.ts < 10000 && this.cache.data === str) {
             return callback(true);
@@ -125,38 +270,9 @@ class XtermAdapter extends Adapter {
             return callback(false);
         }
 
-        if (this.bruteForce[username] && this.bruteForce[username].errors > 4) {
-            let minutes: number = Date.now() - this.bruteForce[username].time;
-            if (this.bruteForce[username].errors < 7) {
-                if (Date.now() - this.bruteForce[username].time < 60000) {
-                    minutes = 1;
-                } else {
-                    minutes = 0;
-                }
-            } else if (this.bruteForce[username].errors < 10) {
-                if (Date.now() - this.bruteForce[username].time < 180000) {
-                    minutes = Math.ceil((180000 - minutes) / 60000);
-                } else {
-                    minutes = 0;
-                }
-            } else if (this.bruteForce[username].errors < 15) {
-                if (Date.now() - this.bruteForce[username].time < 600000) {
-                    minutes = Math.ceil((600000 - minutes) / 60000);
-                } else {
-                    minutes = 0;
-                }
-            } else if (Date.now() - this.bruteForce[username].time < 3600000) {
-                minutes = Math.ceil((3600000 - minutes) / 60000);
-            } else {
-                minutes = 0;
-            }
-
-            if (minutes) {
-                return callback(
-                    false,
-                    `Too many errors. Try again in ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}.`,
-                );
-            }
+        const bruteForceMsg = this.getBruteForceDelay(username);
+        if (bruteForceMsg) {
+            return callback(false, bruteForceMsg);
         }
 
         void this.checkPassword(username, password, result => {
@@ -176,12 +292,18 @@ class XtermAdapter extends Adapter {
         });
     }
 
+    private verifySessionCookie(req: IncomingMessage): boolean {
+        const cookies = parseCookies(req.headers.cookie);
+        const token = cookies.xterm_session;
+        return !!(token && this.verifySessionToken(token));
+    }
+
     private startShellForTab(ws: XtermWebSocket, tabId: string): void {
         if (!ws?.__iobroker) {
             return;
         }
 
-        // Kill existing PTY for this tab (e.g. on reconnect or duplicate create)
+        // Kill existing PTY for this tab (e.g. on reconnection or duplicate create)
         const existing = ws.__iobroker.tabs.get(tabId);
         if (existing) {
             ws.__iobroker.tabs.delete(tabId);
@@ -341,7 +463,72 @@ class XtermAdapter extends Adapter {
 
                 serverObj.app = express();
 
-                if (this.config.auth) {
+                if (this.config.auth && this.config.authType === 'digest') {
+                    // Digest auth mode: session-based auth with login page
+                    serverObj.app.use('/api', express.json());
+
+                    serverObj.app.get('/login', (_req: express.Request, res: express.Response) => {
+                        res.type('html').send(LOGIN_PAGE);
+                    });
+
+                    serverObj.app.post('/api/login', (req: express.Request, res: express.Response) => {
+                        const { username, password } = req.body || {};
+                        if (!username || !password) {
+                            res.status(400).json({ error: 'Missing credentials' });
+                            return;
+                        }
+                        if (username !== 'admin') {
+                            res.status(401).json({ error: 'Invalid credentials' });
+                            return;
+                        }
+
+                        const bruteForceMsg = this.getBruteForceDelay(username);
+                        if (bruteForceMsg) {
+                            res.status(429).json({ error: bruteForceMsg });
+                            return;
+                        }
+
+                        void this.checkPassword(username, password, result => {
+                            if (result) {
+                                if (this.bruteForce[username]) {
+                                    delete this.bruteForce[username];
+                                }
+                                const token = this.createSessionToken(username);
+                                res.cookie('xterm_session', token, {
+                                    httpOnly: true,
+                                    secure: this.config.secure,
+                                    sameSite: 'lax',
+                                    maxAge: 24 * 60 * 60 * 1000,
+                                    path: '/',
+                                });
+                                res.json({ ok: true });
+                            } else {
+                                this.bruteForce[username] = this.bruteForce[username] || { errors: 0, time: 0 };
+                                this.bruteForce[username].time = Date.now();
+                                this.bruteForce[username].errors++;
+                                res.status(401).json({ error: 'Invalid credentials' });
+                            }
+                        });
+                    });
+
+                    serverObj.app.post('/api/logout', (_req: express.Request, res: express.Response) => {
+                        res.clearCookie('xterm_session', { path: '/' });
+                        res.json({ ok: true });
+                    });
+
+                    // Session check middleware
+                    serverObj.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+                        if (this.verifySessionCookie(req)) {
+                            return next();
+                        }
+                        if (req.path.startsWith('/api/')) {
+                            res.status(401).json({ error: 'Not authenticated' });
+                            return;
+                        }
+                        res.redirect('/login');
+                    });
+                } else if (this.config.auth) {
+                    // Basic auth mode
                     serverObj.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
                         this.auth(req, (result, text) => {
                             if (result) {
@@ -421,17 +608,32 @@ class XtermAdapter extends Adapter {
 
                 serverObj.server.on('upgrade', (request, socket: Socket & { ___auth?: boolean }, head: Buffer) => {
                     if (this.config.auth) {
-                        this.auth(request, result => {
-                            socket.___auth = result;
-                            if (result) {
+                        if (this.config.authType === 'digest') {
+                            // Digest auth: verify session cookie
+                            const authenticated = this.verifySessionCookie(request);
+                            socket.___auth = authenticated;
+                            if (authenticated) {
                                 serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
                                     serverObj.io!.emit('connection', ws, request),
                                 );
                             } else {
-                                this.log.error('Cannot establish socket connection as no credentials found!');
+                                this.log.error('WebSocket: invalid or missing session');
                                 socket.destroy();
                             }
-                        });
+                        } else {
+                            // Basic auth
+                            this.auth(request, result => {
+                                socket.___auth = result;
+                                if (result) {
+                                    serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
+                                        serverObj.io!.emit('connection', ws, request),
+                                    );
+                                } else {
+                                    this.log.error('Cannot establish socket connection as no credentials found!');
+                                    socket.destroy();
+                                }
+                            });
+                        }
                     } else {
                         serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
                             serverObj.io!.emit('connection', ws, request),

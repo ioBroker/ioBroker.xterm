@@ -19,5 +19,8 @@
     "Start directory": "Directory iniziale",
     "Leave empty to use the ioBroker directory": "Lascia vuoto per usare la directory ioBroker",
     "Shell user": "Utente shell",
-    "Leave empty to use the ioBroker process user": "Lascia vuoto per usare l'utente del processo ioBroker"
+    "Leave empty to use the ioBroker process user": "Lascia vuoto per usare l'utente del processo ioBroker",
+    "Authentication type": "Tipo di autenticazione",
+    "auth_type_basic": "Basic (dialogo del browser)",
+    "auth_type_digest": "Digest (pagina di accesso)"
 }

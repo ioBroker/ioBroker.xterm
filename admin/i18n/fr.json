@@ -6,7 +6,6 @@
     "Public certificate": "Certificat public",
     "Private certificate": "Certificat privé",
     "Chained certificate": "Certificat chaîné",
-    "Terminal encoding": "Codage des bornes",
     "Read about Let's Encrypt certificates": "En savoir plus sur les certificats Let's Encrypt",
     "Use Let's Encrypt certificates": "Utiliser les certificats Let's Encrypt",
     "Use this instance for automatic update": "Utiliser cette instance pour la mise à jour automatique",
@@ -17,7 +16,13 @@
     "Unsecure_Auth": "Le mot de passe sera envoyé non crypté via une connexion non sécurisée. Pour protéger vos mots de passe, activez la connexion sécurisée (HTTPS) !",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
     "IP": "Interface IP locale",
-    "Use Bash or cmd.exe": "Utilisez Bash ou cmd.exe",
-    "If unchecked, the shell will be simulated": "Si décoché, le shell sera simulé",
-    "Do not use canvas plugin": "N'utilisez pas le plugin Canvas"
+    "Start directory": "Répertoire de démarrage",
+    "Leave empty to use the ioBroker directory": "Laisser vide pour utiliser le répertoire ioBroker",
+    "Shell user": "Utilisateur du shell",
+    "Leave empty to use the ioBroker process user": "Laisser vide pour utiliser l'utilisateur du processus ioBroker",
+    "Authentication type": "Type d'authentification",
+    "auth_type_basic": "Basic (dialogue du navigateur)",
+    "auth_type_digest": "Digest (page de connexion)",
+    "Session timeout": "Délai d'expiration de la session",
+    "session_timeout_help": "Durée pendant laquelle un terminal continue de fonctionner si le navigateur perd la connexion (en minutes). 0 = terminer immédiatement"
 }

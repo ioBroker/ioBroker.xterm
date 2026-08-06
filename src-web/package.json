@@ -1,0 +1,37 @@
+{
+    "name": "xterm-www",
+    "version": "1.1.5",
+    "private": true,
+    "dependencies": {
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
+        "@types/react": "^19.2.18",
+        "@types/react-dom": "^19.2.4",
+        "@types/ws": "^8.18.1",
+        "@vitejs/plugin-react": "^6.0.5",
+        "vite": "^8.2.1"
+    },
+    "scripts": {
+        "start": "vite --host",
+        "lint": "eslint -c eslint.config.mjs",
+        "check-ts": "tsc --noEmit --checkJS false",
+        "tsc": "tsc --project tsconfig.json",
+        "build": "vite build"
+    },
+    "homepage": ".",
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@types/leaflet": "^1.9.21"
+    }
+}

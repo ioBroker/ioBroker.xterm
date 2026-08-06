@@ -6,7 +6,6 @@
     "Public certificate": "公共证书",
     "Private certificate": "私人证书",
     "Chained certificate": "链式证书",
-    "Terminal encoding": "终端编码",
     "Read about Let's Encrypt certificates": "阅读让我们加密证书",
     "Use Let's Encrypt certificates": "使用 Let's Encrypt 证书",
     "Use this instance for automatic update": "使用此实例进行自动更新",
@@ -17,7 +16,13 @@
     "Unsecure_Auth": "密码将通过不安全的连接以未加密的方式发送。为了保护您的密码，请启用安全连接 (HTTPS)！",
     "Let's Encrypt SSL": "Let's Encrypt SSL",
     "IP": "本地IP接口",
-    "Use Bash or cmd.exe": "使用 Bash 或 cmd.exe",
-    "If unchecked, the shell will be simulated": "如果未选中，将模拟 shell",
-    "Do not use canvas plugin": "不要使用canvas插件"
+    "Start directory": "起始目录",
+    "Leave empty to use the ioBroker directory": "留空以使用 ioBroker 目录",
+    "Shell user": "Shell 用户",
+    "Leave empty to use the ioBroker process user": "留空以使用 ioBroker 进程用户",
+    "Authentication type": "认证类型",
+    "auth_type_basic": "Basic（浏览器对话框）",
+    "auth_type_digest": "Digest（登录页面）",
+    "Session timeout": "会话超时",
+    "session_timeout_help": "浏览器断开连接后终端继续运行的时间（分钟）。0 = 立即终止"
 }

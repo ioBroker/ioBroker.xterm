@@ -1,8 +1,73 @@
 {
   "common": {
     "name": "xterm",
-    "version": "2.0.1",
+    "version": "4.0.0",
     "news": {
+      "4.0.0": {
+        "en": "Dropped support of Node.js 20\nAdded SVG icon\nThe terminals now run on the server: they survive a reload or a lost connection and are restored with their content\nAdded the setting for the session timeout\nFixed the HTTPS mode: the adapter did not start the web server at all if `secure` was enabled\nFixed the shown client IP addresses in `info.connection`\nErrors of the web socket connection do not terminate the adapter anymore\nA shell that cannot be started is not restarted endlessly anymore\nAll shells are terminated now if the adapter stops\nFixed the double connections of the GUI after a connection timeout",
+        "de": "Die Unterstützung für Node.js 20 wurde eingestellt.\nSVG-Symbol hinzugefügt\nDie Terminals laufen nun auf dem Server: Sie überstehen einen Neustart oder einen Verbindungsverlust und werden mit ihrem Inhalt wiederhergestellt.\nEinstellung für Sitzungstimeout hinzugefügt\nDer HTTPS-Modus wurde korrigiert: Der Adapter startete den Webserver überhaupt nicht, wenn `secure` aktiviert war.\nDie in `info.connection` angezeigten Client-IP-Adressen wurden korrigiert.\nFehler der WebSocket-Verbindung führen nicht mehr zum Abbruch des Adapters.\nEine Shell, die nicht gestartet werden kann, wird nicht mehr endlos neu gestartet.\nAlle Shells werden nun beendet, wenn der Adapter stoppt.\nDas Problem mit den doppelten Verbindungen der Benutzeroberfläche nach einem Verbindungstimeout wurde behoben.",
+        "ru": "Прекращена поддержка Node.js 20.\nДобавлена иконка SVG.\nТеперь терминалы работают на сервере: они сохраняются после перезагрузки или потери соединения и восстанавливаются со своим содержимым.\nДобавлена настройка времени ожидания сессии.\nИсправлен режим HTTPS: адаптер вообще не запускал веб-сервер, если был включен параметр `secure`.\nИсправлены отображаемые IP-адреса клиентов в файле `info.connection`.\nОшибки подключения веб-сокета больше не приводят к разрыву соединения адаптера.\nОболочка, которую не удается запустить, больше не перезапускается бесконечно.\nТеперь все оболочки завершают работу, если адаптер останавливается.\nИсправлена ошибка двойного подключения графического интерфейса после истечения времени ожидания соединения.",
+        "pt": "Suporte ao Node.js 20 foi descontinuado.\nÍcone SVG adicionado\nOs terminais agora são executados no servidor: eles sobrevivem a uma reinicialização ou a uma perda de conexão e são restaurados com seu conteúdo.\nAdicionada a configuração para o tempo limite da sessão.\nCorrigido o modo HTTPS: o adaptador não iniciava o servidor web se a opção `secure` estivesse ativada.\nCorrigido o endereço IP do cliente exibido em `info.connection`.\nOs erros de conexão do WebSocket não encerram mais o adaptador.\nUm shell que não pode ser iniciado não é mais reiniciado indefinidamente.\nTodos os shells são encerrados agora se o adaptador parar.\nCorrigido o problema de conexões duplicadas na interface gráfica após um tempo limite de conexão.",
+        "nl": "Ondersteuning voor Node.js 20 is stopgezet.\nSVG-pictogram toegevoegd\nDe terminals draaien nu op de server: ze blijven functioneren na een herstart of een verbroken verbinding en worden hersteld met hun inhoud.\nDe instelling voor de sessietime-out is toegevoegd.\nDe HTTPS-modus is gecorrigeerd: de adapter startte de webserver helemaal niet als 'secure' was ingeschakeld.\nDe weergegeven client-IP-adressen in `info.connection` zijn gecorrigeerd.\nFouten in de websocketverbinding zorgen er niet langer voor dat de adapter wordt uitgeschakeld.\nEen shell die niet kan worden gestart, wordt niet langer eindeloos opnieuw opgestart.\nAlle shells worden nu beëindigd als de adapter stopt.\nHet probleem met dubbele verbindingen in de GUI na een verbindingsfout is opgelost.",
+        "fr": "Abandon de la prise en charge de Node.js 20\nIcône SVG ajoutée\nLes terminaux fonctionnent désormais sur le serveur : ils survivent à un rechargement ou à une perte de connexion et sont restaurés avec leur contenu.\nAjout d'un paramètre pour le délai d'expiration de session\nCorrection du mode HTTPS : l’adaptateur ne démarrait pas du tout le serveur Web si l’option « secure » était activée.\nCorrection des adresses IP client affichées dans `info.connection`\nLes erreurs de connexion WebSocket n'entraînent plus l'arrêt de l'adaptateur.\nUn shell qui ne peut pas être lancé n'est plus redémarré indéfiniment.\nTous les shells sont désormais fermés si l'adaptateur s'arrête.\nCorrection des doubles connexions de l'interface graphique après un délai d'attente de connexion.",
+        "it": "Supporto per Node.js 20 interrotto.\nAggiunta icona SVG\nI terminali ora funzionano sul server: resistono a un riavvio o a una perdita di connessione e vengono ripristinati con il loro contenuto\nAggiunta l'impostazione per il timeout della sessione.\nRisolto il problema con la modalità HTTPS: l'adattatore non avviava affatto il server web se era abilitata l'opzione `secure`.\nHo corretto gli indirizzi IP dei client visualizzati in `info.connection`.\nGli errori della connessione WebSocket non terminano più l'adattatore\nUna shell che non può essere avviata non viene più riavviata all'infinito\nTutte le shell vengono terminate ora se l'adattatore si arresta\nRisolto il problema delle doppie connessioni dell'interfaccia grafica dopo un timeout di connessione.",
+        "es": "Se eliminó la compatibilidad con Node.js 20.\nIcono SVG añadido\nLos terminales ahora se ejecutan en el servidor: sobreviven a una recarga o a una pérdida de conexión y se restauran con su contenido.\nSe agregó la configuración para el tiempo de espera de la sesión.\nSe corrigió el modo HTTPS: el adaptador no iniciaba el servidor web si `secure` estaba habilitado.\nSe corrigieron las direcciones IP de cliente que se mostraban en `info.connection`.\nLos errores de la conexión de socket web ya no terminan el adaptador.\nUn intérprete de comandos que no se puede iniciar ya no se reinicia indefinidamente.\nAhora, si el adaptador se detiene, todas las sesiones de shell se terminan.\nSe corrigieron las conexiones duplicadas de la interfaz gráfica de usuario después de un tiempo de espera de conexión.",
+        "pl": "Porzucono wsparcie dla Node.js 20\nDodano ikonę SVG\nTerminale działają teraz na serwerze: przetrwają ponowne załadowanie lub utratę połączenia i zostaną przywrócone z całą zawartością\nDodano ustawienie limitu czasu sesji\nNaprawiono tryb HTTPS: adapter w ogóle nie uruchamiał serwera WWW, jeśli włączony był tryb „secure”\nNaprawiono wyświetlane adresy IP klientów w `info.connection`\nBłędy połączenia gniazda sieciowego nie powodują już zakończenia działania adaptera\nPowłoka, której nie można uruchomić, nie jest już uruchamiana ponownie w nieskończoność\nWszystkie powłoki zostaną teraz zakończone, jeśli adapter się zatrzyma\nNaprawiono podwójne połączenia GUI po przekroczeniu limitu czasu połączenia",
+        "uk": "Припинено підтримку Node.js 20\nДодано значок SVG\nТермінали тепер працюють на сервері: вони переживають перезавантаження або втрату з'єднання та відновлюються зі своїм вмістом.\nДодано налаштування тайм-ауту сеансу\nВиправлено режим HTTPS: адаптер взагалі не запускав вебсервер, якщо було ввімкнено режим `secure`.\nВиправлено відображення IP-адрес клієнтів у `info.connection`\nПомилки підключення веб-сокета більше не завершують роботу адаптера.\nОболонка, яку неможливо запустити, більше не перезапускається нескінченно.\nТепер усі оболонки завершуються, якщо адаптер зупиняється.\nВиправлено подвійні підключення графічного інтерфейсу після тайм-ауту підключення.",
+        "zh-cn": "已停止支持 Node.js 20\n添加了 SVG 图标\n终端现在运行在服务器上：即使服务器重新加载或连接断开，它们也能保留下来，并恢复其内容。\n添加了会话超时设置\n修复了 HTTPS 模式：如果启用了“安全”选项，适配器将根本不会启动 Web 服务器。\n修复了 `info.connection` 中显示的客户端 IP 地址\nWebSocket 连接错误不再导致适配器终止\n无法启动的 shell 不会再无限重启了。\n如果适配器停止运行，所有 shell 进程都会终止。\n修复了连接超时后 GUI 的双重连接问题"
+      },
+      "3.1.0": {
+        "en": "Added the icon in the GUI\nAdded possibility to run under a specified user on Linux\nImplemented paste on right mouse click\nImplemented authentication for the terminal",
+        "de": "Das Icon in der GUI hinzugefügt\nZusätzliche Möglichkeit, unter einem bestimmten Benutzer auf Linux laufen\nImplementiert Paste auf der rechten Maustaste\nImplementierung der Authentifizierung für das Terminal",
+        "ru": "Добавлена иконка в GUI\nДобавлена возможность запуска под определенным пользователем на Linux\nВнедренная паста на правом клике мыши\nПроверка подлинности терминала",
+        "pt": "Adicionado o ícone na interface gráfica\nAdicionada possibilidade de execução sob um usuário especificado no Linux\nPasta implementada no botão direito do mouse\nAutenticação implementada para o terminal",
+        "nl": "Het pictogram in de GUI toegevoegd\nToegevoegd mogelijkheid om te draaien onder een gespecificeerde gebruiker op Linux\nGeïmplementeerd plakken op rechter muisklik\nGeïmplementeerde authenticatie voor de terminal",
+        "fr": "Ajout de l'icône dans l'interface graphique\nAjout de la possibilité d'exécuter sous un utilisateur spécifié sur Linux\nImplémenté coller sur le clic droit de la souris\nAuthentification mise en œuvre pour le terminal",
+        "it": "Aggiunto l'icona nella GUI\nAggiunta possibilità di eseguire sotto un utente specificato su Linux\nPasta implementata sul tasto destro del mouse\nAutenticazione implementata per il terminale",
+        "es": "Añadido el icono en el GUI\nPosibilidad de ejecutar bajo un usuario especificado en Linux\nPasta implementada en el clic derecho del ratón\nAutenticación implementada para el terminal",
+        "pl": "Dodano ikonę w GUI\nDodano możliwość uruchomienia pod określonym użytkownikiem na Linuksie\nWbudowany wklej prawym przyciskiem myszy\nWdrożenie uwierzytelniania terminala",
+        "uk": "Додано іконку в GUI\nДодано можливість запуску за вказаною користувачем на Linux\nРеалізована паста на правому кліку миші\nРеалізовано автентифікацію для терміналу",
+        "zh-cn": "在图形界面中添加图标\n添加在 Linux 上指定用户下运行的可能性\n鼠标右键点击已执行粘贴\n已执行终端认证"
+      },
+      "3.0.2": {
+        "en": "Added the icon in the GUI\nAdded possibility to run under specified user on Linux",
+        "de": "Das Icon in der GUI hinzugefügt\nZusätzliche Möglichkeit, unter bestimmten Benutzer auf Linux laufen",
+        "ru": "Добавлена иконка в GUI\nДобавлена возможность запуска под указанным пользователем на Linux",
+        "pt": "Adicionado o ícone na interface gráfica\nAdicionada possibilidade de execução sob o usuário especificado no Linux",
+        "nl": "Het pictogram in de GUI toegevoegd\nToegevoegde mogelijkheid om te draaien onder opgegeven gebruiker op Linux",
+        "fr": "Ajout de l'icône dans l'interface graphique\nAjout de la possibilité d'exécuter sous l'utilisateur spécifié sur Linux",
+        "it": "Aggiunto l'icona nella GUI\nAggiunta possibilità di eseguire sotto utente specificato su Linux",
+        "es": "Añadido el icono en el GUI\nPosibilidad de ejecutar bajo el usuario especificado en Linux",
+        "pl": "Dodano ikonę w GUI\nDodano możliwość uruchomienia pod określonym użytkownikiem na Linuksie",
+        "uk": "Додано іконку в GUI\nДодано можливість запуску за вказаною користувачем на Linux",
+        "zh-cn": "在图形界面中添加图标\n添加在 Linux 上指定用户下运行的可能性"
+      },
+      "3.0.1": {
+        "en": "Added the icon in the GUI",
+        "de": "Das Icon in der GUI hinzugefügt",
+        "ru": "Добавлена иконка в GUI",
+        "pt": "Adicionado o ícone na interface gráfica",
+        "nl": "Het pictogram in de GUI toegevoegd",
+        "fr": "Ajout de l'icône dans l'interface graphique",
+        "it": "Aggiunto l'icona nella GUI",
+        "es": "Añadido el icono en el GUI",
+        "pl": "Dodano ikonę w GUI",
+        "uk": "Додано іконку в GUI",
+        "zh-cn": "在图形界面中添加图标"
+      },
+      "3.0.0": {
+        "en": "Migrated the adapter to Typescript\nAdded multiple terminal sessions",
+        "de": "Den Adapter zu Typescript migrieren\nMehrere Terminalsitzungen hinzugefügt",
+        "ru": "Перенес адаптер на Typescript\nДобавлено несколько терминальных сеансов",
+        "pt": "Migrar o adaptador para escrever\nAdicionadas várias sessões de terminal",
+        "nl": "De adapter migreren naar Typescript\nMeerdere terminalsessies toegevoegd",
+        "fr": "Migré l'adaptateur vers Typescript\nAjout de plusieurs sessions de terminal",
+        "it": "Migrato l'adattatore a Typescript\nAggiunto più sessioni terminali",
+        "es": "Migraron el adaptador a Tiposcript\nSesiones terminales múltiples",
+        "pl": "Przekierowany adapter do Typescript\nDodano wiele sesji terminali",
+        "uk": "Переміграний адаптер до Typescript\nДодано кілька терміналів",
+        "zh-cn": "将适配器移到 Typescript\n添加多个终端会话"
+      },
       "2.0.1": {
         "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
         "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
@@ -27,66 +92,6 @@
         "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
         "pl": "Biblioteka xterma\nPrepare for future js-controller version",
         "zh-cn": "更新图书馆\n今后防污版本的编制"
-      },
-      "1.0.0": {
-        "en": "Check only port of the interface and not of all interfaces",
-        "de": "Überprüfen Sie nur den Port der Schnittstelle und nicht alle Schnittstellen",
-        "ru": "Проверьте только порт интерфейса и не все интерфейсы",
-        "pt": "Verifique apenas a porta da interface e não de todas as interfaces",
-        "nl": "Controleer alleen de interface en niet van alle interfaces",
-        "fr": "Vérifiez uniquement le port de l'interface et pas de toutes les interfaces",
-        "it": "Controllare solo la porta dell'interfaccia e non di tutte le interfacce",
-        "es": "Compruebe sólo el puerto de la interfaz y no de todas las interfaces",
-        "pl": "Check jedynie port interfejsu i nie wszystkie interfejsy",
-        "zh-cn": "检查站只是接口的港口,而不是所有接口"
-      },
-      "0.3.2": {
-        "en": "Fix crash cases reported by Sentry",
-        "de": "Von Sentry gemeldete Absturzfälle beheben",
-        "ru": "Исправить случаи сбоев, о которых сообщил Sentry",
-        "pt": "Corrigir casos de travamento relatados pelo Sentinela",
-        "nl": "Herstel crashgevallen gemeld door Sentry",
-        "fr": "Correction des cas de plantage signalés par Sentry",
-        "it": "Risolvi i casi di crash segnalati da Sentry",
-        "es": "Solucionar casos de fallas informados por Sentry",
-        "pl": "Napraw przypadki awarii zgłoszone przez Sentry",
-        "zh-cn": "修复 Sentry 报告的崩溃案例"
-      },
-      "0.3.1": {
-        "en": "Fix a crash case reported by Sentry",
-        "de": "Beheben Sie einen von Sentry gemeldeten Absturzfall",
-        "ru": "Исправление сбоя, о котором сообщил Sentry",
-        "pt": "Corrigir um caso de falha relatado pelo Sentinela",
-        "nl": "Een door Sentry gemeld crashgeval oplossen",
-        "fr": "Correction d'un cas de plantage signalé par Sentry",
-        "it": "Risolvi un caso di crash segnalato da Sentry",
-        "es": "Solucionar un caso de bloqueo informado por Sentry",
-        "pl": "Napraw awarię zgłoszoną przez Sentry",
-        "zh-cn": "修复 Sentry 报告的崩溃案例"
-      },
-      "0.3.0": {
-        "en": "Prevent some warnings in js-controller 3+\nAdd Fallback to simulated shell if bash/cmd.exe is selected by node-pty was not installed correctly!\nRework info.connection status to show that server is connected also as green by using \"none\" to show that noone is connected\nUpdate all dependencies\nAdd sentry for crash reporting",
-        "de": "Einige Warnungen in js-controller 3+ verhindern\nFallback zur simulierten Shell hinzufügen, wenn bash/cmd.exe von node-pty ausgewählt wird, wurde nicht korrekt installiert!\nÜberarbeiten Sie den info.connection-Status, um anzuzeigen, dass der Server verbunden ist, auch als grün, indem Sie \"none\" verwenden, um anzuzeigen, dass niemand verbunden ist\nAktualisieren Sie alle Abhängigkeiten\nSentry für Absturzberichte hinzufügen",
-        "ru": "Предотвратить некоторые предупреждения в js-controller 3+\nДобавьте резервный вариант в смоделированную оболочку, если bash/cmd.exe выбран из-за неправильной установки node-pty!\nПереработать статус info.connection, чтобы показать, что сервер подключен, также зеленым, используя «none», чтобы показать, что никто не подключен.\nОбновить все зависимости\nДобавить часового для отчетов о сбоях",
-        "pt": "Evite alguns avisos no js-controller 3+\nAdicione Fallback ao shell simulado se bash/cmd.exe for selecionado por node-pty não foi instalado corretamente!\nRetrabalhe o status info.connection para mostrar que o servidor também está conectado como verde usando \"none\" para mostrar que ninguém está conectado\nAtualizar todas as dependências\nAdicionar sentinela para relatórios de falhas",
-        "nl": "Voorkom enkele waarschuwingen in js-controller 3+\nVoeg terugval toe aan gesimuleerde shell als bash/cmd.exe is geselecteerd door node-pty niet correct is geïnstalleerd!\nHerwerk de info.connection-status om aan te geven dat de server ook groen is verbonden door \"none\" te gebruiken om aan te geven dat er niemand is verbonden\nAlle afhankelijkheden bijwerken\nEen schildwacht toevoegen voor crashrapportage",
-        "fr": "Empêcher certains avertissements dans js-controller 3+\nAjoutez Fallback au shell simulé si bash/cmd.exe est sélectionné par node-pty n'a pas été installé correctement !\nRetravailler l'état de l'info.connexion pour montrer que le serveur est connecté également en vert en utilisant \"aucun\" pour montrer que personne n'est connecté\nMettre à jour toutes les dépendances\nAjouter une sentinelle pour les rapports de plantage",
-        "it": "Impedisci alcuni avvisi in js-controller 3+\nAggiungi fallback alla shell simulata se bash/cmd.exe è selezionato da node-pty non è stato installato correttamente!\nRielabora lo stato di info.connection per mostrare che il server è connesso anche come verde usando \"none\" per mostrare che nessuno è connesso\nAggiorna tutte le dipendenze\nAggiungi sentinella per la segnalazione degli arresti anomali",
-        "es": "Evite algunas advertencias en js-controller 3+\n¡Agregue Fallback al shell simulado si node-pty seleccionó bash/cmd.exe y no se instaló correctamente!\nVuelva a trabajar en el estado de info.connection para mostrar que el servidor está conectado también como verde usando \"ninguno\" para mostrar que nadie está conectado\nActualizar todas las dependencias\nAgregar centinela para informes de fallas",
-        "pl": "Zapobiegaj niektórym ostrzeżeniom w js-controller 3+\nDodaj Fallback do symulowanej powłoki, jeśli bash/cmd.exe jest wybrany przez node-pty nie został poprawnie zainstalowany!\nZmień stan info.connection, aby pokazać, że serwer jest podłączony również na zielono, używając „brak”, aby pokazać, że nikt nie jest podłączony\nZaktualizuj wszystkie zależności\nDodaj wartownika do zgłaszania awarii",
-        "zh-cn": "防止在 js-controller 3+ 中出现一些警告\n如果 node-pty 选择的 bash/cmd.exe 未正确安装，则将 Fallback 添加到模拟 shell！\n重做 info.connection 状态以显示服务器也已连接为绿色，使用“none”表示没有人连接\n更新所有依赖项\n为崩溃报告添加哨兵"
-      },
-      "0.2.0": {
-        "en": "Added the real terminal (bash or cmd.exe) to simulated one",
-        "de": "Das echte Terminal (bash oder cmd.exe) zum simulierten hinzugefügt",
-        "ru": "Добавлен реальный терминал (bash или cmd.exe) к имитируемому",
-        "pt": "Adicionado o terminal real (bash ou cmd.exe) para simular um",
-        "nl": "De echte terminal (bash of cmd.exe) toegevoegd aan de gesimuleerde",
-        "fr": "Ajout du vrai terminal (bash ou cmd.exe) à un simulé",
-        "it": "Aggiunto il terminale reale (bash o cmd.exe) a quello simulato",
-        "es": "Se agregó la terminal real (bash o cmd.exe) a una simulada",
-        "pl": "Dodano prawdziwy terminal (bash lub cmd.exe) do symulowanego",
-        "zh-cn": "将真实终端（bash 或 cmd.exe）添加到模拟终端"
       }
     },
     "title": "Shell console XTerm",
@@ -126,14 +131,15 @@
       "license": "MIT"
     },
     "platform": "Javascript/Node.js",
-    "icon": "xterm.png",
+    "icon": "xterm.svg",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.svg",
     "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
     "loglevel": "info",
     "mode": "daemon",
     "type": "utility",
     "compact": true,
+    "stopBeforeUpdate": true,
     "localLinks": {
       "_default": "%protocol%://%ip%:%port%"
     },
@@ -165,11 +171,12 @@
   "native": {
     "bind": "0.0.0.0",
     "port": "8099",
-    "pty": true,
     "secure": false,
     "auth": true,
-    "encoding": "utf-8",
-    "doNotUseCanvas": false
+    "authType": "basic",
+    "cwd": "",
+    "shellUser": "",
+    "sessionTimeout": 5
   },
   "objects": [],
   "instanceObjects": [

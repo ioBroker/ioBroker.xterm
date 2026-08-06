@@ -14,8 +14,12 @@ export function useWebSocket({ onMessage, onConnected }: UseWebSocketOptions): {
     const wsRef = useRef<WebSocket | null>(null);
     const onMessageRef = useRef(onMessage);
     const onConnectedRef = useRef(onConnected);
-    onMessageRef.current = onMessage;
-    onConnectedRef.current = onConnected;
+
+    // Always call the latest callbacks, but do not re-create the connection for that
+    useEffect(() => {
+        onMessageRef.current = onMessage;
+        onConnectedRef.current = onConnected;
+    });
 
     const send = useCallback((msg: ClientMessage) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -26,7 +30,28 @@ export function useWebSocket({ onMessage, onConnected }: UseWebSocketOptions): {
     useEffect(() => {
         let connectTimer: ReturnType<typeof setTimeout> | null = null;
         let connectingTimeout: ReturnType<typeof setTimeout> | null = null;
+        // Socket that is currently connecting or connected
+        let socket: WebSocket | null = null;
         let disposed = false;
+
+        /** Remove all handlers and close the socket, so it cannot trigger a second reconnect */
+        function discard(ws: WebSocket): void {
+            ws.onopen = null;
+            ws.onerror = null;
+            ws.onclose = null;
+            ws.onmessage = null;
+            try {
+                ws.close();
+            } catch {
+                // ignore
+            }
+            if (socket === ws) {
+                socket = null;
+            }
+            if (wsRef.current === ws) {
+                wsRef.current = null;
+            }
+        }
 
         function connect(noWait?: boolean): void {
             if (disposed) {
@@ -42,16 +67,22 @@ export function useWebSocket({ onMessage, onConnected }: UseWebSocketOptions): {
                             return;
                         }
 
+                        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                        // `host` already contains the port (if it is not the default one)
+                        const ws = new WebSocket(`${protocol}//${window.location.host}`);
+                        socket = ws;
+
                         if (connectingTimeout) {
                             clearTimeout(connectingTimeout);
                         }
                         connectingTimeout = setTimeout(() => {
+                            connectingTimeout = null;
                             console.log('Connect timeout');
+                            // The socket is still connecting - throw it away before trying again
+                            discard(ws);
+                            setConnected(false);
                             connect();
                         }, 5000);
-
-                        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                        const ws = new WebSocket(`${protocol}//${window.location.hostname}:${window.location.port}`);
 
                         ws.onopen = () => {
                             if (connectingTimeout) {
@@ -65,26 +96,37 @@ export function useWebSocket({ onMessage, onConnected }: UseWebSocketOptions): {
                         };
 
                         ws.onerror = () => {
+                            // `onclose` is called afterwards and triggers the reconnect
                             try {
                                 ws.close();
                             } catch {
                                 // ignore
                             }
-                            wsRef.current = null;
+                        };
+
+                        ws.onclose = () => {
+                            if (connectingTimeout) {
+                                clearTimeout(connectingTimeout);
+                                connectingTimeout = null;
+                            }
+                            if (socket === ws) {
+                                socket = null;
+                            }
+                            if (wsRef.current === ws) {
+                                wsRef.current = null;
+                            }
                             setConnected(false);
                             connect();
                         };
 
-                        ws.onclose = () => {
-                            wsRef.current = null;
-                            setConnected(false);
-                            if (!disposed) {
-                                connect();
-                            }
-                        };
-
                         ws.onmessage = event => {
-                            const msg = JSON.parse(event.data as string) as ServerMessage;
+                            let msg: ServerMessage;
+                            try {
+                                msg = JSON.parse(event.data as string) as ServerMessage;
+                            } catch {
+                                console.error('Cannot parse message from server');
+                                return;
+                            }
                             onMessageRef.current(msg);
                         };
                     },
@@ -102,10 +144,10 @@ export function useWebSocket({ onMessage, onConnected }: UseWebSocketOptions): {
             if (connectingTimeout) {
                 clearTimeout(connectingTimeout);
             }
-            if (wsRef.current) {
-                wsRef.current.close();
-                wsRef.current = null;
+            if (socket) {
+                discard(socket);
             }
+            wsRef.current = null;
         };
     }, []);
 

@@ -131,9 +131,9 @@
     },
     "platform": "Javascript/Node.js",
     "main": "build/main.js",
-    "icon": "xterm.png",
+    "icon": "xterm.svg",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.png",
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.svg",
     "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
     "loglevel": "info",
     "mode": "daemon",
@@ -175,7 +175,8 @@
     "auth": true,
     "authType": "basic",
     "cwd": "",
-    "shellUser": ""
+    "shellUser": "",
+    "sessionTimeout": 5
   },
   "objects": [],
   "instanceObjects": [

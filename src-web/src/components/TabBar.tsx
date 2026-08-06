@@ -40,7 +40,11 @@ export function TabBar({ tabs, activeTabId, onSwitch, onAdd, onClose }: TabBarPr
                 +
             </button>
             <div className="tab-bar-spacer" />
-            <img src="xterm.png" alt="xterm" className="tab-bar-icon" />
+            <img
+                src="xterm.svg"
+                alt="xterm"
+                className="tab-bar-icon"
+            />
         </div>
     );
 }

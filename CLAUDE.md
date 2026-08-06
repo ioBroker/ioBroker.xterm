@@ -35,11 +35,15 @@ There is no root `build:web` / `dev:web` script. To develop the UI live, run the
 
 **Frontend** (`src-web/src/`): React 19 + TypeScript app built with Vite to the repo-root `public/`. Multi-tab terminal using xterm.js. Each tab has its own PTY process on the server. Entry point is `src-web/src/main.tsx`.
 
-**PTY / shell selection** (`startShellForTab`): per `tabId`, `node-pty` spawns `cmd.exe` on Windows, `su - <shellUser>` when `shellUser` is configured on Linux, otherwise `bash`. Working directory is `config.cwd` or, if empty, the detected ioBroker root. A PTY that exits is automatically restarted while its tab is still open.
+**Terminal sessions** (`TerminalSession`, `attachSession`/`detachSocket`/`terminateSession`): PTYs are owned by the adapter (`this.sessions`, keyed by `tabId`), **not** by the WebSocket connection, so a shell survives a reload or a dropped connection. Each session keeps a replay buffer of the last `REPLAY_BUFFER_SIZE` characters of shell output (truncated at a line break so escape sequences stay intact). `create` attaches to an existing session or creates a new one; a second connection attaching to the same `tabId` takes it over. On disconnect the session is detached and terminated after `config.sessionTimeout` minutes (`0` = immediately). Commands other than `create` are only accepted from the connection the session is attached to. Cap: `MAX_SESSIONS` (detached sessions are evicted oldest-first to make room).
+
+**PTY / shell selection** (`startPty`): `node-pty` spawns `cmd.exe` on Windows, `su - <shellUser>` when `shellUser` is configured on Linux, otherwise `bash`. Working directory is `config.cwd` (falls back to the detected ioBroker root if it does not exist). A PTY that exits is restarted; if it dies within `MIN_SHELL_LIFETIME_MS` more than `MAX_SHELL_RESTARTS` times in a row, the session is given up with an error in the terminal instead of looping.
 
 **Multi-tab WebSocket protocol** — single connection, multiplexed by `tabId`:
 - Client→Server: `{ method: "create", tabId }`, `{ method: "key", tabId, key }`, `{ method: "resize", tabId, cols, rows }`, `{ method: "close", tabId }`
-- Server→Client: `{ method: "data", tabId, data }`, `{ method: "created", tabId }`, `{ method: "closed", tabId }`
+- Server→Client: `{ method: "data", tabId, data }`, `{ method: "created", tabId, restored }`, `{ method: "restore", tabId, data }`, `{ method: "closed", tabId }`
+
+`restored` tells the client whether it attached to a running shell; if so, a `restore` message with the replay buffer follows and the client resets its terminal before writing it. The frontend keeps its tab IDs in `sessionStorage`, which is what makes a page reload reattach instead of starting new shells.
 
 **Authentication** (only when `config.auth`, hardcoded to the ioBroker `admin` user via `checkPassword`, with shared brute-force protection — escalating lockout delays after 4 failures). Two modes selected by `config.authType`:
 - `basic`: HTTP Basic auth Express middleware, backed by a 10-second auth cache. The WebSocket upgrade re-runs the same Basic check.
@@ -59,7 +63,7 @@ There is no root `build:web` / `dev:web` script. To develop the UI live, run the
 - `src-web/src/theme.ts` — xterm.js dark theme constant
 - `src-web/src/types.ts` — Protocol message types
 - `src-web/vite.config.ts` — Vite build config (root: `src-web/`, output: `../public`)
-- `admin/jsonConfig.json` — Admin config UI schema (bind, port, secure, auth, authType, cwd, shellUser)
+- `admin/jsonConfig.json` — Admin config UI schema (bind, port, secure, auth, authType, cwd, shellUser, sessionTimeout)
 
 ## TypeScript
 
@@ -69,13 +73,19 @@ There is no root `build:web` / `dev:web` script. To develop the UI live, run the
 
 ## Testing
 
-Tests use `@iobroker/testing` (wraps Mocha) and are plain JS files in `test/`. The test infrastructure validates package structure, adapter instantiation, and integration with ioBroker.
+Tests are plain JS files in `test/` and run with Mocha:
+
+- `test/package.js`, `test/unit.js` — `@iobroker/testing` (package structure, adapter instantiation)
+- `test/integration/adapter.js` — `@iobroker/testing` integration run; needs a **stopped** js-controller (it refuses to run if one is already running on the machine)
+- `test/integration/sessions.js` — terminal session tests. Runs `build/main.js` in-process with a stubbed `@iobroker/adapter-core`/`@iobroker/webserver` (no js-controller needed), talks to it over a real WebSocket and starts a real shell via node-pty. Requires `npm run build:tsc` first, otherwise the suite skips itself.
+
+`npm run test:integration` runs both files of `test/integration/`, so the path argument of `tests.integration()` in `adapter.js` points two levels up.
 
 ## ioBroker Adapter Conventions
 
 - Adapter lifecycle: `onReady()` initializes the web server, `onUnload()` tears it down
 - Connection state tracked via the `info.connection` ioBroker state (holds the comma-separated list of connected client IPs, or `none`)
-- Config defined in `io-package.json` under `native` (bind, port, secure, auth, authType, cwd, shellUser) and surfaced in the admin UI via `admin/jsonConfig.json`
+- Config defined in `io-package.json` under `native` (bind, port, secure, auth, authType, cwd, shellUser, sessionTimeout) and surfaced in the admin UI via `admin/jsonConfig.json`
 - Default port: 8099 (set `findNextPort` to fall back to the next free port instead of terminating when the port is taken)
 - Supports compact mode (shared process)
 - `node-pty` is a required dependency

@@ -12,6 +12,8 @@ import './TerminalPane.css';
 
 export interface TerminalPaneHandle {
     write: (data: string) => void;
+    /** Clear the terminal and replay the content that the server kept while the connection was lost */
+    restore: (data: string) => void;
     fit: () => void;
 }
 
@@ -80,6 +82,18 @@ export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(
         useImperativeHandle(ref, () => ({
             write: (data: string) => {
                 termRef.current?.write(data);
+            },
+            restore: (data: string) => {
+                const term = termRef.current;
+                if (!term) {
+                    return;
+                }
+                // `reset` also clears the scrollback, so the replayed content is not doubled
+                term.reset();
+                term.clear();
+                if (data) {
+                    term.write(data);
+                }
             },
             fit: () => {
                 if (fitAddonRef.current && containerRef.current?.offsetParent !== null) {

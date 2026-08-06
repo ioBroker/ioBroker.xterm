@@ -46,7 +46,7 @@ A terminal is terminated if it is explicitly closed, or if no browser comes back
 -->
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 4.0.0 (2026-08-06)
 * (@GermanBluefox) Dropped support of Node.js 20
 * (@GermanBluefox) Added SVG icon
 * (@GermanBluefox) The terminals now run on the server: they survive a reload or a lost connection and are restored with their content

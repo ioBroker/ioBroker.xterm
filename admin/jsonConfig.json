@@ -48,6 +48,19 @@
                     "md": 6,
                     "lg": 2
                 },
+                "authType": {
+                    "type": "select",
+                    "label": "Authentication type",
+                    "options": [
+                        { "label": "auth_type_basic", "value": "basic" },
+                        { "label": "auth_type_digest", "value": "digest" }
+                    ],
+                    "default": "basic",
+                    "hidden": "!data.auth",
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4
+                },
                 "cwd": {
                     "newLine": true,
                     "type": "text",
@@ -64,6 +77,18 @@
                     "label": "Shell user",
                     "help": "Leave empty to use the ioBroker process user",
                     "placeholder": "root",
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6
+                },
+                "sessionTimeout": {
+                    "newLine": true,
+                    "type": "number",
+                    "min": 0,
+                    "max": 1440,
+                    "label": "Session timeout",
+                    "help": "session_timeout_help",
+                    "default": 5,
                     "sm": 12,
                     "md": 8,
                     "lg": 6

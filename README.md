@@ -1,4 +1,4 @@
-![Logo](admin/xterm.png)
+![Logo](admin/xterm.svg)
 # ioBroker.xterm
 
 ![Number of Installations](http://iobroker.live/badges/xterm-installed.svg)
@@ -25,6 +25,13 @@ If the authentication is enabled, only ioBroker "admin" user can log in.
 The adapter starts cmd.exe (Windows) or bash (Linux) via a real pseudo-terminal (node-pty).
 On Linux, bash runs under the `iobroker` user — you can switch to another user with more privileges via `su USER`.
 
+### Persistent terminals
+The shells run in the adapter and not in the browser. If the connection is lost or the page is reloaded,
+the terminals keep running and are restored including their content — long-running commands are not interrupted.
+
+A terminal is terminated if it is explicitly closed, or if no browser comes back within the configured
+**session timeout** (5 minutes by default; `0` terminates the shells immediately when the browser disconnects).
+
 ## Keyboard shortcuts
 | Shortcut         | Action                                                                              |
 |------------------|-------------------------------------------------------------------------------------|
@@ -39,9 +46,25 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 -->
 
 ## Changelog
-### 3.0.2 (2026-04-13)
+
+### **WORK IN PROGRESS**
+* (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
+* (@GermanBluefox) Dropped support of Node.js 20
+* (@GermanBluefox) Added SVG icon
+* (@GermanBluefox) The terminals now run on the server: they survive a reload or a lost connection and are restored with their content
+* (@GermanBluefox) Added the setting for the session timeout
+* (@GermanBluefox) Fixed the HTTPS mode: the adapter did not start the web server at all if `secure` was enabled
+* (@GermanBluefox) Fixed the shown client IP addresses in `info.connection`
+* (@GermanBluefox) Errors of the web socket connection do not terminate the adapter anymore
+* (@GermanBluefox) A shell that cannot be started is not restarted endlessly anymore
+* (@GermanBluefox) All shells are terminated now if the adapter stops
+* (@GermanBluefox) Fixed the double connections of the GUI after a connection timeout
+
+### 3.1.0 (2026-06-04)
 * (bluefox) Added the icon in the GUI
-* (bluefox) Added possibility to run under specified user on Linux
+* (bluefox) Added possibility to run under a specified user on Linux
+* (bluefox) Implemented paste on right mouse click
+* (bluefox) Implemented authentication for the terminal
 
 ### 3.0.0 (2026-04-12)
 * (bluefox) Migrated the adapter to Typescript
@@ -83,6 +106,8 @@ On Linux, bash runs under the `iobroker` user — you can switch to another user
 
 ### 0.0.1
 * (ioBroker) initial release
+
+[Older changelogs can be found there](CHANGELOG_OLD.md)
 
 ## License
 MIT License

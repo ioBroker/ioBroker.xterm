@@ -105,6 +105,8 @@ A terminal is terminated if it is explicitly closed, or if no browser comes back
 ### 0.0.1
 * (ioBroker) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 MIT License
 

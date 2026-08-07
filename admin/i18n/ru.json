@@ -22,5 +22,7 @@
     "Leave empty to use the ioBroker process user": "Оставьте пустым, чтобы использовать пользователя процесса ioBroker",
     "Authentication type": "Тип аутентификации",
     "auth_type_basic": "Basic (диалог браузера)",
-    "auth_type_digest": "Digest (страница входа)"
+    "auth_type_digest": "Digest (страница входа)",
+    "Session timeout": "Тайм-аут сессии",
+    "session_timeout_help": "Как долго терминал продолжает работать, если браузер потерял соединение (в минутах). 0 = завершить немедленно"
 }

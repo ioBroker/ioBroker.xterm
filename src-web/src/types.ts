@@ -13,6 +13,9 @@ export type ClientMessage =
 
 // Server -> Client
 export type ServerMessage =
+    // `restored` is true if the terminal was still running on the server
+    | { method: 'created'; tabId: string; restored?: boolean }
+    // Content of the terminal before the connection was lost
+    | { method: 'restore'; tabId: string; data: string }
     | { method: 'data'; tabId: string; data: string }
-    | { method: 'created'; tabId: string }
     | { method: 'closed'; tabId: string };

@@ -2,6 +2,7 @@ import { Adapter, type AdapterOptions, EXIT_CODES, getAbsoluteDefaultDataDir } f
 import { WebServer as IoBWebServer } from '@iobroker/webserver';
 import path from 'node:path';
 import os from 'node:os';
+import fs from 'node:fs';
 import crypto from 'node:crypto';
 import express from 'express';
 import { WebSocketServer, type WebSocket } from 'ws';
@@ -14,7 +15,31 @@ import type { XtermAdapterConfig } from './types';
 
 interface IobrokerMeta {
     address: string;
-    tabs: Map<string, pty.IPty>;
+    /** IDs of the terminal sessions that are attached to this connection */
+    sessions: Set<string>;
+}
+
+/**
+ * A terminal session lives in the adapter and not in the web socket connection,
+ * so the shell survives a reconnection of the browser.
+ */
+interface TerminalSession {
+    id: string;
+    pty: pty.IPty | null;
+    /** Last output of the shell, used to restore the terminal after a reconnection */
+    buffer: string;
+    /** Currently attached web socket or null if no client is connected */
+    ws: XtermWebSocket | null;
+    /** Terminates the session if no client comes back */
+    killTimer: ReturnType<typeof setTimeout> | null;
+    /** Delayed restart of a shell that exited immediately */
+    restartTimer: ReturnType<typeof setTimeout> | null;
+    /** Number of consecutive immediate exits of the shell */
+    restarts: number;
+    /** Time when the last client detached */
+    detachedAt: number;
+    cols: number;
+    rows: number;
 }
 
 interface XtermWebSocket extends WebSocket {
@@ -103,6 +128,17 @@ fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},bo
 </body>
 </html>`;
 
+/** Maximum number of simultaneously existing terminal sessions */
+const MAX_SESSIONS = 20;
+/** A shell that exits faster than that is treated as "failed to start" */
+const MIN_SHELL_LIFETIME_MS = 2000;
+/** How many times a failing shell will be restarted before giving up */
+const MAX_SHELL_RESTARTS = 5;
+/** How many characters of the shell output are kept to restore the terminal after a reconnection */
+const REPLAY_BUFFER_SIZE = 100000;
+/** Used if the configured session timeout is invalid */
+const DEFAULT_SESSION_TIMEOUT_MIN = 5;
+
 function findIoBrokerDirectory(): string {
     const dir = getAbsoluteDefaultDataDir().replace(/\\/g, '/');
     const parts = dir.split('/');
@@ -115,6 +151,8 @@ class XtermAdapter extends Adapter {
     declare config: XtermAdapterConfig;
 
     private server: WebServerInstance | null = null;
+    /** All terminal sessions, independent of the web socket connections */
+    private sessions: Map<string, TerminalSession> = new Map();
     private connectedIPs: string[] = [];
     private bruteForce: Record<string, BruteForceEntry> = {};
     private IOB_DIR: string = findIoBrokerDirectory();
@@ -136,6 +174,9 @@ class XtermAdapter extends Adapter {
 
     private onUnload(callback: () => void): void {
         try {
+            // Terminate all shells, so no orphaned processes stay behind
+            this.destroyAllSessions();
+
             if (this.server?.io) {
                 this.server.io.clients.forEach(socket => socket.close());
             }
@@ -147,6 +188,11 @@ class XtermAdapter extends Adapter {
                             socket.terminate();
                         }
                     });
+                    try {
+                        this.server.io.close();
+                    } catch {
+                        // ignore
+                    }
                 }
 
                 try {
@@ -298,65 +344,309 @@ class XtermAdapter extends Adapter {
         return !!(token && this.verifySessionToken(token));
     }
 
-    private startShellForTab(ws: XtermWebSocket, tabId: string): void {
-        if (!ws?.__iobroker) {
+    /** Send a message to the client, but only if the socket is still open */
+    private sendToClient(ws: XtermWebSocket, message: Record<string, unknown>): void {
+        if (ws.readyState !== ws.OPEN) {
+            return;
+        }
+        try {
+            ws.send(JSON.stringify(message));
+        } catch (err) {
+            this.log.debug(`Cannot send message to client: ${err as Error}`);
+        }
+    }
+
+    /** Determine the working directory of the shell and fall back to the ioBroker directory if it does not exist */
+    private getShellCwd(): string {
+        if (this.config.cwd) {
+            if (fs.existsSync(this.config.cwd)) {
+                return this.config.cwd;
+            }
+            this.log.warn(`Start directory "${this.config.cwd}" does not exist. Using "${this.IOB_DIR}" instead.`);
+        }
+        return this.IOB_DIR;
+    }
+
+    /** How long a session stays alive without a client (in ms, 0 = terminate immediately) */
+    private getSessionTimeout(): number {
+        const minutes = Number(this.config.sessionTimeout);
+        return (isFinite(minutes) && minutes >= 0 ? minutes : DEFAULT_SESSION_TIMEOUT_MIN) * 60000;
+    }
+
+    /** Shell and its arguments for the current configuration */
+    private getShell(): { shell: string; args: string[] } {
+        if (os.platform() === 'win32') {
+            return { shell: 'cmd.exe', args: [] };
+        }
+        if (this.config.shellUser) {
+            return { shell: 'su', args: ['-', this.config.shellUser] };
+        }
+        return { shell: 'bash', args: [] };
+    }
+
+    /** Store the output of the shell, so the terminal can be restored after a reconnection */
+    private static appendToBuffer(session: TerminalSession, data: string): void {
+        session.buffer += data;
+        if (session.buffer.length > REPLAY_BUFFER_SIZE) {
+            const cut = session.buffer.length - REPLAY_BUFFER_SIZE;
+            // Cut at a line break, so no escape sequence is torn apart
+            const lineStart = session.buffer.indexOf('\n', cut);
+            session.buffer = session.buffer.substring(lineStart === -1 ? cut : lineStart + 1);
+        }
+    }
+
+    /** Start the shell of a session. Returns false if the shell could not be started at all */
+    private startPty(session: TerminalSession): boolean {
+        const { shell, args } = this.getShell();
+
+        let ptyProcess: pty.IPty;
+        try {
+            ptyProcess = pty.spawn(shell, args, {
+                name: 'xterm-256color',
+                cols: session.cols,
+                rows: session.rows,
+                cwd: this.getShellCwd(),
+                env: process.env,
+            });
+        } catch (err) {
+            // e.g. shell not found or no rights for the working directory
+            this.log.error(`Cannot start shell "${shell}": ${err as Error}`);
+            this.sendToSession(session, {
+                method: 'data',
+                tabId: session.id,
+                data: `\r\n\x1b[31mCannot start shell "${shell}": ${(err as Error).message}\x1b[0m\r\n`,
+            });
+            return false;
+        }
+
+        const startedAt = Date.now();
+        session.pty = ptyProcess;
+
+        ptyProcess.onData((data: string) => {
+            XtermAdapter.appendToBuffer(session, data);
+            this.sendToSession(session, { method: 'data', tabId: session.id, data });
+        });
+
+        // Restart the shell of the session, but do not leave a session without a shell behind
+        const restartShell = (): void => {
+            if (this.sessions.get(session.id) === session && !this.startPty(session)) {
+                this.terminateSession(session, false);
+            }
+        };
+
+        ptyProcess.onExit(({ exitCode, signal }) => {
+            // Ignore PTYs that were already replaced or belong to a destroyed session
+            if (session.pty !== ptyProcess || this.sessions.get(session.id) !== session) {
+                return;
+            }
+            session.pty = null;
+
+            // If the shell dies immediately (invalid user, missing shell, ...), do not restart it endlessly
+            if (Date.now() - startedAt >= MIN_SHELL_LIFETIME_MS) {
+                session.restarts = 0;
+                restartShell();
+                return;
+            }
+
+            session.restarts++;
+            if (session.restarts > MAX_SHELL_RESTARTS) {
+                this.log.error(
+                    `Shell "${shell}" terminates immediately (code: ${exitCode}, signal: ${signal ?? '-'}). Giving up.`,
+                );
+                this.sendToSession(session, {
+                    method: 'data',
+                    tabId: session.id,
+                    data:
+                        `\r\n\x1b[31mThe shell "${shell}" terminates immediately (code ${exitCode}).\x1b[0m\r\n` +
+                        `\x1b[31mPlease check the adapter settings (start directory, shell user).\x1b[0m\r\n`,
+                });
+                this.terminateSession(session, false);
+                return;
+            }
+
+            session.restartTimer = setTimeout(() => {
+                session.restartTimer = null;
+                restartShell();
+            }, 1000);
+        });
+
+        return true;
+    }
+
+    /** Send a message to the client that is currently attached to the session */
+    private sendToSession(session: TerminalSession, message: Record<string, unknown>): void {
+        if (session.ws) {
+            this.sendToClient(session.ws, message);
+        }
+    }
+
+    /**
+     * Attach a connection to an existing session or create a new one.
+     * That is what makes the shell survive a reload or a lost connection.
+     */
+    private attachSession(ws: XtermWebSocket, tabId: string): void {
+        if (!ws.__iobroker || ws.readyState !== ws.OPEN) {
             return;
         }
 
-        // Kill existing PTY for this tab (e.g. on reconnection or duplicate create)
-        const existing = ws.__iobroker.tabs.get(tabId);
-        if (existing) {
-            ws.__iobroker.tabs.delete(tabId);
+        let session = this.sessions.get(tabId);
+        const restored = !!session;
+
+        if (session) {
+            // The session is taken over by this connection
+            if (session.ws && session.ws !== ws) {
+                this.log.debug(`Terminal ${tabId} was taken over by another connection`);
+                // Tell the old client why its terminal does not react anymore
+                this.sendToClient(session.ws, {
+                    method: 'data',
+                    tabId,
+                    data: '\r\n\x1b[33mThis terminal was taken over by another connection.\x1b[0m\r\n',
+                });
+                session.ws.__iobroker?.sessions.delete(tabId);
+            }
+            if (session.killTimer) {
+                clearTimeout(session.killTimer);
+                session.killTimer = null;
+            }
+        } else {
+            if (!this.makeRoomForSession()) {
+                this.log.warn(`Not more than ${MAX_SESSIONS} terminals are possible`);
+                this.sendToClient(ws, {
+                    method: 'data',
+                    tabId,
+                    data: `\r\n\x1b[31mToo many open terminals (max. ${MAX_SESSIONS}).\x1b[0m\r\n`,
+                });
+                return;
+            }
+
+            session = {
+                id: tabId,
+                pty: null,
+                buffer: '',
+                ws,
+                killTimer: null,
+                restartTimer: null,
+                restarts: 0,
+                detachedAt: 0,
+                cols: 80,
+                rows: 30,
+            };
+            this.sessions.set(tabId, session);
+
+            if (!this.startPty(session)) {
+                this.sessions.delete(tabId);
+                return;
+            }
+        }
+
+        session.ws = ws;
+        ws.__iobroker.sessions.add(tabId);
+
+        this.sendToClient(ws, { method: 'created', tabId, restored });
+
+        if (restored && session.buffer) {
+            // Let the client rebuild the terminal content
+            this.sendToClient(ws, { method: 'restore', tabId, data: session.buffer });
+        }
+    }
+
+    /** Terminate a session including its shell */
+    private terminateSession(session: TerminalSession, notifyClient: boolean): void {
+        this.sessions.delete(session.id);
+
+        if (session.killTimer) {
+            clearTimeout(session.killTimer);
+            session.killTimer = null;
+        }
+        if (session.restartTimer) {
+            clearTimeout(session.restartTimer);
+            session.restartTimer = null;
+        }
+
+        const ptyProcess = session.pty;
+        session.pty = null;
+        if (ptyProcess) {
             try {
-                existing.kill();
+                ptyProcess.kill();
             } catch {
                 // ignore
             }
         }
 
-        let shell: string;
-        let args: string[];
-        if (os.platform() === 'win32') {
-            shell = 'cmd.exe';
-            args = [];
-        } else if (this.config.shellUser) {
-            shell = 'su';
-            args = ['-', this.config.shellUser];
-        } else {
-            shell = 'bash';
-            args = [];
-        }
-
-        const ptyProcess = pty.spawn(shell, args, {
-            name: 'xterm-256color',
-            cols: 80,
-            rows: 30,
-            cwd: this.config.cwd || this.IOB_DIR,
-            env: process.env as Record<string, string>,
-        });
-
-        ws.__iobroker.tabs.set(tabId, ptyProcess);
-
-        ptyProcess.onData((data: string) => {
-            ws.send(JSON.stringify({ method: 'data', tabId, data }));
-        });
-
-        ptyProcess.onExit(() => {
-            // Only restart if this PTY is still the active one for this tab
-            if (ws.__iobroker?.tabs.get(tabId) === ptyProcess) {
-                // Shell exited — restart it
-                this.startShellForTab(ws, tabId);
+        if (session.ws) {
+            session.ws.__iobroker?.sessions.delete(session.id);
+            if (notifyClient) {
+                this.sendToClient(session.ws, { method: 'closed', tabId: session.id });
             }
-        });
+            session.ws = null;
+        }
+        session.buffer = '';
+    }
 
-        ws.send(JSON.stringify({ method: 'created', tabId }));
+    /** Detach all sessions of a connection and let them run until the timeout expires */
+    private detachSocket(ws: XtermWebSocket): void {
+        if (!ws.__iobroker) {
+            return;
+        }
+        const timeout = this.getSessionTimeout();
+
+        for (const id of ws.__iobroker.sessions) {
+            const session = this.sessions.get(id);
+            if (!session || session.ws !== ws) {
+                // Already taken over by another connection
+                continue;
+            }
+            session.ws = null;
+            session.detachedAt = Date.now();
+
+            if (!timeout) {
+                this.terminateSession(session, false);
+            } else {
+                session.killTimer = setTimeout(() => {
+                    session.killTimer = null;
+                    this.log.debug(`Terminal ${id} terminated, because no client came back`);
+                    this.terminateSession(session, false);
+                }, timeout);
+            }
+        }
+        ws.__iobroker.sessions.clear();
+    }
+
+    /** Make sure that a new session can be created. Detached sessions are sacrificed first */
+    private makeRoomForSession(): boolean {
+        if (this.sessions.size < MAX_SESSIONS) {
+            return true;
+        }
+        let oldest: TerminalSession | null = null;
+        for (const session of this.sessions.values()) {
+            if (!session.ws && (!oldest || session.detachedAt < oldest.detachedAt)) {
+                oldest = session;
+            }
+        }
+        if (oldest) {
+            this.log.debug(`Terminal ${oldest.id} terminated to make room for a new one`);
+            this.terminateSession(oldest, false);
+            return true;
+        }
+        return false;
+    }
+
+    /** Terminate all sessions, e.g. if the adapter stops */
+    private destroyAllSessions(): void {
+        for (const session of [...this.sessions.values()]) {
+            this.terminateSession(session, false);
+        }
+    }
+
+    /** Report the currently connected clients in `info.connection` */
+    private updateConnectionState(): void {
+        void this.setStateAsync('info.connection', [...new Set(this.connectedIPs)].join(', ') || 'none', true);
     }
 
     private initSocketConnection(ws: XtermWebSocket): void {
-        ws.__iobroker = {
-            address: (ws._socket.address() as AddressInfo).address,
-            tabs: new Map(),
-        };
+        // Without an error handler, a socket error (e.g. ECONNRESET or an invalid frame) would
+        // be thrown as an uncaught exception and would terminate the adapter
+        ws.on('error', (err: Error) => this.log.debug(`WebSocket error: ${err.message}`));
 
         if (this.config.auth && !ws._socket.___auth) {
             ws.close();
@@ -364,48 +654,72 @@ class XtermAdapter extends Adapter {
             return;
         }
 
-        if (!this.connectedIPs.includes(ws.__iobroker.address)) {
-            this.connectedIPs.push(ws.__iobroker.address);
-        }
-        void this.setStateAsync('info.connection', this.connectedIPs.join(', ') || 'none', true);
+        ws.__iobroker = {
+            // `address()` would return the address of the server, not the one of the client
+            address: ws._socket.remoteAddress || (ws._socket.address() as AddressInfo)?.address || 'unknown',
+            sessions: new Set(),
+        };
+
+        this.connectedIPs.push(ws.__iobroker.address);
+        this.updateConnectionState();
 
         ws.on('message', (rawMessage: Buffer | string) => {
             if (!ws.__iobroker) {
                 return;
             }
-            const message = JSON.parse(rawMessage.toString());
 
-            if (message.method === 'create' && message.tabId) {
-                this.startShellForTab(ws, message.tabId);
-            } else if (message.method === 'key' && message.tabId) {
-                ws.__iobroker.tabs.get(message.tabId)?.write(message.key);
-            } else if (message.method === 'resize' && message.tabId) {
-                ws.__iobroker.tabs.get(message.tabId)?.resize(message.cols, message.rows);
-            } else if (message.method === 'close' && message.tabId) {
-                const ptyProcess = ws.__iobroker.tabs.get(message.tabId);
-                if (ptyProcess) {
-                    ws.__iobroker.tabs.delete(message.tabId);
+            let message: { method?: string; tabId?: string; key?: string; cols?: number; rows?: number };
+            try {
+                message = JSON.parse(rawMessage.toString());
+            } catch {
+                this.log.warn('Received invalid JSON message from client');
+                return;
+            }
+
+            if (!message || typeof message.tabId !== 'string' || !message.tabId) {
+                return;
+            }
+            const tabId = message.tabId;
+
+            if (message.method === 'create') {
+                // Attaches to an existing session or creates a new one
+                this.attachSession(ws, tabId);
+                return;
+            }
+
+            // All other commands are only allowed for sessions of this connection
+            const session = this.sessions.get(tabId);
+            if (!session || session.ws !== ws) {
+                return;
+            }
+
+            if (message.method === 'key') {
+                if (typeof message.key === 'string') {
+                    session.pty?.write(message.key);
+                }
+            } else if (message.method === 'resize') {
+                const cols = Math.round(message.cols as number);
+                const rows = Math.round(message.rows as number);
+                // node-pty throws on invalid dimensions
+                if (cols > 0 && rows > 0 && isFinite(cols) && isFinite(rows)) {
+                    session.cols = cols;
+                    session.rows = rows;
                     try {
-                        ptyProcess.kill();
-                    } catch {
-                        // ignore
+                        session.pty?.resize(cols, rows);
+                    } catch (err) {
+                        this.log.debug(`Cannot resize terminal: ${err as Error}`);
                     }
                 }
-                ws.send(JSON.stringify({ method: 'closed', tabId: message.tabId }));
+            } else if (message.method === 'close') {
+                // Explicitly closed by the user => the session must not survive
+                this.terminateSession(session, true);
             }
         });
 
         ws.on('close', () => {
             if (ws.__iobroker) {
-                // Kill all PTY processes for this connection
-                for (const [, ptyProcess] of ws.__iobroker.tabs) {
-                    try {
-                        ptyProcess.kill();
-                    } catch {
-                        // ignore
-                    }
-                }
-                ws.__iobroker.tabs.clear();
+                // The shells keep running, so the client can attach to them again
+                this.detachSocket(ws);
 
                 const pos = this.connectedIPs.indexOf(ws.__iobroker.address);
                 if (pos !== -1) {
@@ -414,7 +728,7 @@ class XtermAdapter extends Adapter {
                 delete ws.__iobroker;
             }
             this.log.debug('WebSocket connection disconnected');
-            void this.setStateAsync('info.connection', this.connectedIPs.join(', ') || 'none', true);
+            this.updateConnectionState();
         });
 
         this.log.debug('WebSocket connection established');
@@ -440,10 +754,7 @@ class XtermAdapter extends Adapter {
             return null;
         }
 
-        // @ts-expect-error to solve
-        if (settings.secure && !this.config.certificates) {
-            return null;
-        }
+        // The certificates for the secure mode are read by the ioBroker web server itself
 
         this.getPort(
             settings.port,
@@ -553,7 +864,7 @@ class XtermAdapter extends Adapter {
                 try {
                     const webserver = new IoBWebServer({
                         app: serverObj.app,
-                        adapter: this as ioBroker.Adapter,
+                        adapter: this,
                         secure: settings.secure,
                     });
                     serverObj.server = await webserver.init();
@@ -607,6 +918,9 @@ class XtermAdapter extends Adapter {
                 );
 
                 serverObj.server.on('upgrade', (request, socket: Socket & { ___auth?: boolean }, head: Buffer) => {
+                    // A socket that fails during the handshake must not crash the adapter
+                    socket.on('error', (err: Error) => this.log.debug(`Upgrade socket error: ${err.message}`));
+
                     if (this.config.auth) {
                         if (this.config.authType === 'digest') {
                             // Digest auth: verify session cookie
@@ -642,6 +956,7 @@ class XtermAdapter extends Adapter {
                 });
 
                 serverObj.io = new WebSocketServer({ noServer: true });
+                serverObj.io.on('error', (err: Error) => this.log.error(`WebSocket server error: ${err.message}`));
                 serverObj.io.on('connection', (ws: WebSocket) => this.initSocketConnection(ws as XtermWebSocket));
             },
         );

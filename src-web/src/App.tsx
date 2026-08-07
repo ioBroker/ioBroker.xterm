@@ -6,34 +6,101 @@ import { detectThemeType, type ThemeType } from './theme';
 import type { ServerMessage, Tab } from './types';
 import './App.css';
 
+/** The terminals of this browser tab are remembered here, so a reload can attach to the running shells */
+const STORAGE_KEY = 'xterm.session';
+
+interface StoredSession {
+    tabs: { id: string; title: string }[];
+    activeTabId: string | null;
+}
+
 let tabCounter = 0;
+
+function createTabId(): string {
+    // `randomUUID` is only available in a secure context (https or localhost)
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return `tab-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 10)}`;
+}
 
 function createTab(): Tab {
     tabCounter++;
     return {
-        id: crypto.randomUUID ? crypto.randomUUID() : `tab-${tabCounter}`,
+        id: createTabId(),
         title: `Terminal ${tabCounter}`,
         ready: false,
     };
 }
 
-const initialTab = createTab();
+function loadSession(): StoredSession | null {
+    try {
+        const raw = window.sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            return null;
+        }
+        const stored = JSON.parse(raw) as StoredSession;
+        const tabs = (stored?.tabs || []).filter(tab => tab?.id && tab?.title);
+        if (!tabs.length) {
+            return null;
+        }
+        // Continue the numbering of the terminals where it stopped
+        tabCounter = tabs.reduce((max, tab) => {
+            const num = parseInt(tab.title.replace(/^\D+/, ''), 10);
+            return isFinite(num) && num > max ? num : max;
+        }, 0);
+
+        return { tabs, activeTabId: stored.activeTabId };
+    } catch {
+        return null;
+    }
+}
+
+const storedSession = loadSession();
+const initialTabs: Tab[] = storedSession
+    ? storedSession.tabs.map(tab => ({ id: tab.id, title: tab.title, ready: false }))
+    : [createTab()];
+const initialActiveTabId =
+    storedSession && initialTabs.some(tab => tab.id === storedSession.activeTabId)
+        ? storedSession.activeTabId
+        : initialTabs[0].id;
 
 export default function App(): React.JSX.Element {
-    const [tabs, setTabs] = useState<Tab[]>([initialTab]);
-    const [activeTabId, setActiveTabId] = useState<string | null>(initialTab.id);
+    const [tabs, setTabs] = useState<Tab[]>(initialTabs);
+    const [activeTabId, setActiveTabId] = useState<string | null>(initialActiveTabId);
     const [themeType, setThemeType] = useState<ThemeType>(detectThemeType);
     const paneRefs = useRef<Map<string, TerminalPaneHandle>>(new Map());
     const tabsRef = useRef(tabs);
-    tabsRef.current = tabs;
 
-    const sendRef = useRef<(msg: import('./types').ClientMessage) => void>(() => {});
+    useEffect(() => {
+        tabsRef.current = tabs;
+    });
+
+    // Remember the terminals of this browser tab, so a reload can attach to the running shells
+    useEffect(() => {
+        try {
+            const stored: StoredSession = {
+                tabs: tabs.map(tab => ({ id: tab.id, title: tab.title })),
+                activeTabId,
+            };
+            window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+        } catch {
+            // e.g. private mode without storage - the terminals then simply start anew
+        }
+    }, [tabs, activeTabId]);
 
     const onMessage = useCallback((msg: ServerMessage) => {
         if (msg.method === 'data' && msg.tabId) {
             paneRefs.current.get(msg.tabId)?.write(msg.data);
         } else if (msg.method === 'created' && msg.tabId) {
+            if (!msg.restored) {
+                // A new shell was started - the old content of the terminal is obsolete
+                paneRefs.current.get(msg.tabId)?.restore('');
+            }
             setTabs(prev => prev.map(t => (t.id === msg.tabId ? { ...t, ready: true } : t)));
+        } else if (msg.method === 'restore' && msg.tabId) {
+            // The shell survived the disconnection - show what happened in the meantime
+            paneRefs.current.get(msg.tabId)?.restore(msg.data);
         } else if (msg.method === 'closed' && msg.tabId) {
             setTabs(prev => prev.filter(t => t.id !== msg.tabId));
         }
@@ -45,7 +112,6 @@ export default function App(): React.JSX.Element {
     }, []);
 
     const { connected, send } = useWebSocket({ onMessage, onConnected });
-    sendRef.current = send;
 
     // Send 'create' for new tabs added while connected
     useEffect(() => {

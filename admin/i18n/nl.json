@@ -22,5 +22,7 @@
     "Leave empty to use the ioBroker process user": "Laat leeg om de ioBroker-procesgebruiker te gebruiken",
     "Authentication type": "Verificatietype",
     "auth_type_basic": "Basic (browserdialoog)",
-    "auth_type_digest": "Digest (inlogpagina)"
+    "auth_type_digest": "Digest (inlogpagina)",
+    "Session timeout": "Sessietime-out",
+    "session_timeout_help": "Hoe lang een terminal blijft draaien als de browser de verbinding verliest (in minuten). 0 = direct beëindigen"
 }

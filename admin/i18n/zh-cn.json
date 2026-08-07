@@ -22,5 +22,7 @@
     "Leave empty to use the ioBroker process user": "留空以使用 ioBroker 进程用户",
     "Authentication type": "认证类型",
     "auth_type_basic": "Basic（浏览器对话框）",
-    "auth_type_digest": "Digest（登录页面）"
+    "auth_type_digest": "Digest（登录页面）",
+    "Session timeout": "会话超时",
+    "session_timeout_help": "浏览器断开连接后终端继续运行的时间（分钟）。0 = 立即终止"
 }

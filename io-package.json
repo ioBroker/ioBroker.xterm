@@ -131,7 +131,6 @@
       "license": "MIT"
     },
     "platform": "Javascript/Node.js",
-    "main": "build/main.js",
     "icon": "xterm.svg",
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.svg",

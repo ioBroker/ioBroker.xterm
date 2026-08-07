@@ -1,6 +1,6 @@
 {
   "name": "iobroker.xterm",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "This adapter allows to execute shell commands on ioBroker host.",
   "author": {
     "name": "ioBroker",

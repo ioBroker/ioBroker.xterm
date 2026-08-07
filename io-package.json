@@ -1,175 +1,193 @@
 {
-    "common": {
-        "name": "xterm",
-        "version": "4.0.0",
-        "news": {
-            "3.0.2": {
-                "en": "Added the icon in the GUI\nAdded possibility to run under specified user on Linux",
-                "de": "Das Icon in der GUI hinzugefügt\nZusätzliche Möglichkeit, unter bestimmten Benutzer auf Linux laufen",
-                "ru": "Добавлена иконка в GUI\nДобавлена возможность запуска под указанным пользователем на Linux",
-                "pt": "Adicionado o ícone na interface gráfica\nAdicionada possibilidade de execução sob o usuário especificado no Linux",
-                "nl": "Het pictogram in de GUI toegevoegd\nToegevoegde mogelijkheid om te draaien onder opgegeven gebruiker op Linux",
-                "fr": "Ajout de l'icône dans l'interface graphique\nAjout de la possibilité d'exécuter sous l'utilisateur spécifié sur Linux",
-                "it": "Aggiunto l'icona nella GUI\nAggiunta possibilità di eseguire sotto utente specificato su Linux",
-                "es": "Añadido el icono en el GUI\nPosibilidad de ejecutar bajo el usuario especificado en Linux",
-                "pl": "Dodano ikonę w GUI\nDodano możliwość uruchomienia pod określonym użytkownikiem na Linuksie",
-                "uk": "Додано іконку в GUI\nДодано можливість запуску за вказаною користувачем на Linux",
-                "zh-cn": "在图形界面中添加图标\n添加在 Linux 上指定用户下运行的可能性"
-            },
-            "3.0.1": {
-                "en": "Added the icon in the GUI",
-                "de": "Das Icon in der GUI hinzugefügt",
-                "ru": "Добавлена иконка в GUI",
-                "pt": "Adicionado o ícone na interface gráfica",
-                "nl": "Het pictogram in de GUI toegevoegd",
-                "fr": "Ajout de l'icône dans l'interface graphique",
-                "it": "Aggiunto l'icona nella GUI",
-                "es": "Añadido el icono en el GUI",
-                "pl": "Dodano ikonę w GUI",
-                "uk": "Додано іконку в GUI",
-                "zh-cn": "在图形界面中添加图标"
-            },
-            "3.0.0": {
-                "en": "Migrated the adapter to Typescript\nAdded multiple terminal sessions",
-                "de": "Den Adapter zu Typescript migrieren\nMehrere Terminalsitzungen hinzugefügt",
-                "ru": "Перенес адаптер на Typescript\nДобавлено несколько терминальных сеансов",
-                "pt": "Migrar o adaptador para escrever\nAdicionadas várias sessões de terminal",
-                "nl": "De adapter migreren naar Typescript\nMeerdere terminalsessies toegevoegd",
-                "fr": "Migré l'adaptateur vers Typescript\nAjout de plusieurs sessions de terminal",
-                "it": "Migrato l'adattatore a Typescript\nAggiunto più sessioni terminali",
-                "es": "Migraron el adaptador a Tiposcript\nSesiones terminales múltiples",
-                "pl": "Przekierowany adapter do Typescript\nDodano wiele sesji terminali",
-                "uk": "Переміграний адаптер до Typescript\nДодано кілька терміналів",
-                "zh-cn": "将适配器移到 Typescript\n添加多个终端会话"
-            },
-            "2.0.1": {
-                "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
-                "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
-                "ru": "обновлена библиотека xterm\nMove Lets зашифровать настройки в acme адаптер\nМинимальная поддерживаемая версия node.js 16",
-                "pt": "biblioteca xterm atualizado\nMover Permite criptografar configurações para o adaptador acme\nNode.js com suporte mínimo é 16",
-                "nl": "xterm bibliotheek update\nVerplaats Lets encrypt setting om acme adapter te maken\nMinimale ondersteunde node",
-                "fr": "xterm library updated\nDéplacer permet de chiffrer les paramètres à l'adaptateur acme\nVersion node.js supportée Minimal est 16",
-                "it": "xterm library aggiornato\nSposta Consente di crittografare le impostazioni all'adattatore acme\nMinimal supportato node.js versione è 16",
-                "es": "xterm library updated\nMover Permite encriptar los ajustes para el adaptador de acme\nMinimal soportado node.js versión es 16",
-                "pl": "biblioteki xterm\nMove Lets encrypts adapter to acme adapter\nMinimal supportowana wersja węzła wynosi 16",
-                "uk": "русскийукраїнськабеларускаяoʻzbek tilienglish\nПеремістити налаштування шифрування до адаптера Acme\nMinimal підтримуваний node.js версія 16",
-                "zh-cn": "更新图书馆\n让加密环境适应者\n米切尔支持不dejs版本为16。"
-            },
-            "1.1.0": {
-                "en": "Update xterm library\nPrepare for future js-controller versions",
-                "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",
-                "ru": "Обновление библиотеки xterm\nПодготовьтесь к будущим версиям js-controller",
-                "pt": "Atualizar biblioteca xterm\nPrepare-se para futuras versões js-controller",
-                "nl": "Update Xterm bibliotheek\nBereid je voor op toekomstige Js-controller versie",
-                "fr": "Mettre à jour la bibliothèque xterm\nPréparez-vous pour les versions futures de js-controller",
-                "it": "Aggiornare la libreria xterm\nPrepararsi per le future versioni js-controller",
-                "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
-                "pl": "Biblioteka xterma\nPrepare for future js-controller version",
-                "zh-cn": "更新图书馆\n今后防污版本的编制"
-            }
-        },
-        "titleLang": {
-            "en": "Shell console XTerm",
-            "de": "Shell-Konsole XTerm",
-            "ru": "Консоль shell XTerm",
-            "pt": "Console shell XTerm",
-            "nl": "Shell-console XTerm",
-            "fr": "Console coque XTerm",
-            "it": "Console shell XTerm",
-            "es": "Consola de Shell XTerm",
-            "pl": "Konsola powłoki XTerm",
-            "uk": "Консоль оболонки XTerm",
-            "zh-cn": "外壳控制台 XTerm"
-        },
-        "desc": {
-            "en": "This adapter allows to execute shell commands on ioBroker host.",
-            "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
-            "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
-            "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
-            "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
-            "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
-            "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
-            "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
-            "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
-            "uk": "Цей адаптер дозволяє виконувати команди оболонки на хості ioBroker.",
-            "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
-        },
-        "authors": ["ioBroker <dogafox@gmail.com>"],
-        "keywords": ["terminal", "ssh"],
-        "licenseInformation": {
-            "type": "free",
-            "license": "MIT"
-        },
-        "platform": "Javascript/Node.js",
-        "icon": "xterm.svg",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.svg",
-        "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
-        "loglevel": "info",
-        "mode": "daemon",
-        "type": "utility",
-        "compact": true,
-        "stopBeforeUpdate": true,
-        "localLinks": {
-            "_default": "%protocol%://%ip%:%port%"
-        },
-        "adminTab": {
-            "link": "%protocol%://%ip%:%port%"
-        },
-        "adminUI": {
-            "config": "json"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=6.0.11"
-            }
-        ],
-        "plugins": {
-            "sentry": {
-                "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
-            }
-        },
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.17"
-            }
-        ],
-        "connectionType": "local",
-        "dataSource": "none",
-        "tier": 2
+  "common": {
+    "name": "xterm",
+    "version": "4.0.1",
+    "news": {
+      "4.0.1": {
+        "en": "Adapter requires js-controller >= 6.0.11 now.\nDropped support of Node.js 20\nAdded SVG icon\nThe terminals now run on the server: they survive a reload or a lost connection and are restored with their content\nAdded the setting for the session timeout\nFixed the HTTPS mode: the adapter did not start the web server at all if `secure` was enabled\nFixed the shown client IP addresses in `info.connection`\nErrors of the web socket connection do not terminate the adapter anymore\nA shell that cannot be started is not restarted endlessly anymore\nAll shells are terminated now if the adapter stops\nFixed the double connections of the GUI after a connection timeout",
+        "de": "Adapter benötigt js-Controller >= 6.0.11 jetzt.\nUnterstützung für Node.js 20\nSVG-Icon hinzugefügt\nDie Terminals laufen jetzt auf dem Server: Sie überleben ein Reload oder eine verlorene Verbindung und werden mit ihren Inhalten wiederhergestellt\nDie Einstellung für das Session-Timeout hinzugefügt\nHTTPS-Modus behoben: Der Adapter hat den Webserver überhaupt nicht gestartet, wenn \"sicher\" aktiviert war\nFix der angezeigten Client-IP-Adressen in `info.connection`\nFehler der Web-Socket-Verbindung beenden den Adapter nicht mehr\nEine Shell, die nicht mehr gestartet werden kann, wird nicht mehr endlos neu gestartet\nAlle Schalen sind jetzt beendet, wenn der Adapter stoppt\nBehebung der Doppelverbindungen der GUI nach einem Verbindungs-Timeout",
+        "ru": "Адаптер требует js-контроллер >= 6.0.11 сейчас.\nОтказ от поддержки Node.js 20\nДобавлен значок SVG\nТерминалы теперь работают на сервере: они перезагружаются или теряют соединение и восстанавливаются с их содержимым\nДобавлена установка для тайм-аута сессии\nИсправлен режим HTTPS: адаптер вообще не запускал веб-сервер, если был включен «безопасный»\nИсправлены показанные IP-адреса клиентов в «info.connection»\nОшибки подключения веб-сокета больше не прерывают адаптер\nОболочка, которую нельзя запустить, больше не перезапускается бесконечно\nВсе оболочки прекращаются, если адаптер остановлен\nИсправлено двойное соединение GUI после тайм-аута соединения",
+        "pt": "O adaptador requer js-controlador >= 6.0.11 agora.\nApoio abandonado de Node.js 20\nÍcone SVG adicionado\nOs terminais agora são executados no servidor: eles sobrevivem a uma recarga ou uma conexão perdida e são restaurados com seu conteúdo\nAdicionada a configuração para o tempo- limite da sessão\nCorrigido o modo HTTPS: o adaptador não iniciou o servidor Web se 'secure' estiver activado\nCorrigido os endereços IP do cliente mostrados em `info.connection`\nErros da conexão do socket web não terminam mais o adaptador\nUma shell que não pode ser iniciada não é reiniciada infinitamente mais\nTodas as shells são terminadas agora se o adaptador parar\nCorrigido as conexões duplas da GUI após um tempo- limite de conexão",
+        "nl": "Voor de adapter is nu js-controller > 6.0.11 nodig.\nVervallen ondersteuning van Node.js 20\nSVG-pictogram toegevoegd\nDe terminals draaien nu op de server: ze overleven een herlading of een verloren verbinding en worden hersteld met hun inhoud\nDe instelling voor de sessie timeout toegevoegd\nDe HTTPS-modus is hersteld: de adapter startte de webserver helemaal niet als er een \"secure\" is ingeschakeld\nDe getoonde IP-adressen van clients zijn hersteld in \nFouten in de websocketverbinding beëindigen de adapter niet meer\nEen shell die niet kan worden gestart wordt niet meer eindeloos herstart\nAlle schelpen worden nu beëindigd als de adapter stopt\nDe dubbele verbindingen van de GUI hersteld na een timeout van de verbinding",
+        "fr": "Adaptateur nécessite js-controller >= 6.0.11 maintenant.\nSupport abandonné de Node.js 20\nAjout de l'icône SVG\nLes terminaux fonctionnent désormais sur le serveur : ils survivent à un rechargement ou à une connexion perdue et sont restaurés avec leur contenu\nAjout du paramètre pour le timeout de la session\nCorrection du mode HTTPS : l'adaptateur n'a pas du tout démarré le serveur web si `secure` était activé\nCorrection des adresses IP du client affichées dans `info.connection`\nLes erreurs de la connexion de socket web ne résilient plus l'adaptateur\nUn shell qui ne peut pas être démarré n'est plus redémarré sans fin\nToutes les coquilles sont terminées dès maintenant si l'adaptateur s'arrête\nCorrection des doubles connexions de l'interface graphique après un délai de connexion",
+        "it": "Adattatore richiede js-controller >= 6.0.11 ora.\nSupporto goccia di Node.js 20\nAggiunta icona SVG\nI terminali ora funzionano sul server: sopravvivono a un reload o a una connessione perduta e vengono ripristinati con il loro contenuto\nAggiunto l'impostazione per la sessione timeout\nRisolto il modo HTTPS: l'adattatore non ha avviato affatto il server web se `secure` è stato abilitato\nRisolto gli indirizzi IP del client mostrato in `info.connection`\nGli errori della connessione web socket non terminano più l'adattatore\nUn guscio che non può essere avviato non è più riavviato senza fine\nTutti i gusci sono terminati ora se l'adattatore si ferma\nRisolto i doppi collegamenti della GUI dopo un timeout di connessione",
+        "es": "Adaptador requiere js-controller >= 6.0.11 ahora.\nApoyo retirado de Node.js 20\nAñadido icono SVG\nLos terminales ahora funcionan en el servidor: sobreviven una recarga o una conexión perdida y se restauran con su contenido\nAñadido el ajuste para el período de sesiones\nArreglado el modo HTTPS: el adaptador no inició el servidor web en absoluto si se ha habilitado `segura'\nArreglado las direcciones IP del cliente mostrado en `info.connection`\nLos errores de la conexión de toma web ya no terminan el adaptador\nUna cáscara que no se puede iniciar ya no se reinicia sin fin\nTodas las conchas se terminan ahora si el adaptador se detiene\nArreglado las dobles conexiones del GUI después de un tiempo de conexión",
+        "pl": "Adapter wymaga sterownika js- > = 6.0.11 teraz.\nUpuszczone wsparcie Node.js 20\nDodano ikonę SVG\nTerminale działają teraz na serwerze: przeżywają przeładowanie lub utracone połączenie i są przywracane z ich treścią\nDodano ustawienie timeout sesji\nNaprawiono tryb HTTPS: adapter w ogóle nie uruchomił serwera WWW, jeśli 'bezpieczne' było włączone\nNaprawiono wyświetlane adresy IP klienta w 'info.connection'\nBłędy połączenia gniazda WWW nie wyłączają już adaptera\nPowłoka, która nie może być uruchomiona, nie jest już wiecznie uruchamiana\nWszystkie pociski zostaną zakończone, jeśli adapter przestanie działać\nNaprawiono podwójne połączenia GUI po przerwie czasu połączenia",
+        "uk": "Адаптер вимагає js-controller >=6.0.11 тепер.\nПокрадена підтримка Node.js 20\nДодано іконку SVG\nТермінали тепер працюють на сервері: вони виживають перевантаження або втрачене з'єднання і реставруються з їх вмістом\nДодано налаштування часу сеансу\nВиправлено режим HTTPS: адаптер не запустив веб-сервер на всіх, якщо ввімкнено `secure`\nВиправлено відображення IP-адреси клієнта в `info.connection`\nПомилки підключення веб-роз'єму не розірвати адаптера\nНе перезавантажити безкінечно\nУсі оболонки припиняються зараз, якщо адаптер припиняється\nВиправлено подвійні з'єднання GUI після підключення",
+        "zh-cn": "适配器需要js控制器 >= 6.0.11 现在.\n已放弃的节点支持 20\n添加了 SVG 图标\n终端现在运行在服务器上:它们在重新装入或丢失的连接中幸存下来,并随内容而恢复\n添加会话超时设置\n固定 HTTPS 模式: 如果启用“ 安全” , 适配器根本没有启动网络服务器\n固定“ info. connection”中显示的客户端 IP 地址\nWeb 套接字连接错误不再终止适配器\n无法启动的 shell 不再无休止地重启\n如果适配器停止,所有贝壳现在都终止了\n连接超时后修复图形界面的双连接"
+      },
+      "3.0.2": {
+        "en": "Added the icon in the GUI\nAdded possibility to run under specified user on Linux",
+        "de": "Das Icon in der GUI hinzugefügt\nZusätzliche Möglichkeit, unter bestimmten Benutzer auf Linux laufen",
+        "ru": "Добавлена иконка в GUI\nДобавлена возможность запуска под указанным пользователем на Linux",
+        "pt": "Adicionado o ícone na interface gráfica\nAdicionada possibilidade de execução sob o usuário especificado no Linux",
+        "nl": "Het pictogram in de GUI toegevoegd\nToegevoegde mogelijkheid om te draaien onder opgegeven gebruiker op Linux",
+        "fr": "Ajout de l'icône dans l'interface graphique\nAjout de la possibilité d'exécuter sous l'utilisateur spécifié sur Linux",
+        "it": "Aggiunto l'icona nella GUI\nAggiunta possibilità di eseguire sotto utente specificato su Linux",
+        "es": "Añadido el icono en el GUI\nPosibilidad de ejecutar bajo el usuario especificado en Linux",
+        "pl": "Dodano ikonę w GUI\nDodano możliwość uruchomienia pod określonym użytkownikiem na Linuksie",
+        "uk": "Додано іконку в GUI\nДодано можливість запуску за вказаною користувачем на Linux",
+        "zh-cn": "在图形界面中添加图标\n添加在 Linux 上指定用户下运行的可能性"
+      },
+      "3.0.1": {
+        "en": "Added the icon in the GUI",
+        "de": "Das Icon in der GUI hinzugefügt",
+        "ru": "Добавлена иконка в GUI",
+        "pt": "Adicionado o ícone na interface gráfica",
+        "nl": "Het pictogram in de GUI toegevoegd",
+        "fr": "Ajout de l'icône dans l'interface graphique",
+        "it": "Aggiunto l'icona nella GUI",
+        "es": "Añadido el icono en el GUI",
+        "pl": "Dodano ikonę w GUI",
+        "uk": "Додано іконку в GUI",
+        "zh-cn": "在图形界面中添加图标"
+      },
+      "3.0.0": {
+        "en": "Migrated the adapter to Typescript\nAdded multiple terminal sessions",
+        "de": "Den Adapter zu Typescript migrieren\nMehrere Terminalsitzungen hinzugefügt",
+        "ru": "Перенес адаптер на Typescript\nДобавлено несколько терминальных сеансов",
+        "pt": "Migrar o adaptador para escrever\nAdicionadas várias sessões de terminal",
+        "nl": "De adapter migreren naar Typescript\nMeerdere terminalsessies toegevoegd",
+        "fr": "Migré l'adaptateur vers Typescript\nAjout de plusieurs sessions de terminal",
+        "it": "Migrato l'adattatore a Typescript\nAggiunto più sessioni terminali",
+        "es": "Migraron el adaptador a Tiposcript\nSesiones terminales múltiples",
+        "pl": "Przekierowany adapter do Typescript\nDodano wiele sesji terminali",
+        "uk": "Переміграний адаптер до Typescript\nДодано кілька терміналів",
+        "zh-cn": "将适配器移到 Typescript\n添加多个终端会话"
+      },
+      "2.0.1": {
+        "en": "xterm library updated\nMove Lets encrypt settings to acme adapter\nMinimal supported node.js version is 16",
+        "de": "xterm library aktualisiert\nVerschieben Lassen Sie die Einstellungen zu einemcme Adapter verschlüsseln\nMinimal unterstützt node.js version is 16",
+        "ru": "обновлена библиотека xterm\nMove Lets зашифровать настройки в acme адаптер\nМинимальная поддерживаемая версия node.js 16",
+        "pt": "biblioteca xterm atualizado\nMover Permite criptografar configurações para o adaptador acme\nNode.js com suporte mínimo é 16",
+        "nl": "xterm bibliotheek update\nVerplaats Lets encrypt setting om acme adapter te maken\nMinimale ondersteunde node",
+        "fr": "xterm library updated\nDéplacer permet de chiffrer les paramètres à l'adaptateur acme\nVersion node.js supportée Minimal est 16",
+        "it": "xterm library aggiornato\nSposta Consente di crittografare le impostazioni all'adattatore acme\nMinimal supportato node.js versione è 16",
+        "es": "xterm library updated\nMover Permite encriptar los ajustes para el adaptador de acme\nMinimal soportado node.js versión es 16",
+        "pl": "biblioteki xterm\nMove Lets encrypts adapter to acme adapter\nMinimal supportowana wersja węzła wynosi 16",
+        "uk": "русскийукраїнськабеларускаяoʻzbek tilienglish\nПеремістити налаштування шифрування до адаптера Acme\nMinimal підтримуваний node.js версія 16",
+        "zh-cn": "更新图书馆\n让加密环境适应者\n米切尔支持不dejs版本为16。"
+      },
+      "1.1.0": {
+        "en": "Update xterm library\nPrepare for future js-controller versions",
+        "de": "Xterm Bibliothek aktualisieren\nBereiten Sie sich auf zukünftige js-Controller-Versionen",
+        "ru": "Обновление библиотеки xterm\nПодготовьтесь к будущим версиям js-controller",
+        "pt": "Atualizar biblioteca xterm\nPrepare-se para futuras versões js-controller",
+        "nl": "Update Xterm bibliotheek\nBereid je voor op toekomstige Js-controller versie",
+        "fr": "Mettre à jour la bibliothèque xterm\nPréparez-vous pour les versions futures de js-controller",
+        "it": "Aggiornare la libreria xterm\nPrepararsi per le future versioni js-controller",
+        "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
+        "pl": "Biblioteka xterma\nPrepare for future js-controller version",
+        "zh-cn": "更新图书馆\n今后防污版本的编制"
+      }
     },
-    "native": {
-        "bind": "0.0.0.0",
-        "port": "8099",
-        "secure": false,
-        "auth": true,
-        "authType": "basic",
-        "cwd": "",
-        "shellUser": "",
-        "sessionTimeout": 5
+    "titleLang": {
+      "en": "Shell console XTerm",
+      "de": "Shell-Konsole XTerm",
+      "ru": "Консоль shell XTerm",
+      "pt": "Console shell XTerm",
+      "nl": "Shell-console XTerm",
+      "fr": "Console coque XTerm",
+      "it": "Console shell XTerm",
+      "es": "Consola de Shell XTerm",
+      "pl": "Konsola powłoki XTerm",
+      "uk": "Консоль оболонки XTerm",
+      "zh-cn": "外壳控制台 XTerm"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Number or connected clients",
-                "type": "string",
-                "read": true,
-                "write": false,
-                "def": ""
-            },
-            "native": {}
-        }
-    ]
+    "desc": {
+      "en": "This adapter allows to execute shell commands on ioBroker host.",
+      "de": "Dieser Adapter ermöglicht die Ausführung von Shell-Befehlen auf dem ioBroker-Host.",
+      "ru": "Этот адаптер позволяет выполнять команды оболочки на хосте ioBroker.",
+      "pt": "Este adaptador permite executar comandos shell no host ioBroker.",
+      "nl": "Met deze adapter kunnen shell-opdrachten op de ioBroker-host worden uitgevoerd.",
+      "fr": "Cet adaptateur permet d'exécuter des commandes shell sur l'hôte ioBroker.",
+      "it": "Questo adattatore permette di eseguire comandi shell sull'host ioBroker.",
+      "es": "Este adaptador permite ejecutar comandos de shell en el host ioBroker.",
+      "pl": "Ten adapter umożliwia wykonywanie poleceń powłoki na hoście ioBroker.",
+      "uk": "Цей адаптер дозволяє виконувати команди оболонки на хості ioBroker.",
+      "zh-cn": "该适配器允许在 ioBroker 主机上执行 shell 命令。"
+    },
+    "authors": [
+      "ioBroker <dogafox@gmail.com>"
+    ],
+    "keywords": [
+      "terminal",
+      "ssh"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "xterm.svg",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.xterm/master/admin/xterm.svg",
+    "readme": "https://github.com/ioBroker/ioBroker.xterm/blob/master/README.md",
+    "loglevel": "info",
+    "mode": "daemon",
+    "type": "utility",
+    "compact": true,
+    "stopBeforeUpdate": true,
+    "localLinks": {
+      "_default": "%protocol%://%ip%:%port%"
+    },
+    "adminTab": {
+      "link": "%protocol%://%ip%:%port%"
+    },
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "plugins": {
+      "sentry": {
+        "dsn": "https://3d1d14076f5f473c8bc469c74417d141@sentry.iobroker.net/146"
+      }
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
+    ],
+    "connectionType": "local",
+    "dataSource": "none",
+    "tier": 2
+  },
+  "native": {
+    "bind": "0.0.0.0",
+    "port": "8099",
+    "secure": false,
+    "auth": true,
+    "authType": "basic",
+    "cwd": "",
+    "shellUser": "",
+    "sessionTimeout": 5
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Number or connected clients",
+        "type": "string",
+        "read": true,
+        "write": false,
+        "def": ""
+      },
+      "native": {}
+    }
+  ]
 }

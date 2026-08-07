@@ -1,15 +1,17 @@
-import { Adapter, type AdapterOptions, EXIT_CODES, getAbsoluteDefaultDataDir } from '@iobroker/adapter-core';
-import { WebServer as IoBWebServer } from '@iobroker/webserver';
 import path from 'node:path';
 import os from 'node:os';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import express from 'express';
-import { WebSocketServer, type WebSocket } from 'ws';
-import * as pty from 'node-pty';
 import type { Socket, AddressInfo } from 'node:net';
 import type { IncomingMessage, Server as HttpServer } from 'node:http';
 import type { Server as HttpsServer } from 'node:https';
+
+import express from 'express';
+import { WebSocketServer, type WebSocket } from 'ws';
+import * as pty from 'node-pty';
+
+import { Adapter, type AdapterOptions, EXIT_CODES, getAbsoluteDefaultDataDir } from '@iobroker/adapter-core';
+import { WebServer as IoBWebServer } from '@iobroker/webserver';
 
 import type { XtermAdapterConfig } from './types';
 

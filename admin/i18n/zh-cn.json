@@ -1,5 +1,5 @@
 {
-    "Authentication": "认证机制",
+    "Authentication": "验证",
     "Authentication type": "认证类型",
     "Chained certificate": "链式证书",
     "Disable authentication": "禁用身份验证",

@@ -59,7 +59,7 @@ of the used resources, so another instance does not get configured to the same p
 -->
 
 ## Changelog
-### **WORK IN PROGRESS**
+### 4.0.2 (2026-10-14)
 * (@GermanBluefox) Admin 7.6.20+ is required. Compact mode no longer can exit the whole host process. The tests run on Windows and macOS too
 * (@GermanBluefox) Added HTTP/2 (with HTTP/1.1 fallback) for HTTPS, can be switched off with the option "Use HTTP/2"
 * (@GermanBluefox) The used port is reported to js-controller 8+
@@ -92,10 +92,6 @@ of the used resources, so another instance does not get configured to the same p
 * (bluefox) xterm library updated
 * (bluefox) Move Lets encrypt settings to acme adapter
 * (bluefox) Minimal supported node.js version is 16
-
-### 1.1.0 (2022-10-08)
-* (Apollon77) Updated the xterm library
-* (Apollon77) Prepared for future js-controller versions
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

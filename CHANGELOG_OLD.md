@@ -1,4 +1,8 @@
 # Older changes
+## 1.1.0 (2022-10-08)
+* (Apollon77) Updated the xterm library
+* (Apollon77) Prepared for future js-controller versions
+
 ## 1.0.0 (2022-08-29)
 * (bluefox) Check only port of the interface and not of all interfaces
 

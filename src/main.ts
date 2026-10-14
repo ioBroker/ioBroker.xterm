@@ -125,7 +125,7 @@ document.getElementById("loginForm").addEventListener("submit",function(e){
 e.preventDefault();
 var err=document.getElementById("error"),btn=document.getElementById("submitBtn");
 err.style.display="none";btn.disabled=true;btn.textContent="Logging in\\u2026";
-fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value})}).then(function(r){if(r.ok){window.location.href="/"}else{return r.json().then(function(d){err.textContent=d.error||"Login failed";err.style.display="block"})}}).catch(function(){err.textContent="Connection error";err.style.display="block"}).finally(function(){btn.disabled=false;btn.textContent="Login"});
+fetch("api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value})}).then(function(r){if(r.ok){window.location.href="./"}else{return r.json().then(function(d){err.textContent=d.error||"Login failed";err.style.display="block"})}}).catch(function(){err.textContent="Connection error";err.style.display="block"}).finally(function(){btn.disabled=false;btn.textContent="Login"});
 });
 </script>
 </body>
@@ -141,6 +141,8 @@ const MAX_SHELL_RESTARTS = 5;
 const REPLAY_BUFFER_SIZE = 100000;
 /** Used if the configured session timeout is invalid */
 const DEFAULT_SESSION_TIMEOUT_MIN = 5;
+/** How long a checked login of admin is reused, so not every file of the page reads the session again */
+const ADMIN_SESSION_CACHE_MS = 10000;
 
 function findIoBrokerDirectory(): string {
     const dir = getAbsoluteDefaultDataDir().replace(/\\/g, '/');
@@ -160,6 +162,7 @@ class XtermAdapter extends Adapter {
     private bruteForce: Record<string, BruteForceEntry> = {};
     private IOB_DIR: string = findIoBrokerDirectory();
     private cache: AuthCache | null = null;
+    private adminSessionCache: { token: string; ts: number; valid: boolean } | null = null;
     private sessionSecret: string = crypto.randomBytes(32).toString('hex');
 
     public constructor(options: Partial<AdapterOptions> = {}) {
@@ -366,6 +369,89 @@ class XtermAdapter extends Adapter {
 
             callback(result);
         });
+    }
+
+    /**
+     * True if the request carries the login of an administrator in ioBroker admin.
+     *
+     * Opened through the proxy of admin (`/proxy/xterm.0/`), the browser sends the `access_token` cookie of admin
+     * along, and the terminal opens without a second login. The session is read from the states DB, so the token
+     * cannot be forged. A token that admin issued to an OAuth client for a certain resource (`aud`), e.g., to an
+     * MCP client, does not count.
+     */
+    private async verifyAdminSession(req: IncomingMessage): Promise<boolean> {
+        if (this.config.adminSession === false) {
+            return false;
+        }
+        const token = parseCookies(req.headers.cookie).access_token;
+        if (!token) {
+            return false;
+        }
+        if (
+            this.adminSessionCache?.token === token &&
+            Date.now() - this.adminSessionCache.ts < ADMIN_SESSION_CACHE_MS
+        ) {
+            return this.adminSessionCache.valid;
+        }
+
+        let valid = false;
+        try {
+            const session = await new Promise<Record<string, any> | null>(resolve =>
+                this.getSession(`a:${token}`, obj => resolve((obj as Record<string, any>) || null)),
+            );
+            if (session?.user && !session.aud && !session.clientId && session.aExp > Date.now()) {
+                const user: string = session.user.startsWith('system.user.')
+                    ? session.user
+                    : `system.user.${session.user}`;
+                const group = await this.getForeignObjectAsync('system.group.administrator');
+                valid = !!group?.common?.members?.includes(user as ioBroker.ObjectIDs.User);
+                if (!valid) {
+                    this.log.warn(`${user} is logged in to admin, but is not an administrator`);
+                }
+            }
+        } catch (err) {
+            this.log.debug(`Cannot check the session of admin: ${err as Error}`);
+        }
+
+        this.adminSessionCache = { token, ts: Date.now(), valid };
+        return valid;
+    }
+
+    /** Check the credentials of a web socket connection and hand it over to the web socket server */
+    private async handleUpgrade(
+        serverObj: WebServerInstance,
+        request: IncomingMessage,
+        socket: Socket & { ___auth?: boolean },
+        head: Buffer,
+    ): Promise<void> {
+        const accept = (): void => {
+            socket.___auth = true;
+            serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
+                serverObj.io!.emit('connection', ws, request),
+            );
+        };
+
+        if (!this.config.auth || (await this.verifyAdminSession(request))) {
+            accept();
+        } else if (this.config.authType === 'digest') {
+            // Digest auth: verify session cookie
+            if (this.verifySessionCookie(request)) {
+                accept();
+            } else {
+                this.log.error('WebSocket: invalid or missing session');
+                socket.destroy();
+            }
+        } else {
+            // Basic auth
+            this.auth(request, result => {
+                if (result) {
+                    accept();
+                } else {
+                    this.log.error('Cannot establish socket connection as no credentials found!');
+                    socket.destroy();
+                }
+            });
+        }
     }
 
     private verifySessionCookie(req: IncomingMessage): boolean {
@@ -796,6 +882,16 @@ class XtermAdapter extends Adapter {
 
                 serverObj.app = express();
 
+                if (this.config.auth) {
+                    // The login of admin is accepted in front of the own login of xterm
+                    serverObj.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+                        void this.verifyAdminSession(req).then(valid => {
+                            res.locals.adminSession = valid;
+                            next();
+                        });
+                    });
+                }
+
                 if (this.config.auth && this.config.authType === 'digest') {
                     // Digest auth mode: session-based auth with login page
                     serverObj.app.use('/api', express.json());
@@ -851,7 +947,7 @@ class XtermAdapter extends Adapter {
 
                     // Session check middleware
                     serverObj.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-                        if (this.verifySessionCookie(req)) {
+                        if (res.locals.adminSession || this.verifySessionCookie(req)) {
                             return next();
                         }
                         if (req.path.startsWith('/api/')) {
@@ -863,6 +959,9 @@ class XtermAdapter extends Adapter {
                 } else if (this.config.auth) {
                     // Basic auth mode
                     serverObj.app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+                        if (res.locals.adminSession) {
+                            return next();
+                        }
                         this.auth(req, (result, text) => {
                             if (result) {
                                 next();
@@ -936,38 +1035,7 @@ class XtermAdapter extends Adapter {
                     // A socket that fails during the handshake must not crash the adapter
                     socket.on('error', (err: Error) => this.log.debug(`Upgrade socket error: ${err.message}`));
 
-                    if (this.config.auth) {
-                        if (this.config.authType === 'digest') {
-                            // Digest auth: verify session cookie
-                            const authenticated = this.verifySessionCookie(request);
-                            socket.___auth = authenticated;
-                            if (authenticated) {
-                                serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
-                                    serverObj.io!.emit('connection', ws, request),
-                                );
-                            } else {
-                                this.log.error('WebSocket: invalid or missing session');
-                                socket.destroy();
-                            }
-                        } else {
-                            // Basic auth
-                            this.auth(request, result => {
-                                socket.___auth = result;
-                                if (result) {
-                                    serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
-                                        serverObj.io!.emit('connection', ws, request),
-                                    );
-                                } else {
-                                    this.log.error('Cannot establish socket connection as no credentials found!');
-                                    socket.destroy();
-                                }
-                            });
-                        }
-                    } else {
-                        serverObj.io!.handleUpgrade(request, socket, head, (ws: WebSocket) =>
-                            serverObj.io!.emit('connection', ws, request),
-                        );
-                    }
+                    void this.handleUpgrade(serverObj, request, socket, head);
                 });
 
                 serverObj.io = new WebSocketServer({ noServer: true });

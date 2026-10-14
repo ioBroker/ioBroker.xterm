@@ -28,5 +28,7 @@
     "http2_hint": "Przeglądarki ładują strony przez jedno połączenie z wieloma równoległymi żądaniami. Klienci bez HTTP/2 automatycznie korzystają z HTTP/1.1",
     "session_timeout_help": "Jak długo terminal działa dalej, jeśli przeglądarka utraci połączenie (w minutach). 0 = zakończ natychmiast",
     "/home/iobroker": "/home/iobroker",
-    "root": "root"
+    "root": "root",
+    "Accept the login of admin": "Akceptuj logowanie do admin",
+    "admin_session_help": "Otwarty jako karta w admin, terminal uruchamia się bez ponownego logowania, jeśli jesteś zalogowany do admin jako administrator"
 }

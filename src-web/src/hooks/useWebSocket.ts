@@ -67,9 +67,13 @@ export function useWebSocket({ onMessage, onConnected }: UseWebSocketOptions): {
                             return;
                         }
 
-                        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                        // `host` already contains the port (if it is not the default one)
-                        const ws = new WebSocket(`${protocol}//${window.location.host}`);
+                        // Relative to the page, so it also works below a path, e.g. through the proxy of
+                        // admin (`/proxy/xterm.0/`). The server accepts the web socket on every path.
+                        const url = new URL('ws', window.location.href);
+                        url.protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                        url.search = '';
+                        url.hash = '';
+                        const ws = new WebSocket(url.href);
                         socket = ws;
 
                         if (connectingTimeout) {

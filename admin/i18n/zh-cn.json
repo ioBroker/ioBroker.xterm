@@ -28,5 +28,7 @@
     "http2_hint": "浏览器通过单个连接并行发送多个请求来加载页面。不支持 HTTP/2 的客户端会自动回退到 HTTP/1.1",
     "session_timeout_help": "浏览器断开连接后终端继续运行的时间（分钟）。0 = 立即终止",
     "/home/iobroker": "/home/iobroker",
-    "root": "root"
+    "root": "root",
+    "Accept the login of admin": "接受 admin 的登录",
+    "admin_session_help": "在 admin 中作为标签页打开时，如果您以管理员身份登录 admin，终端无需再次登录即可启动"
 }

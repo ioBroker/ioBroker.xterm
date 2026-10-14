@@ -28,5 +28,7 @@
     "http2_hint": "Browser laden die Seiten über eine einzige Verbindung mit vielen parallelen Anfragen. Clients ohne HTTP/2 fallen automatisch auf HTTP/1.1 zurück",
     "session_timeout_help": "Wie lange ein Terminal weiterläuft, wenn der Browser die Verbindung verliert (in Minuten). 0 = sofort beenden",
     "/home/iobroker": "/home/iobroker",
-    "root": "root"
+    "root": "root",
+    "Accept the login of admin": "Anmeldung von Admin akzeptieren",
+    "admin_session_help": "Als Tab in Admin geöffnet, startet das Terminal ohne zweite Anmeldung, wenn Sie in Admin als Administrator angemeldet sind"
 }

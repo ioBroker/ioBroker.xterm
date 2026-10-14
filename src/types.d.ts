@@ -6,6 +6,8 @@ export interface XtermAdapterConfig {
     http2?: boolean;
     auth: boolean;
     authType: 'basic' | 'digest';
+    /** Accept the login of an administrator in ioBroker admin instead of the own login (default: true) */
+    adminSession?: boolean;
     cwd: string;
     shellUser: string;
     /** How long a terminal keeps running after the browser disconnected (in minutes, 0 = terminate immediately) */

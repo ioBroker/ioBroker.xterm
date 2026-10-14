@@ -83,6 +83,19 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "adminSession": {
+                    "newLine": true,
+                    "type": "checkbox",
+                    "label": "Accept the login of admin",
+                    "help": "admin_session_help",
+                    "default": true,
+                    "hidden": "!data.auth",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "cwd": {
                     "newLine": true,
                     "type": "text",

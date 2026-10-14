@@ -21,6 +21,9 @@ Based on xterm.js and node-pty packages.
 
 If the authentication is enabled, only ioBroker "admin" user can log in.
 
+With admin newer than 8.2.0, the tab in admin runs through the port of admin (`/proxy/xterm.0/`), so the port of xterm does not have to be reachable from the browser.
+If you are logged in to admin as an administrator, the terminal opens without a second login (option "Accept the login of admin").
+
 ## Usage
 The adapter starts cmd.exe (Windows) or bash (Linux) via a real pseudo-terminal (node-pty).
 On Linux, bash runs under the `iobroker` user — you can switch to another user with more privileges via `su USER`.
@@ -59,6 +62,9 @@ of the used resources, so another instance does not get configured to the same p
 -->
 
 ## Changelog
+### **WORK IN PROGRESS**
+* (@GermanBluefox) The tab in admin runs through the port of admin, the login of admin is accepted
+
 ### 4.0.2 (2026-10-14)
 * (@GermanBluefox) Admin 7.6.20+ is required. Compact mode no longer can exit the whole host process. The tests run on Windows and macOS too
 * (@GermanBluefox) Added HTTP/2 (with HTTP/1.1 fallback) for HTTPS, can be switched off with the option "Use HTTP/2"

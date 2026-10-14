@@ -146,7 +146,8 @@
       "_default": "%protocol%://%ip%:%port%"
     },
     "adminTab": {
-      "link": "%protocol%://%ip%:%port%"
+      "link": "%protocol%://%ip%:%port%",
+      "proxy": true
     },
     "adminUI": {
       "config": "json"
@@ -163,7 +164,7 @@
     },
     "globalDependencies": [
       {
-        "admin": ">=7.6.20"
+        "admin": ">=8.2.1"
       }
     ],
     "declareUsedResources": true,
@@ -179,6 +180,7 @@
     "http2": true,
     "auth": true,
     "authType": "basic",
+    "adminSession": true,
     "cwd": "",
     "shellUser": "",
     "sessionTimeout": 5

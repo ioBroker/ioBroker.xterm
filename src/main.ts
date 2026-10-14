@@ -218,9 +218,36 @@ class XtermAdapter extends Adapter {
             await this.setObjectAsync(obj._id, obj);
         }
 
+        this.makeSpawnHelperExecutable();
+
         await this.setStateChangedAsync('info.connection', '', true);
         this.server = this.initWebServer(this.config);
         await this.setStateChangedAsync('info.connection', 'none', true);
+    }
+
+    /**
+     * On macOS node-pty starts every shell through its prebuilt `spawn-helper`. npm unpacks it without
+     * the execute bit, so every shell would fail with "posix_spawnp failed".
+     */
+    private makeSpawnHelperExecutable(): void {
+        if (process.platform !== 'darwin') {
+            return;
+        }
+        try {
+            const ptyDir = path.dirname(require.resolve('node-pty/package.json'));
+            for (const dir of [path.join('prebuilds', `darwin-${process.arch}`), path.join('build', 'Release')]) {
+                const helper = path.join(ptyDir, dir, 'spawn-helper');
+                if (fs.existsSync(helper)) {
+                    const mode = fs.statSync(helper).mode;
+                    if ((mode & 0o111) !== 0o111) {
+                        fs.chmodSync(helper, mode | 0o755);
+                        this.log.debug(`Made ${helper} executable`);
+                    }
+                }
+            }
+        } catch (err) {
+            this.log.warn(`Cannot make the spawn-helper of node-pty executable: ${err as Error}`);
+        }
     }
 
     private createSessionToken(username: string): string {

@@ -63,6 +63,7 @@ of the used resources, so another instance does not get configured to the same p
 * (@GermanBluefox) Admin 7.6.20+ is required. Compact mode no longer can exit the whole host process. The tests run on Windows and macOS too
 * (@GermanBluefox) Added HTTP/2 (with HTTP/1.1 fallback) for HTTPS, can be switched off with the option "Use HTTP/2"
 * (@GermanBluefox) The used port is reported to js-controller 8+
+* (@GermanBluefox) macOS: the shells could not start, because the `spawn-helper` of node-pty was not executable
 
 ### 4.0.1 (2026-08-07)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.

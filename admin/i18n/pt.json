@@ -24,5 +24,9 @@
     "Warning!": "Aviso!",
     "auth_type_basic": "Basic (diálogo do navegador)",
     "auth_type_digest": "Digest (página de login)",
-    "session_timeout_help": "Por quanto tempo um terminal continua em execução se o navegador perder a conexão (em minutos). 0 = encerrar imediatamente"
+    "http2": "Usar HTTP/2",
+    "http2_hint": "Os navegadores carregam as páginas por uma única conexão com muitas solicitações paralelas. Clientes sem HTTP/2 usam automaticamente o HTTP/1.1",
+    "session_timeout_help": "Por quanto tempo um terminal continua em execução se o navegador perder a conexão (em minutos). 0 = encerrar imediatamente",
+    "/home/iobroker": "/home/iobroker",
+    "root": "root"
 }

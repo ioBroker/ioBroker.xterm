@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import type { Socket, AddressInfo } from 'node:net';
 import type { IncomingMessage, Server as HttpServer } from 'node:http';
 import type { Server as HttpsServer } from 'node:https';
+import type { Http2SecureServer } from 'node:http2';
 
 import express from 'express';
 import { WebSocketServer, type WebSocket } from 'ws';
@@ -51,7 +52,7 @@ interface XtermWebSocket extends WebSocket {
 
 interface WebServerInstance {
     app: express.Express | null;
-    server: HttpServer | HttpsServer | null;
+    server: HttpServer | HttpsServer | Http2SecureServer | null;
     io: WebSocketServer | null;
     settings: XtermAdapterConfig;
 }
@@ -748,11 +749,7 @@ class XtermAdapter extends Adapter {
 
         if (!settings.port) {
             this.log.error('port missing');
-            if (this.terminate) {
-                this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-            } else {
-                process.exit(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-            }
+            this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
             return null;
         }
 
@@ -764,11 +761,7 @@ class XtermAdapter extends Adapter {
             async (port: number) => {
                 if (port !== settings.port && !this.config.findNextPort) {
                     this.log.error(`port ${settings.port} already in use`);
-                    if (this.terminate) {
-                        this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                    } else {
-                        process.exit(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                    }
+                    this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
                     return;
                 }
 
@@ -868,25 +861,22 @@ class XtermAdapter extends Adapter {
                         app: serverObj.app,
                         adapter: this,
                         secure: settings.secure,
+                        // HTTP/2 with HTTP/1.1 fallback, only if secure. Instances created before this option
+                        // existed have no value, and it is on by default, so only an explicit `false` switches it off
+                        http2: settings.http2 !== false,
                     });
+                    // The web server also reports the port it really listens on (with `findNextPort` it can differ
+                    // from `native.port`) to the used resources of js-controller 8+ (`common.declareUsedResources`)
                     serverObj.server = await webserver.init();
                 } catch (err) {
                     this.log.error(`Cannot create webserver: ${err}`);
-                    if (this.terminate) {
-                        this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                    } else {
-                        process.exit(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                    }
+                    this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
                     return;
                 }
 
                 if (!serverObj.server) {
                     this.log.error('Cannot create webserver');
-                    if (this.terminate) {
-                        this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                    } else {
-                        process.exit(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                    }
+                    this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
                     return;
                 }
 
@@ -902,11 +892,7 @@ class XtermAdapter extends Adapter {
                         this.log.error(`Cannot start server on ${settings.bind || '0.0.0.0'}:${port}: ${e}`);
                     }
                     if (!serverListening) {
-                        if (this.terminate) {
-                            this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                        } else {
-                            process.exit(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
-                        }
+                        this.terminate(EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
                     }
                 });
 

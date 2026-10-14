@@ -10,26 +10,44 @@
                     "type": "ip",
                     "listenOnAllPorts": true,
                     "label": "IP",
+                    "xs": 12,
                     "sm": 12,
                     "md": 8,
-                    "lg": 5
+                    "lg": 5,
+                    "xl": 5
                 },
                 "port": {
                     "type": "number",
                     "min": 1,
                     "max": 65565,
                     "label": "Port",
+                    "xs": 12,
                     "sm": 12,
                     "md": 4,
-                    "lg": 3
+                    "lg": 3,
+                    "xl": 3
                 },
                 "secure": {
                     "newLine": true,
                     "type": "checkbox",
                     "label": "Secure(HTTPS)",
+                    "xs": 12,
                     "sm": 12,
                     "md": 6,
-                    "lg": 2
+                    "lg": 2,
+                    "xl": 2
+                },
+                "http2": {
+                    "type": "checkbox",
+                    "label": "http2",
+                    "help": "http2_hint",
+                    "default": true,
+                    "hidden": "!data.secure",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "auth": {
                     "newLine": true,
@@ -44,9 +62,11 @@
                         "alsoDependsOn": ["secure"]
                     },
                     "label": "Authentication",
+                    "xs": 12,
                     "sm": 12,
                     "md": 6,
-                    "lg": 2
+                    "lg": 2,
+                    "xl": 2
                 },
                 "authType": {
                     "type": "select",
@@ -57,9 +77,11 @@
                     ],
                     "default": "basic",
                     "hidden": "!data.auth",
+                    "xs": 12,
                     "sm": 12,
                     "md": 6,
-                    "lg": 4
+                    "lg": 4,
+                    "xl": 4
                 },
                 "cwd": {
                     "newLine": true,
@@ -67,9 +89,11 @@
                     "label": "Start directory",
                     "help": "Leave empty to use the ioBroker directory",
                     "placeholder": "/home/iobroker",
+                    "xs": 12,
                     "sm": 12,
                     "md": 8,
-                    "lg": 6
+                    "lg": 6,
+                    "xl": 6
                 },
                 "shellUser": {
                     "newLine": true,
@@ -77,9 +101,11 @@
                     "label": "Shell user",
                     "help": "Leave empty to use the ioBroker process user",
                     "placeholder": "root",
+                    "xs": 12,
                     "sm": 12,
                     "md": 8,
-                    "lg": 6
+                    "lg": 6,
+                    "xl": 6
                 },
                 "sessionTimeout": {
                     "newLine": true,
@@ -89,9 +115,11 @@
                     "label": "Session timeout",
                     "help": "session_timeout_help",
                     "default": 5,
+                    "xs": 12,
                     "sm": 12,
                     "md": 8,
-                    "lg": 6
+                    "lg": 6,
+                    "xl": 6
                 }
             }
         },
@@ -108,11 +136,21 @@
                     "style": {
                         "width": 200,
                         "height": 59
-                    }
+                    },
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "_staticText": {
                     "type": "staticText",
-                    "text": "ra_Use iobroker.acme adapter for letsencrypt certificates"
+                    "text": "ra_Use iobroker.acme adapter for letsencrypt certificates",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 }
             }
         }

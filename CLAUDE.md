@@ -63,7 +63,7 @@ There is no root `build:web` / `dev:web` script. To develop the UI live, run the
 - `src-web/src/theme.ts` — xterm.js dark theme constant
 - `src-web/src/types.ts` — Protocol message types
 - `src-web/vite.config.ts` — Vite build config (root: `src-web/`, output: `../public`)
-- `admin/jsonConfig.json` — Admin config UI schema (bind, port, secure, auth, authType, cwd, shellUser, sessionTimeout)
+- `admin/jsonConfig.json` — Admin config UI schema (bind, port, secure, http2, auth, authType, cwd, shellUser, sessionTimeout)
 
 ## TypeScript
 
@@ -85,7 +85,9 @@ Tests are plain JS files in `test/` and run with Mocha:
 
 - Adapter lifecycle: `onReady()` initializes the web server, `onUnload()` tears it down
 - Connection state tracked via the `info.connection` ioBroker state (holds the comma-separated list of connected client IPs, or `none`)
-- Config defined in `io-package.json` under `native` (bind, port, secure, auth, authType, cwd, shellUser, sessionTimeout) and surfaced in the admin UI via `admin/jsonConfig.json`
+- Config defined in `io-package.json` under `native` (bind, port, secure, http2, auth, authType, cwd, shellUser, sessionTimeout) and surfaced in the admin UI via `admin/jsonConfig.json`
 - Default port: 8099 (set `findNextPort` to fall back to the next free port instead of terminating when the port is taken)
+- `common.declareUsedResources: true`: `@iobroker/webserver` reports the port it really listens on to the used resources of js-controller 8+ and frees it on close (no own `registerUsedResource` calls needed)
+- With `secure`, the server speaks HTTP/2 with HTTP/1.1 fallback (`http2` option, only an explicit `false` disables it); WebSocket upgrades keep using HTTP/1.1
 - Supports compact mode (shared process)
 - `node-pty` is a required dependency

@@ -24,5 +24,9 @@
     "Warning!": "警告！",
     "auth_type_basic": "Basic（浏览器对话框）",
     "auth_type_digest": "Digest（登录页面）",
-    "session_timeout_help": "浏览器断开连接后终端继续运行的时间（分钟）。0 = 立即终止"
+    "http2": "使用 HTTP/2",
+    "http2_hint": "浏览器通过单个连接并行发送多个请求来加载页面。不支持 HTTP/2 的客户端会自动回退到 HTTP/1.1",
+    "session_timeout_help": "浏览器断开连接后终端继续运行的时间（分钟）。0 = 立即终止",
+    "/home/iobroker": "/home/iobroker",
+    "root": "root"
 }

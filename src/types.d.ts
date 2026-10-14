@@ -2,6 +2,8 @@ export interface XtermAdapterConfig {
     bind: string;
     port: number;
     secure: boolean;
+    /** Speak HTTP/2 with HTTP/1.1 fallback, only if `secure` (default: true) */
+    http2?: boolean;
     auth: boolean;
     authType: 'basic' | 'digest';
     cwd: string;

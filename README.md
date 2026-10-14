@@ -32,6 +32,19 @@ the terminals keep running and are restored including their content — long-run
 A terminal is terminated if it is explicitly closed, or if no browser comes back within the configured
 **session timeout** (5 minutes by default; `0` terminates the shells immediately when the browser disconnects).
 
+### HTTP/2
+With HTTPS enabled, the web server speaks HTTP/2: the browser loads the page and all its files over a single
+connection with many parallel requests. Clients that do not offer HTTP/2 fall back to HTTP/1.1 automatically,
+and the terminal connection keeps working - browsers open web sockets on a separate HTTP/1.1 connection.
+Without HTTPS the option has no effect, as browsers use HTTP/2 over TLS only.
+
+If a client has problems with it, switch the option **Use HTTP/2** (`http2`) off to stay with HTTP/1.1.
+
+### Used port
+The adapter opens one TCP port (8099 by default) for the web interface and the terminal connection.
+With js-controller 8 or newer, the port it really listens on is reported to the host and shown in the overview
+of the used resources, so another instance does not get configured to the same port.
+
 ## Keyboard shortcuts
 | Shortcut         | Action                                                                              |
 |------------------|-------------------------------------------------------------------------------------|
@@ -46,6 +59,11 @@ A terminal is terminated if it is explicitly closed, or if no browser comes back
 -->
 
 ## Changelog
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Admin 7.6.20+ is required. Compact mode no longer can exit the whole host process. The tests run on Windows and macOS too
+* (@GermanBluefox) Added HTTP/2 (with HTTP/1.1 fallback) for HTTPS, can be switched off with the option "Use HTTP/2"
+* (@GermanBluefox) The used port is reported to js-controller 8+
+
 ### 4.0.1 (2026-08-07)
 * (ioBroker-Bot) Adapter requires js-controller >= 6.0.11 now.
 * (@GermanBluefox) Dropped support of Node.js 20

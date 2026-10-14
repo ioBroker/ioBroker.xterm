@@ -78,7 +78,8 @@
         "it": "Aggiornare la libreria xterm\nPrepararsi per le future versioni js-controller",
         "es": "Actualizar la biblioteca xterm\nPrepararse para futuras versiones js-controller",
         "pl": "Biblioteka xterma\nPrepare for future js-controller version",
-        "zh-cn": "更新图书馆\n今后防污版本的编制"
+        "zh-cn": "更新图书馆\n今后防污版本的编制",
+        "uk": "Оновлено бібліотеку xterm\nПідготовка до майбутніх версій js-controller"
       }
     },
     "titleLang": {
@@ -149,17 +150,20 @@
     },
     "globalDependencies": [
       {
-        "admin": ">=7.6.17"
+        "admin": ">=7.6.20"
       }
     ],
+    "declareUsedResources": true,
     "connectionType": "local",
     "dataSource": "none",
-    "tier": 2
+    "tier": 2,
+    "nogit": true
   },
   "native": {
     "bind": "0.0.0.0",
     "port": "8099",
     "secure": false,
+    "http2": true,
     "auth": true,
     "authType": "basic",
     "cwd": "",
@@ -180,8 +184,8 @@
       "_id": "info.connection",
       "type": "state",
       "common": {
-        "role": "indicator.connected",
-        "name": "Number or connected clients",
+        "role": "info.status",
+        "name": "Connected clients",
         "type": "string",
         "read": true,
         "write": false,
